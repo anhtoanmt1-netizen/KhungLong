@@ -10,7 +10,7 @@ git remote add origin https://github.com/<tên-bạn>/pixel-dino-survivor.git &&
 Sau đó vào Settings > Pages, chọn nhánh main, thư mục root. Mở link HTTPS trên Android Chrome > Menu > Cài đặt ứng dụng.
 
 ## Cập nhật phiên bản
-Service Worker dùng chiến lược network-first nên sau khi đẩy bản mới, tải lại trang là có nội dung mới (vẫn nên tăng `C='pds-v8'` trong sw.js để dọn cache cũ).
+Service Worker dùng chiến lược network-first nên sau khi đẩy bản mới, tải lại trang là có nội dung mới (vẫn nên tăng `C='pds-v9'` trong sw.js để dọn cache cũ).
 
 ## Cân bằng game
 Số liệu nằm ở đầu index.html: CFG (cấu hình), UP (nâng cấp, giá = b × g^cấp), SL (8 loại Slime).
@@ -31,3 +31,6 @@ Menu > Cài đặt > Tùy chỉnh hình ảnh: tải ảnh Nền, Cây, Lá, N�
 Hiệu ứng riêng từng kỹ năng: Bão Lửa (loạt cầu vàng + vòng lửa), Lửa Xanh Xuyên Phá (cầu xanh dài, nổ nhỏ), Lửa Bùng Nổ (nổ lớn + sóng xung kích), Phượng Hoàng Lửa (bùng lửa vàng khi hồi sinh), Hỏa Ngục Cổ Đại (cầu đỏ to + vầng lửa quanh khủng long), Tường Lửa (5 ngọn lửa chắn trước khủng long).
 Màu lửa đổi theo cấp tiến hóa. Kích thước đạn mặc định 52px (Cài đặt > Tùy chỉnh hình ảnh > Đạn riêng). Nếu tải ảnh riêng, ảnh đó thay cầu lửa; bấm Dùng mặc định để quay lại lửa.
 Atlas tạo từ gói `fireball_assets_pack` (chuẩn hóa hướng bay sang phải, thu còn 160px). `grass.png`, `rocks.png`, `leaf.png` vẫn nằm trong assets nhưng chưa dùng.
+
+## Âm thanh phun lửa
+Tiếng bắn dùng `assets/fire_breath.mp3` (1,045s), phát từ giây 0, độ dài đoạn phát = min(độ dài file, 1,05 × khoảng cách giữa 2 phát bắn, tối thiểu 0,2s) và mờ dần ở cuối để các phát không chồng nhau. Lửa xanh xuyên phá phát nhanh 1,3x. Nếu file lỗi/chưa tải kịp, game tự dùng âm tổng hợp cũ (0,16s).
