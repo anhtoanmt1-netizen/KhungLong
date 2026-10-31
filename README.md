@@ -37,3 +37,6 @@ Tiếng bắn dùng `assets/fire_breath.mp3` (1,045s), phát từ giây 0, độ
 
 ## Giao diện v1.6
 Phong cách khung đồng + đá tối. Biểu tượng là SVG vẽ bằng mã (`IC_`), không dùng ảnh ngoài. Màn chơi có dải nút nhanh góc phải trên (âm thanh, nhạc, số sát thương, giảm chuyển động, toàn màn hình, bánh răng mở Cài đặt) và nút Nâng cấp/Tạm dừng ở dưới. Bảng nâng cấp là cây nhánh (`TR` = nút, `ED` = đường nối): bấm nút để xem chi tiết và mua. Vuông = chỉ số, thoi = kỹ năng, cờ hiệu = tiến hóa.
+
+## v1.7
+Âm lượng hiệu ứng mặc định 50% (Cài đặt có thanh trượt, nút loa ở góc là tắt/bật tiếng). Đạn lửa mặc định 28px. Bỏ yêu cầu toàn màn hình của trình duyệt: game luôn lấp đầy khung 16:9. Giao diện nâng cấp/cài đặt phong cách pixel trung cổ, biểu tượng nâng cấp là pixel art 12x12 (`PX`).
