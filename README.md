@@ -10,7 +10,7 @@ git remote add origin https://github.com/<tên-bạn>/pixel-dino-survivor.git &&
 Sau đó vào Settings > Pages, chọn nhánh main, thư mục root. Mở link HTTPS trên Android Chrome > Menu > Cài đặt ứng dụng.
 
 ## Cập nhật phiên bản
-Sửa nội dung rồi đổi số phiên bản `C='pds-v5'` trong sw.js (ví dụ thành `pds-v6`) để xóa cache cũ.
+Service Worker dùng chiến lược network-first nên sau khi đẩy bản mới, tải lại trang là có nội dung mới (vẫn nên tăng `C='pds-v6'` trong sw.js để dọn cache cũ).
 
 ## Cân bằng game
 Số liệu nằm ở đầu index.html: CFG (cấu hình), UP (nâng cấp, giá = b × g^cấp), SL (8 loại Slime).
@@ -21,7 +21,7 @@ Thư mục `assets/`: background.jpg (nền), tree.png (cây), grass2.jpg (ô n�
 Font Montserrat tải từ Google Fonts ở lần mở đầu tiên có mạng, sau đó Service Worker lưu lại để dùng offline.
 
 ## Rương kho báu
-Cấu hình trong `CFG` (chestP = 30%/đợt trong chestW = 20 đợt đầu, sau đó giảm chestDec mỗi đợt, tối thiểu chestMin) và bảng thưởng `CHR` (100, 200, 500, 1000, 2000, 5000, x2 vàng hiện có). Khủng long tự đá rương khi rương chạy tới.
+Cấu hình trong `CFG` (chestP = 30%/đợt trong chestW = 20 đợt đầu, sau đó giảm chestDec mỗi đợt, tối thiểu chestMin) và bảng thưởng `CHR` (100, 200, 500, 1000, 2000, 5000, x2 vàng hiện có). Người chơi phải chạm vào rương để nhận thưởng; rương chạy tới khủng long mà chưa chạm sẽ bị bỏ lỡ.
 
 ## Tùy chỉnh hình ảnh
 Menu > Cài đặt > Tùy chỉnh hình ảnh: tải ảnh Nền, Cây, Lá, Nền cỏ; cắt và thu phóng; mỗi loại lưu tối đa 3 ảnh gần nhất (IndexedDB, phải xóa bớt mới thêm được); nhập px để đổi kích thước cây, lá, ô cỏ.
