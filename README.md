@@ -40,3 +40,6 @@ Phong cách khung đồng + đá tối. Biểu tượng là SVG vẽ bằng mã 
 
 ## v1.7
 Âm lượng hiệu ứng mặc định 50% (Cài đặt có thanh trượt, nút loa ở góc là tắt/bật tiếng). Đạn lửa mặc định 28px. Bỏ yêu cầu toàn màn hình của trình duyệt: game luôn lấp đầy khung 16:9. Giao diện nâng cấp/cài đặt phong cách pixel trung cổ, biểu tượng nâng cấp là pixel art 12x12 (`PX`).
+
+## v1.8
+Bảng nâng cấp cố định kích thước (mô tả dài thì cuộn trong bảng). Màn hình **Đổi nhạc nền**: tải nhạc lên, lưu tối đa 3 bản (IndexedDB), xóa bớt mới tải thêm được. Nhạc mặc định: đặt file `assets/bgm.mp3` (nếu chưa có sẽ dùng nhạc tổng hợp).
