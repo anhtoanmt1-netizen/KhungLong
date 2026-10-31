@@ -1,0 +1,72 @@
+/* ===== Thẻ nâng cấp =====
+   Mọi kích thước tính theo em của #w. Khung thẻ 400×553 (tỉ lệ cố định) nên
+   vị trí các lớp bên trong tính theo % của thẻ:
+   vòng tròn ảnh · dải tên · tấm giấy mô tả. */
+.up-panel { width: 72.5em }
+.tabs { display: flex; gap: .5em; justify-content: center; margin-bottom: .9em; flex-wrap: wrap }
+.tab { position: relative; padding: .55em 1.1em; font: 800 .8em/1 Montserrat, sans-serif; letter-spacing: .06em; color: #c9b88a; background: linear-gradient(#232b45, #131a2e); border: .17em solid #3a4466; border-radius: .7em; cursor: pointer; transition: transform .12s, filter .15s; -webkit-tap-highlight-color: transparent }
+.tab:hover { filter: brightness(1.15) }
+.tab:active { transform: translateY(.1em) }
+.tab:focus-visible { outline: .18em solid #ffd23a; outline-offset: .1em }
+.tab.on { color: #5a2a05; background: linear-gradient(#fff08a, #f0a034); border-color: #7a4a14; box-shadow: 0 0 .9em #ffb03066 }
+.tab .dot { position: absolute; right: -.35em; top: -.35em; width: .85em; height: .85em; border-radius: 50%; background: #59e04a; border: .14em solid #0b1020; box-shadow: 0 0 .5em #59e04a }
+
+.cards { display: flex; justify-content: center; gap: 1em; padding-top: 1.1em; min-height: 24.2em }
+.card { position: relative; flex: none; width: 16.4em; aspect-ratio: 400 / 553; padding: 0; border: 0; background: none; cursor: pointer; font: inherit; color: #3b2410; text-align: center; transition: transform .2s ease, filter .2s ease; -webkit-tap-highlight-color: transparent }
+.card > * { position: absolute; pointer-events: none }
+.card:focus-visible { outline: none; transform: translateY(-.4em) scale(1.02) }
+.card:focus-visible .c-frame { filter: drop-shadow(0 0 .5em #ffd23a) }
+@media (hover: hover) { .card:hover { transform: translateY(-.5em) scale(1.03); filter: brightness(1.06) } }
+.card:active { transform: translateY(-.15em) scale(.985) }
+
+.c-art { left: 17.5%; top: 10.4%; width: 60.6%; height: 43.8%; border-radius: 50%; background: center / cover no-repeat; box-shadow: inset 0 0 1.2em #000a }
+.c-frame { left: 0; top: 0; width: 100%; height: 100%; user-select: none; -webkit-user-drag: none }
+
+/* Nhãn cấp (trái) và giá (phải) — theo ảnh minh_họa.png */
+.c-lv, .c-price { top: -2.2%; height: 8.4%; display: flex; align-items: center; box-sizing: border-box; font-weight: 900; white-space: nowrap }
+.c-lv { left: 1.5%; padding: 0 1.1em 0 .9em; font-size: .95em; color: #ffeab0; background: linear-gradient(#f04545, #b01818 70%, #8a1010); border: .14em solid #f2c260; border-radius: .6em .35em .35em .6em; text-shadow: 0 .08em 0 #5a0808, 0 0 .2em #000; box-shadow: 0 .15em .3em #0008, inset 0 .1em 0 #fff4 }
+.c-lv b { margin-left: .08em; font-weight: 900 }
+.c-price { right: 1.5%; gap: .3em; padding: 0 .9em 0 .35em; font-size: .92em; color: #fff; background: linear-gradient(#1a2644, #0b1124); border: .14em solid #d9a640; border-radius: 2em; text-shadow: 0 .08em 0 #000; box-shadow: 0 .15em .3em #0008, inset 0 0 .5em #000 }
+.c-price img { position: static; width: 1.7em; height: 1.7em; flex: none }
+.c-price .mx { color: #ffe08a; letter-spacing: .06em }
+.c-price:has(.mx) { padding-left: .9em }
+
+.c-name { left: 19.9%; right: 23.3%; top: 49%; height: 8.6%; display: flex; align-items: center; justify-content: center; font: 900 .92em/1 Montserrat, sans-serif; color: #3a1f08; text-shadow: 0 .06em 0 #fff8; white-space: nowrap }
+.c-name.long { font-size: .78em }
+.c-desc { left: 18.3%; right: 22.7%; top: 68.5%; bottom: 7.5%; display: flex; flex-direction: column; justify-content: center; gap: .3em; font: 700 .82em/1.2 Montserrat, sans-serif; color: #3b2410 }
+.c-desc em { font-style: italic; font-weight: 800; color: #1f4fc4 }
+.c-desc em.warn { color: #c0261a }
+
+/* Trạng thái */
+.st-poor { filter: saturate(.85) brightness(.93) }
+.st-poor .c-price b { color: #ff9a8a }
+.st-ok .c-frame { animation: ready 2.4s ease-in-out infinite }
+.st-max .c-frame { filter: drop-shadow(0 0 .45em #ffd23a88) }
+.st-max .c-price { background: linear-gradient(#5a3a10, #2a1604) }
+.st-lock { filter: grayscale(.85) brightness(.7) }
+.c-lock { left: 33%; top: 18%; width: 30%; aspect-ratio: 1; filter: drop-shadow(0 .2em .3em #000a) }
+.c-lock img { display: block; width: 100%; height: 100% }
+@keyframes ready { 0%, 100% { filter: drop-shadow(0 0 .12em #ffd23a44) } 50% { filter: drop-shadow(0 0 .6em #ffd23acc) } }
+@media (hover: hover) { .st-poor:hover, .st-lock:hover { filter: saturate(.9) brightness(1) } }
+
+/* Hiệu ứng chọn nhẹ nhàng khi nâng cấp / khi không đủ điều kiện */
+.c-fx { left: 5%; top: 3%; width: 90%; height: 94%; overflow: hidden; border-radius: 2em }
+.c-fx b, .c-fx s { position: absolute; opacity: 0 }
+.c-fx b { inset: 0; background: radial-gradient(circle at 50% 38%, #fffbe0cc, #ffd23a55 40%, #0000 70%) }
+.c-fx s { top: -10%; left: -50%; width: 35%; height: 120%; background: linear-gradient(100deg, #0000, #fff9, #0000); transform: skewX(-14deg) }
+.fx-buy { animation: buyPop .55s ease-out }
+.fx-buy .c-fx b { animation: flash .6s ease-out }
+.fx-buy .c-fx s { animation: shine .7s ease-out }
+.fx-buy .c-lv { animation: lvPop .5s ease-out .05s }
+.fx-no { animation: shake .34s ease-in-out }
+.fx-no .c-price { animation: warnBlink .5s ease-in-out }
+@keyframes buyPop { 0% { transform: scale(.97) } 40% { transform: translateY(-.5em) scale(1.06) } 100% { transform: scale(1) } }
+@keyframes flash { 0% { opacity: .9 } 100% { opacity: 0 } }
+@keyframes shine { 0% { opacity: 1; left: -50% } 100% { opacity: 0; left: 130% } }
+@keyframes lvPop { 0% { transform: scale(1) } 40% { transform: scale(1.22) } 100% { transform: scale(1) } }
+@keyframes shake { 0%, 100% { transform: translateX(0) } 25% { transform: translateX(-.35em) } 75% { transform: translateX(.35em) } }
+@keyframes warnBlink { 50% { background: linear-gradient(#6a1414, #2a0606); border-color: #ff6a5a } }
+
+.up-panel .hint { max-width: none; margin: .8em 0 0; min-height: 1.4em; text-align: center; font: 700 .8em Montserrat, sans-serif; color: #b8c4e8; transition: color .2s }
+.up-panel .hint.warn { color: #ff9a8a }
+@media (prefers-reduced-motion: reduce) { .st-ok .c-frame { animation: none } .fx-buy, .fx-no, .fx-buy .c-lv { animation: none } }
