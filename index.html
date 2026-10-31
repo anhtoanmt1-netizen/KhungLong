@@ -27,21 +27,51 @@ body{display:flex;flex-direction:column;align-items:center;justify-content:cente
 #up{justify-content:flex-start}#cards{display:grid;grid-template-columns:repeat(4,1fr);gap:.5em;width:100%}
 .cd{background:#1d3a22;border:.15em solid #8ee06a;border-radius:.3em;padding:.4em;display:flex;flex-direction:column;gap:.25em;font-size:.9em}.cd small{font-size:.9em}
 #rot{display:none;padding:1em;text-align:center}@media(orientation:portrait){#rot{display:block}}
-#over{background:rgba(8,20,10,.5);justify-content:flex-start;padding-top:2%}</style></head><body>
+#over{background:rgba(8,20,10,.5);justify-content:flex-start;padding-top:2%}
+.sc{background:rgba(6,8,14,.9)}.sc h1{color:#e8c06a}#up,#set{justify-content:center}
+.b{background:linear-gradient(#454d66,#272d3f);color:#f3e6c4;border:.14em solid #9a7238;border-radius:.35em;box-shadow:inset 0 .08em #fff3,0 .18em #0009;text-shadow:0 .08em #000a}
+.b:active{box-shadow:0 .04em #0009}.b.s,.b.a,.b.r{box-shadow:inset 0 .08em #fff5,0 .18em #0009;text-shadow:none}
+.b.s{background:linear-gradient(#e6b650,#a8741f);color:#2a1604;border-color:#5a3a10}.b.a{background:linear-gradient(#fff3c8,#d9b86a);color:#2a1604;border-color:#5a3a10}.b.r{background:linear-gradient(#b84a3a,#6e1f18);color:#ffe6df;border-color:#3a0e0a}
+.b:disabled{background:#2f323b;color:#80838c;border-color:#4a473f;box-shadow:0 .18em #0007;text-shadow:none}
+.b i{display:inline-block;width:1.15em;height:1.15em;vertical-align:-.22em}i svg{width:100%;height:100%;display:block}
+.cd{background:linear-gradient(#232838,#12151f);border-color:#8a6a38}.cd input[type=number],.pv{border-color:#8a6a38}
+.fr{position:relative;background:radial-gradient(ellipse at 50% 30%,#232838,#0b0d15 80%);border-radius:.3em;padding:.9em 1.1em 1.1em;max-width:100%;box-shadow:0 0 0 .12em #000,0 0 0 .4em #a8742c,0 0 0 .52em #3d240c,0 1em 2em #000c,inset 0 0 2.5em #000c}
+.hd{display:flex;align-items:center;justify-content:space-between;gap:1em;margin:-.9em -1.1em .9em;padding:.4em .8em;background:linear-gradient(#c88a3a,#7a4c18 55%,#a8742c);border-bottom:.14em solid #2a1604;color:#2a1604;font-weight:800;letter-spacing:.12em;text-shadow:0 .06em #ffe0a0aa}
+.gl{background:#0b0d15;color:#ffd23a;padding:.2em .9em;border-radius:.3em;box-shadow:inset 0 0 .5em #000,0 0 0 .1em #5a3a12;text-shadow:none;letter-spacing:0}
+.ib{position:relative;width:2.5em;height:2.5em;padding:.45em;border-radius:.35em;border:.14em solid #9a7238;background:linear-gradient(#454d66,#272d3f);color:#f3e6c4;cursor:pointer;box-shadow:inset 0 .08em #fff3,0 .15em #0009}.ib i{display:block;width:100%;height:100%}.ib:active{transform:translateY(.12em)}
+.ib.q.on{color:#ffd23a;border-color:#e0b050}.ib.q:not(.on){color:#7d8290}.ib.sl:not(.on)::after{content:"";position:absolute;left:16%;right:16%;top:calc(50% - .08em);height:.16em;background:#ff7a5a;transform:rotate(-45deg)}
+#qt{position:absolute;right:.7em;top:.6em;display:flex;gap:.35em}#qt .ib{width:2.3em;height:2.3em}#bb .ib{width:2.8em;height:2.8em}
+.tb{display:flex;gap:1.3em;align-items:stretch;text-align:left}#tree{position:relative;flex:none;width:41.6em;height:14.6em}#tree svg{position:absolute;inset:0;width:100%;height:100%}
+.ln{fill:none;stroke:#2a2f3d;stroke-width:.5;stroke-linecap:round}.ln.on{stroke:#d9a24a}
+.nd{position:absolute;width:3.8em;height:3.8em;padding:.7em;border-radius:.5em;border:.16em solid #5d6270;background:linear-gradient(#262a38,#0d0f17);color:var(--c);box-shadow:inset 0 0 .6em #000,0 .12em .3em #000;cursor:pointer}
+.nd svg{width:100%;height:100%;display:block;filter:drop-shadow(0 0 .25em var(--c))}
+.nd.dm{width:3em;height:3em;padding:.55em;transform:rotate(45deg);border-radius:.3em}.nd.dm svg,.nd.dm .bd{transform:rotate(-45deg)}
+.nd.ev{border:0;clip-path:polygon(0 0,100% 0,100% 80%,50% 100%,0 80%);background:linear-gradient(#3a2a5a,#150d28)}.nd.ev .bd{right:.2em;bottom:.9em}
+.nd:not(.on):not(.ok) svg{opacity:.5}.nd.lk{opacity:.4;filter:grayscale(1)}.nd.on{border-color:#c8963e}.nd.mx{border-color:#ffd23a;box-shadow:inset 0 0 .6em #000,0 0 .8em #ffd23a88}
+.nd.ok{border-color:#ffe27a;animation:pl 1.4s infinite}@keyframes pl{50%{box-shadow:inset 0 0 .6em #000,0 0 1em #ffe27acc}}.nd.sel{outline:.18em solid #fff;outline-offset:.2em}
+.bd{position:absolute;right:-.5em;bottom:-.5em;min-width:1.5em;padding:0 .25em;background:#0b0d15;border:.1em solid #8a6a38;border-radius:.4em;font-size:.7em;color:#f3e6c4;line-height:1.6;text-align:center}.bd:empty{display:none}
+#det{flex:1;min-width:0;background:#0b0d15cc;border:.14em solid #5a3a12;border-radius:.4em;padding:.8em;display:flex;flex-direction:column;gap:.5em;box-shadow:inset 0 0 1.5em #000}
+.dh{display:flex;gap:.7em;align-items:center}.dh svg{width:2.8em;height:2.8em;flex:none}.dh b{display:block;font-size:1.1em;color:#ffd78a}.dh small{opacity:.8}#det p{margin:0;font-size:.95em;line-height:1.35;flex:1}
+#sets{display:grid;grid-template-columns:1fr 1fr;gap:.55em;width:44em;max-width:100%}
+.tg{display:flex;align-items:center;gap:.7em;padding:.5em .8em;min-height:3em;font:inherit;font-weight:700;color:#f3e6c4;background:linear-gradient(#2d3345,#171b27);border:.14em solid #5d6270;border-radius:.4em;cursor:pointer;text-align:left}
+.tg svg{width:1.8em;height:1.8em;flex:none;color:#8a8f9c}.tg span{flex:1}.tg em{font-style:normal;font-size:.85em;padding:.1em .6em;border-radius:.3em;background:#000a;color:#8a8f9c}
+.tg.on{border-color:#c8963e}.tg.on svg{color:#ffd23a}.tg.on em{color:#10260f;background:#8ee06a}
+</style></head><body>
 <div id="w"><canvas id="c" width="1280" height="720"></canvas>
 <div id="bn" class="h"></div>
-<div id="bb"><button class="b s" data-a="hudup">⬆ Nâng cấp</button><div class="row" style="flex-wrap:nowrap"><button class="b p a" data-a="spd" data-k="1" aria-label="Tốc độ x1">x1</button><button class="b p" data-a="spd" data-k="2" aria-label="Tốc độ x2">x2</button><button class="b p" data-a="spd" data-k="3" aria-label="Tốc độ x3">x3</button><button class="b p" data-a="spd" data-k="5" aria-label="Tốc độ x5">x5</button></div><button class="b" data-a="pause" aria-label="Tạm dừng">⏸ Tạm dừng</button></div>
-<div class="sc on" id="menu"><h1>PIXEL DINO<br>SURVIVOR</h1><p>Khủng long sinh tồn · Vàng: <b id="mg"></b></p><p id="warn"></p><p style="font-size:.75em;opacity:.7;margin:0">Phiên bản 1.5</p>
-<button class="b" id="bp" data-a="play">▶ CHƠI</button><button class="b a" id="bf" data-a="play1" style="display:none">↺ Từ đầu (đợt 1)</button><button class="b s" data-a="up">⬆ NÂNG CẤP</button><button class="b r" data-a="newg">NEW GAME – TRÒ CHƠI MỚI</button>
-<div class="row"><button class="b" data-a="set">⚙ Cài đặt</button><button class="b" data-a="how">? Hướng dẫn</button><button class="b" data-a="about">ℹ Giới thiệu</button></div></div>
+<div id="qt"><button class="ib q sl" data-a="tog" data-k="snd" data-q aria-label="Âm thanh"><i data-ic="sound"></i></button><button class="ib q sl" data-a="tog" data-k="mus" data-q aria-label="Nhạc nền"><i data-ic="music"></i></button><button class="ib q sl" data-a="tog" data-k="dn" data-q aria-label="Số sát thương"><i data-ic="dmg"></i></button><button class="ib q" data-a="tog" data-k="rm" data-q aria-label="Giảm chuyển động"><i data-ic="wave"></i></button><button class="ib q" data-a="tog" data-k="fs" data-q aria-label="Toàn màn hình"><i data-ic="full"></i></button><button class="ib" data-a="hudset" aria-label="Cài đặt"><i data-ic="gear"></i></button></div>
+<div id="bb"><button class="b s" data-a="hudup"><i data-ic="tree"></i> Nâng cấp</button><div class="row" style="flex-wrap:nowrap"><button class="b p a" data-a="spd" data-k="1" aria-label="Tốc độ x1">x1</button><button class="b p" data-a="spd" data-k="2" aria-label="Tốc độ x2">x2</button><button class="b p" data-a="spd" data-k="3" aria-label="Tốc độ x3">x3</button><button class="b p" data-a="spd" data-k="5" aria-label="Tốc độ x5">x5</button></div><button class="ib" data-a="pause" aria-label="Tạm dừng"><i data-ic="pause"></i></button></div>
+<div class="sc on" id="menu"><h1>PIXEL DINO<br>SURVIVOR</h1><p>Khủng long sinh tồn · Vàng: <b id="mg"></b></p><p id="warn"></p><p style="font-size:.75em;opacity:.7;margin:0">Phiên bản 1.6</p>
+<button class="b" id="bp" data-a="play">▶ CHƠI</button><button class="b a" id="bf" data-a="play1" style="display:none">↺ Từ đầu (đợt 1)</button><button class="b s" data-a="up"><i data-ic="tree"></i> NÂNG CẤP</button><button class="b r" data-a="newg">NEW GAME – TRÒ CHƠI MỚI</button>
+<div class="row"><button class="b" data-a="set"><i data-ic="gear"></i> Cài đặt</button><button class="b" data-a="how">? Hướng dẫn</button><button class="b" data-a="about">ℹ Giới thiệu</button></div></div>
 <div class="sc" id="how"><h2>Cách chơi</h2><p>Khủng long tự động phun cầu lửa vào Slime.</p><p>Slime đi từ phải sang trái, chạm vào bạn sẽ mất HP.</p><p>Slime chết rơi vàng. Dùng vàng để nâng cấp.</p><p>Thỉnh thoảng có rương kho báu chạy tới: hãy CHẠM vào rương để mở và nhận vàng; không chạm thì rương sẽ bị bỏ lỡ.</p><p>Có cả quái bay (Dơi, Ong, Ma, Chim Lửa, Rồng Con) và nhiều loại quái mới.</p><p>HP về 0 thì hết lượt; lượt sau quay lại 3 đợt trước đó, vẫn giữ vàng và nâng cấp.</p><p>NEW GAME sẽ xóa toàn bộ tiến trình.</p><button class="b" data-a="menu">Quay lại</button></div>
-<div class="sc" id="about"><h2>Giới thiệu</h2><p>Pixel Dino Survivor v1.5. Khủng long, nền, cây, cỏ, đạn lửa và rương dùng hình ảnh do người dùng cung cấp. Slime và hiệu ứng được vẽ bằng mã.</p><button class="b" data-a="menu">Quay lại</button></div>
-<div class="sc" id="set"><h2>Cài đặt</h2><div id="sets" class="row" style="flex-direction:column"></div><button class="b" data-a="menu">Quay lại</button></div>
-<div class="sc" id="up"><div class="row"><h2>Nâng cấp</h2><b>🪙 <span id="upg"></span> vàng</b></div><div id="cards"></div><button class="b" data-a="closeup">Đóng</button></div>
+<div class="sc" id="about"><h2>Giới thiệu</h2><p>Pixel Dino Survivor v1.6. Khủng long, nền, cây, cỏ, đạn lửa và rương dùng hình ảnh do người dùng cung cấp. Slime và hiệu ứng được vẽ bằng mã.</p><button class="b" data-a="menu">Quay lại</button></div>
+<div class="sc" id="set"><div class="fr"><div class="hd"><b>CÀI ĐẶT</b><button class="ib" data-a="setclose" aria-label="Đóng"><i data-ic="close"></i></button></div><div id="sets"></div></div></div>
+<div class="sc" id="up"><div class="fr"><div class="hd"><b>CÂY NÂNG CẤP</b><span class="gl">🪙 <span id="upg"></span></span><button class="ib" data-a="closeup" aria-label="Đóng"><i data-ic="close"></i></button></div><div class="tb"><div id="tree"></div><div id="det"></div></div></div></div>
 <div class="sc" id="pause"><h2>Tạm dừng</h2><button class="b" data-a="resume">▶ Tiếp tục</button><button class="b s" data-a="up">⬆ Nâng cấp</button><button class="b" data-a="menu">Về menu</button></div>
 <div class="sc" id="over"><h2>GAME OVER</h2><div id="ovt"></div><div class="row"><button class="b" id="bo" data-a="play">↻ Chơi lại</button><button class="b a" id="bf2" data-a="play1" style="display:none">↺ Từ đầu</button><button class="b s" data-a="up">⬆ Nâng cấp</button><button class="b" data-a="menu">Menu</button></div></div>
 <div class="sc" id="conf"><h2>Trò chơi mới?</h2><p>Bạn có chắc chắn muốn bắt đầu trò chơi mới? Toàn bộ vàng, nâng cấp và tiến trình hiện tại sẽ bị xóa.</p><div class="row"><button class="b" data-a="menu">Hủy</button><button class="b r" data-a="donew">Xác nhận trò chơi mới</button></div></div>
-<div class="sc" id="cust"><h2>🖼 Tùy chỉnh hình ảnh</h2><div id="cg"></div><p id="cm" style="min-height:1.3em;font-size:.9em"></p><button class="b" data-a="set">Quay lại</button></div>
+<div class="sc" id="cust"><h2>🖼 Tùy chỉnh hình ảnh</h2><div id="cg"></div><p id="cm" style="min-height:1.3em;font-size:.9em"></p><button class="b" data-a="setback">Quay lại</button></div>
 <div class="sc" id="crop"><h2 id="crt">Cắt ảnh</h2><canvas id="cc"></canvas><div class="row" style="align-items:center;flex-wrap:nowrap"><button class="b p" data-a="zm" data-k="-" aria-label="Thu nhỏ">－</button><input type="range" id="zr" min="0" max="100" value="0" aria-label="Thu phóng"><button class="b p" data-a="zm" data-k="+" aria-label="Phóng to">＋</button></div><p id="crh" style="font-size:.85em"></p><div class="row"><button class="b" data-a="cancrop">Hủy</button><button class="b s" data-a="savecrop">✔ Cắt &amp; dùng ảnh</button></div></div>
 <input type="file" id="fi" accept="image/*" hidden>
 </div>
@@ -144,26 +174,54 @@ const sfx=(n,a)=>AU.s(n,a);function snd(f,d=.08,ty='square',v=.04){AU.t(f,d,ty,v
 addEventListener('pointerdown',()=>{if(S.set.snd)AU.init()},{passive:true});addEventListener('keydown',()=>{if(S.set.snd)AU.init()});
 document.addEventListener('click',e=>{if(e.target.closest&&e.target.closest('button'))sfx('ui')});
 document.addEventListener('visibilitychange',()=>{if(AC)document.hidden?AC.suspend():(S.set.snd&&AC.resume())});
+const SW='fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"',
+IC_={heart:`<path d="M12 21s-8-5.2-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 5.8-8 11-8 11z"/>`,flame:`<path d="M12 2c1 4 6 6 6 12a6 6 0 0 1-12 0c0-3 2-4 3-6 1 2 2 2 3 0 0-2-1-4 0-6z"/>`,bolt:`<path d="M13 2 5 14h6l-1 8 9-13h-6z"/>`,
+multi:`<path d="M12 2l3.5 8h-7zM5.5 12l3.5 8H2zM18.5 12l3.5 8h-7z"/>`,regen:`<path d="M10 3h4v7h7v4h-7v7h-4v-7H3v-4h7z"/>`,drop:`<path d="M12 2s7 7 7 12a7 7 0 0 1-14 0c0-5 7-12 7-12z"/>`,
+coin:`<path fill-rule="evenodd" d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 3a7 7 0 1 1 0 14 7 7 0 0 1 0-14zm0 3.5l3 3.5-3 3.5-3-3.5z"/>`,shield:`<path d="M12 2l8 3v6c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5z"/>`,
+crown:`<path d="M3 19 2 7l6 5 4-8 4 8 6-5-1 12z"/>`,pierce:`<path d="M2 10h12V6l8 6-8 6v-4H2z"/>`,boom:`<path d="M12 1l2.6 6.4L21 5l-3 6.6 5 2.4-6.6 1.6L17 22l-5-3.8L7 22l1.6-6.4L2 14l5-2.4L4 5l6.4 2.4z"/>`,
+storm:`<path d="M3 4h18v3H3zm2 6h14v3H5zm3 6h8v3H8z"/>`,ankh:`<path fill-rule="evenodd" d="M12 2a4.5 4.5 0 0 1 0 9 4.5 4.5 0 0 1 0-9zm0 2.4a2.1 2.1 0 1 0 0 4.2 2.1 2.1 0 0 0 0-4.2zM10.8 11h2.4v3H19v2.4h-5.8V22h-2.4v-5.6H5V14h5.8z"/>`,
+ancient:`<circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2" ${SW}/>`,wall:`<path d="M2 4h9v5H2zm11 0h9v5h-9zM2 11h5v5H2zm7 0h6v5H9zm8 0h5v5h-5zM2 18h9v3H2zm11 0h9v3h-9z"/>`,
+tree:`<circle cx="12" cy="5" r="2.6"/><circle cx="5" cy="19" r="2.6"/><circle cx="19" cy="19" r="2.6"/><path d="M12 7.6v4.4M12 12 5 16.4M12 12l7 4.4" ${SW}/>`,
+gear:`<circle cx="12" cy="12" r="8.2" fill="none" stroke="currentColor" stroke-width="3.2" stroke-dasharray="3.22 3.22"/><circle cx="12" cy="12" r="6.4"/><circle cx="12" cy="12" r="2.6" fill="#0b0d15"/>`,
+pause:`<path d="M6 4h4v16H6zm8 0h4v16h-4z"/>`,sound:`<path d="M3 9h4l5-4v14l-5-4H3z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13" ${SW}/>`,music:`<path d="M9 3h10v3h-8v10.5a3.5 3.5 0 1 1-2-3.2z"/>`,
+dmg:`<text x="12" y="17" font-size="13" font-weight="900" text-anchor="middle" font-family="sans-serif">-9</text>`,wave:`<path d="M2 9c3-4 5 4 8 0s5 4 8 0M2 15c3-4 5 4 8 0s5 4 8 0" ${SW}/>`,
+full:`<path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5" ${SW}/>`,image:`<rect x="3" y="4" width="18" height="16" rx="2" ${SW}/><path d="M5 17l5-6 4 4 2-2 3 4" ${SW}/>`,close:`<path d="M5 5l14 14M19 5 5 19" ${SW}/>`};
+const ico=(n,c)=>`<svg viewBox="0 0 24 24" fill="currentColor"${c?' style="color:'+c+'"':''}>${IC_[n]||''}</svg>`,hyd=()=>document.querySelectorAll('[data-ic]').forEach(e=>e.innerHTML=ico(e.dataset.ic));
+/* ===== Cây nâng cấp: [khóa, cột, hàng, loại(e/u/k), màu, biểu tượng] ===== */
+const TR=[['evo',0,1,'e','#c06aff','crown'],['dmg',1,0,'u','#ff8a3a','flame'],['rate',2,0,'u','#ff8a3a','bolt'],['multi',3,0,'u','#ff8a3a','multi'],['pierce',4,0,'k','#ff8a3a','pierce'],['boom',5,0,'k','#ff8a3a','boom'],['storm',6,0,'k','#ff8a3a','storm'],['ancient',7,0,'k','#ff8a3a','ancient'],
+['hp',1,1,'u','#5ab0ff','heart'],['regen',2,1,'u','#5ab0ff','regen'],['def',3,1,'u','#5ab0ff','shield'],['revive',4,1,'k','#5ab0ff','ankh'],['wall',5,1,'k','#5ab0ff','wall'],['gold',1,2,'u','#ffd23a','coin'],['steal',2,2,'u','#ffd23a','drop']],
+ED=[['evo','dmg'],['evo','hp'],['evo','gold'],['dmg','rate'],['rate','multi'],['multi','pierce'],['pierce','boom'],['boom','storm'],['storm','ancient'],['hp','regen'],['regen','def'],['def','revive'],['revive','wall'],['gold','steal']];
+let selU='dmg',sFrom='';
+const nm=k=>k==='evo'?'Tiến hóa: '+EVO[S.evo][0]:SK[k]?SK[k].n:UP[k].n,
+nst=k=>{if(k==='evo'){const n=EVO[S.evo+1];return{on:S.evo>0,mx:!n,lk:0,ok:!!n&&S.gold>=n[1]&&S.st.kills>=n[2],bd:S.evo}}
+ if(SK[k]){const o=SK[k],own=!!S.sk[k],lk=S.evo<o.e;return{on:own,mx:own,lk,ok:!own&&!lk&&S.gold>=o.c,bd:own?'✓':''}}
+ const l=S.lv[k],m=UP[k].m;return{on:l>0,mx:l>=m,lk:0,ok:l<m&&S.gold>=cost(k,l),bd:l}};
 function show(id){scr=id;document.querySelectorAll('.sc').forEach(e=>e.classList.toggle('on',e.id===id))}
 const fmt=t=>Math.floor(t/60)+':'+String(Math.floor(t%60)).padStart(2,'0'),fmtN=n=>n>=1e6?(n/1e6).toFixed(1).replace('.0','')+'M':n>=1e5?Math.round(n/1e3)+'K':String(n);
 function startRun(){const s=sv();R={t:(S.rw-1)*20,hp:s.maxHp,kills:0,gold:0,dmgT:0,tier:0,mon:[],lv:[],fx:[],tx:[],cd:.3,sp:1.2,inv:0,al:1,dT:0,pz:0,wave:S.rw,bn:2,hitT:0,atk:0,king:100+45*Math.max(0,Math.ceil(((S.rw-1)*20-100)/45)),dust:0,ov:0,cs:8,ca:10,cw:12,cr:0,buf:0,sh:0};R.ch=[];R.cq=[];R.ex=[];R.kick=0;R.th=R.dr=R.ph=R.hp;R.tl=0;chestRoll();show(null)}
 function buy(k){const u=UP[k],l=S.lv[k];if(l>=u.m)return;const c=cost(k,l);if(S.gold<c)return;const o=sv().maxHp;S.gold-=c;S.lv[k]++;if(k==='hp'&&R&&R.al)R.hp+=sv().maxHp-o;save();sfx('buy');renderUp()}
-function renderUp(){$('upg').textContent=S.gold;$('cards').innerHTML=Object.keys(UP).map(k=>{const u=UP[k],l=S.lv[k],mx=l>=u.m,c=cost(k,l),ok=S.gold>=c;return`<div class="cd"><b>${u.i} ${u.n}</b><small>Cấp ${l}/${u.m}</small><small>${u.f(l)}${u.u} → ${mx?'—':u.f(l+1)+u.u}</small><button class="b" data-a="buy" data-k="${k}" ${mx||!ok?'disabled':''}>${mx?'TỐI ĐA':ok?'Mua '+c+' vàng':'Thiếu '+(c-S.gold)+' vàng'}</button></div>`}).join('')+extra()}
+function renderUp(){$('upg').textContent=fmtN(S.gold);const P=5.4,pos=k=>{const t=TR.find(q=>q[0]===k);return[t[1]*P+1.9,t[2]*P+1.9]};
+ $('tree').innerHTML='<svg viewBox="0 0 41.6 14.6" preserveAspectRatio="none">'+ED.map(([a,b])=>{const A=pos(a),B=pos(b);return`<path d="M${A[0]} ${A[1]}V${B[1]}H${B[0]}" class="ln${nst(b).on?' on':''}"/>`}).join('')+'</svg>'+TR.map(([k,c,r,ty,col,ic])=>{const s=nst(k),o=ty==='k'?.4:0,cl=(s.on?' on':'')+(s.mx?' mx':'')+(s.lk?' lk':'')+(s.ok?' ok':'')+(k===selU?' sel':'');return`<button class="nd ${ty==='k'?'dm':ty==='e'?'ev':''}${cl}" style="left:${c*P+o}em;top:${r*P+o}em;--c:${col}" data-a="sel" data-k="${k}" aria-label="${nm(k)}">${ico(ic)}<b class="bd">${s.bd}</b></button>`}).join('');
+ const k=selU,s=nst(k),t=TR.find(q=>q[0]===k);let sub,dsc,lab,da;
+ if(k==='evo'){const n=EVO[S.evo+1];sub='Bậc '+S.evo+'/5';dsc='Mỗi bậc: +10% sát thương, +20 HP, lửa đổi màu.'+(n?' Bậc tiếp: '+n[0]+' · cần '+n[2]+' quái hạ (đã hạ '+S.st.kills+').':' Đã tiến hóa tối đa.');lab=!n?'TỐI ĐA':s.ok?'Tiến hóa '+n[1]+' vàng':S.st.kills<n[2]?'Chưa đủ quái hạ':'Thiếu '+(n[1]-S.gold)+' vàng';da='evo'}
+ else if(SK[k]){const o=SK[k];sub=s.mx?'Đã mở':'Kỹ năng';dsc=o.d;lab=s.mx?'ĐÃ MỞ':s.lk?'Cần tiến hóa: '+EVO[o.e][0]:s.ok?'Mở '+o.c+' vàng':'Thiếu '+(o.c-S.gold)+' vàng';da='skill'}
+ else{const u=UP[k],l=S.lv[k],c=cost(k,l);sub='Cấp '+l+'/'+u.m;dsc=u.f(l)+u.u+' → '+(s.mx?'—':u.f(l+1)+u.u);lab=s.mx?'TỐI ĐA':s.ok?'Mua '+c+' vàng':'Thiếu '+(c-S.gold)+' vàng';da='buy'}
+ $('det').innerHTML=`<div class="dh">${ico(t[5],t[4])}<div><b>${nm(k)}</b><small>${sub}</small></div></div><p>${dsc}</p><button class="b s" data-a="${da}" data-k="${k}" ${s.ok?'':'disabled'}>${lab}</button>`}
 function extra(){const e=S.evo,n=EVO[e+1],ok=n&&S.gold>=n[1]&&S.st.kills>=n[2];let h=`<div class="cd"><b>🦕 Tiến hóa: ${EVO[e][0]}</b><small>Mỗi cấp: +10% sát thương, +20 HP, lửa đổi màu</small>${n?`<small>→ ${n[0]}: cần ${n[2]} quái hạ (đã hạ ${S.st.kills})</small><button class="b s" data-a="evo" ${ok?'':'disabled'}>${ok?'Tiến hóa '+n[1]+' vàng':S.st.kills<n[2]?'Chưa đủ quái hạ':'Thiếu '+(n[1]-S.gold)+' vàng'}</button>`:'<small>Đã tiến hóa tối đa</small>'}</div>`;for(const k in SK){const o=SK[k],own=S.sk[k],lk=e<o.e,ok2=!own&&!lk&&S.gold>=o.c;h+=`<div class="cd"><b>${o.i} ${o.n}</b><small>${o.d}</small><button class="b" data-a="skill" data-k="${k}" ${ok2?'':'disabled'}>${own?'ĐÃ MỞ':lk?'Cần tiến hóa: '+EVO[o.e][0]:ok2?'Mở '+o.c+' vàng':'Thiếu '+(o.c-S.gold)+' vàng'}</button></div>`}return h}
-function renderSet(){if(S.set.mus===undefined)S.set.mus=1;const L={snd:'Âm thanh',mus:'Nhạc nền',dn:'Hiện số sát thương',rm:'Giảm chuyển động',fs:'Toàn màn hình khi chơi'};$('sets').innerHTML=Object.keys(L).map(k=>`<button class="b" data-a="tog" data-k="${k}">${L[k]}: ${S.set[k]?'BẬT':'TẮT'}</button>`).join('')+'<button class="b s" data-a="cust">🖼 Tùy chỉnh hình ảnh</button>'}
+function renderSet(){if(S.set.mus===undefined)S.set.mus=1;const L={snd:['sound','Âm thanh'],mus:['music','Nhạc nền'],dn:['dmg','Hiện số sát thương'],rm:['wave','Giảm chuyển động'],fs:['full','Toàn màn hình khi chơi']};$('sets').innerHTML=Object.keys(L).map(k=>`<button class="tg${S.set[k]?' on':''}" data-a="tog" data-k="${k}">${ico(L[k][0])}<span>${L[k][1]}</span><em>${S.set[k]?'BẬT':'TẮT'}</em></button>`).join('')+`<button class="tg" data-a="cust">${ico('image')}<span>Tùy chỉnh hình ảnh</span><em>›</em></button>`}
 function act(a,k,i){switch(a){
 case'play':goFS();startRun();break;case'play1':S.rw=1;save();goFS();startRun();break;
 case'up':prev=scr;renderUp();show('up');break;
-case'hudup':if(R&&R.al){R.pz=1;prev='pause';renderUp();show('up')}break;
-case'closeup':if(prev==='over'&&R)show('over');else show(prev==='pause'&&R&&R.al?'pause':'menu');break;
+case'hudup':if(R&&R.al){R.pz=1;prev='hud';renderUp();show('up')}break;
+case'closeup':if(prev==='over'&&R)show('over');else if(prev==='hud'&&R&&R.al){R.pz=0;show(null)}else show(prev==='pause'&&R&&R.al?'pause':'menu');break;
 case'buy':buy(k);break;
 case'pause':if(R&&R.al){R.pz=1;show('pause')}break;
 case'resume':if(R)R.pz=0;show(null);break;
 case'menu':R=null;chkRel();$('mg').textContent=S.gold;show('menu');break;
 case'newg':show('conf');break;
 case'donew':{const st=S.set,cu=S.cu;S=defS();S.set=st;S.cu=cu;save();R=null;$('mg').textContent=0;show('menu');break}
-case'set':renderSet();show('set');break;
-case'tog':S.set[k]^=1;save();renderSet();break;
+case'set':sFrom='';renderSet();show('set');break;case'hudset':if(R&&R.al){R.pz=1;sFrom='g';renderSet();show('set')}break;case'setback':renderSet();show('set');break;case'setclose':if(sFrom==='g'&&R&&R.al){R.pz=0;show(null)}else{$('mg').textContent=S.gold;show('menu')}break;case'sel':selU=k;renderUp();break;
+case'tog':S.set[k]^=1;save();renderSet();if(k==='fs'){if(S.set.fs)goFS();else if(document.fullscreenElement)document.exitFullscreen().catch(()=>{})}break;
 case'spd':GS=+k;break;
 case'evo':{const n=EVO[S.evo+1];if(n&&S.gold>=n[1]&&S.st.kills>=n[2]){S.gold-=n[1];S.evo++;if(R&&R.al)R.hp+=20;save();sfx('evo');renderUp()}break}
 case'skill':{const o=SK[k];if(o&&!S.sk[k]&&S.evo>=o.e&&S.gold>=o.c){S.gold-=o.c;S.sk[k]=1;save();sfx('skill');renderUp()}break}
@@ -306,14 +364,14 @@ function draw(){x.setTransform(2,0,0,2,0,0);x.clearRect(0,0,W,H);if(R&&R.hitT>.1
  if(R){for(const l of R.lv){if(CB()&&LF[S.evo]){const c=LF[S.evo];x.save();x.translate(Math.round(l.x*2)/2,Math.round(l.y*2)/2);x.rotate(l.rot||0);const lw=S.cu.leaf.px>0?S.cu.leaf.px:16,lh=lw*c.height/c.width;x.drawImage(c,-lw/2,-lh/2,lw,lh);x.restore()}else fbullet(l)}drawEx();
  for(const f of R.fx){x.globalAlpha=Math.min(1,f.l*3);rc(f.c,f.x,f.y,f.s,f.s)}x.globalAlpha=1;
  x.textAlign='center';x.lineWidth=2;x.strokeStyle='#000';x.lineJoin='round';for(const t of R.tx){const tX=Math.min(W-45,Math.max(45,t.x));x.font='bold '+(t.z||11)+'px Montserrat,sans-serif';x.globalAlpha=Math.min(1,t.l*2);x.strokeText(t.s,tX,t.y);x.fillStyle=t.c;x.fillText(t.s,tX,t.y)}x.globalAlpha=1}hudc()}
-function hud(){hl();const on=!!R;$('bb').style.visibility=on?'visible':'hidden';if(!on){$('bn').textContent='';return}$('bn').textContent=R.bn>0&&R.al?'ĐỢT '+R.wave:'';document.querySelectorAll('[data-a=spd]').forEach(b=>b.classList.toggle('a',+b.dataset.k===GS))}
+function hud(){hl();const on=!!R;$('bb').style.visibility=$('qt').style.visibility=on?'visible':'hidden';document.querySelectorAll('[data-q]').forEach(b=>b.classList.toggle('on',!!S.set[b.dataset.k]));if(!on){$('bn').textContent='';return}$('bn').textContent=R.bn>0&&R.al?'ĐỢT '+R.wave:'';document.querySelectorAll('[data-a=spd]').forEach(b=>b.classList.toggle('a',+b.dataset.k===GS))}
 let pendRel=0;function chkRel(){if(pendRel&&(!R||!R.al))location.reload()}
 function hl(){const p=S.rw>1;$('bp').textContent=p?'▶ CHƠI (đợt '+S.rw+')':'▶ CHƠI';$('bo').textContent=p?'↻ Chơi lại (đợt '+S.rw+')':'↻ Chơi lại';$('bf').style.display=$('bf2').style.display=p?'':'none'}
 cv.addEventListener('pointerdown',e=>{if(!R||!R.al||R.pz||scr!==null)return;const b=cv.getBoundingClientRect(),px=(e.clientX-b.left)*W/b.width,py=(e.clientY-b.top)*H/b.height;let bc=null,bd=1e9;for(const c of R.ch){if(c.st!==0)continue;const cy=GY+5-c.h/2,d=Math.hypot(px-c.x,py-cy);if(Math.abs(px-c.x)<c.w/2+18&&Math.abs(py-cy)<c.h/2+22&&d<bd){bd=d;bc=c}}if(bc){bc.st=1;bc.vz=150;bc.vx=0;sfx('tap')}});
 let last=0,hT=0,FD=0;
 function loop(ts){requestAnimationFrame(loop);const dt=Math.min(.05,(ts-last)/1000||0);last=ts;FD=dt;CT+=dt;if(!R||(!R.pz&&R.al))BT+=dt*GS;if(R&&!R.pz)for(let i=0;i<GS;i++)upd(dt);draw();hT-=dt;if(hT<=0){hT=.1;hud()}if(dirty){sT-=dt;if(sT<=0){save();dirty=0;sT=1}}}
 function rs(){$('w').style.fontSize=Math.max(9.5,$('w').clientWidth/74)+'px'}addEventListener('resize',rs);rs();if(document.fonts&&document.fonts.load){document.fonts.load('bold 11px Montserrat').catch(()=>{});document.fonts.load('400 11px Montserrat').catch(()=>{})}
-$('mg').textContent=S.gold;if(warn)$('warn').textContent='Dữ liệu lưu bị lỗi nên đã được đặt lại.';initCust();
+hyd();$('mg').textContent=S.gold;if(warn)$('warn').textContent='Dữ liệu lưu bị lỗi nên đã được đặt lại.';initCust();
 requestAnimationFrame(loop);
 if('serviceWorker' in navigator&&location.protocol.startsWith('http')){const had=!!navigator.serviceWorker.controller;navigator.serviceWorker.addEventListener('controllerchange',()=>{if(had){pendRel=1;chkRel()}});navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(g=>{g.update();document.addEventListener('visibilitychange',()=>{if(!document.hidden)g.update()})}).catch(()=>{})}
 </script></body></html>

@@ -10,7 +10,7 @@ git remote add origin https://github.com/<tên-bạn>/pixel-dino-survivor.git &&
 Sau đó vào Settings > Pages, chọn nhánh main, thư mục root. Mở link HTTPS trên Android Chrome > Menu > Cài đặt ứng dụng.
 
 ## Cập nhật phiên bản
-Service Worker dùng chiến lược network-first nên sau khi đẩy bản mới, tải lại trang là có nội dung mới (vẫn nên tăng `C='pds-v9'` trong sw.js để dọn cache cũ).
+Service Worker dùng chiến lược network-first nên sau khi đẩy bản mới, tải lại trang là có nội dung mới (vẫn nên tăng `C='pds-v10'` trong sw.js để dọn cache cũ).
 
 ## Cân bằng game
 Số liệu nằm ở đầu index.html: CFG (cấu hình), UP (nâng cấp, giá = b × g^cấp), SL (8 loại Slime).
@@ -34,3 +34,6 @@ Atlas tạo từ gói `fireball_assets_pack` (chuẩn hóa hướng bay sang ph�
 
 ## Âm thanh phun lửa
 Tiếng bắn dùng `assets/fire_breath.mp3` (1,045s), phát từ giây 0, độ dài đoạn phát = min(độ dài file, 1,05 × khoảng cách giữa 2 phát bắn, tối thiểu 0,2s) và mờ dần ở cuối để các phát không chồng nhau. Lửa xanh xuyên phá phát nhanh 1,3x. Nếu file lỗi/chưa tải kịp, game tự dùng âm tổng hợp cũ (0,16s).
+
+## Giao diện v1.6
+Phong cách khung đồng + đá tối. Biểu tượng là SVG vẽ bằng mã (`IC_`), không dùng ảnh ngoài. Màn chơi có dải nút nhanh góc phải trên (âm thanh, nhạc, số sát thương, giảm chuyển động, toàn màn hình, bánh răng mở Cài đặt) và nút Nâng cấp/Tạm dừng ở dưới. Bảng nâng cấp là cây nhánh (`TR` = nút, `ED` = đường nối): bấm nút để xem chi tiết và mua. Vuông = chỉ số, thoi = kỹ năng, cờ hiệu = tiến hóa.
