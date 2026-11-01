@@ -9,7 +9,7 @@ body { display: flex; flex-direction: column; align-items: center; justify-conte
 #rot { display: none; padding: 1em; text-align: center }
 @media (orientation: portrait) and (max-width: 700px) { #rot { display: block } }
 
-/* ----- Nút ảnh (assets/ui/btn_*.png) ----- */
+/* ----- Nút ảnh (assets2/ui/btn_*.png) ----- */
 .ibtn { position: relative; display: inline-block; flex: none; width: 2.7em; height: 2.7em; padding: 0; border: 0; background: none; color: inherit; font: inherit; cursor: pointer; vertical-align: middle; -webkit-tap-highlight-color: transparent; transition: transform .12s, filter .15s }
 .ibtn img { display: block; width: 100%; height: 100%; pointer-events: none; user-select: none; -webkit-user-drag: none }
 .ibtn:hover { filter: brightness(1.1) }
@@ -54,3 +54,17 @@ body { display: flex; flex-direction: column; align-items: center; justify-conte
 #ovt { line-height: 1.5; font-weight: 700 }
 #crop canvas { touch-action: none; border: .15em solid #ffd23a; background: #000; cursor: grab }
 #crop input[type=range] { width: min(22em, 60%) }
+
+/* ----- Biểu ngữ Boss ----- */
+#bn.boss { font-size: 2em; letter-spacing: .04em; animation: bnp .5s ease-in-out infinite alternate; text-shadow: .08em .08em 0 #000, 0 0 .5em currentColor }
+@keyframes bnp { from { transform: scale(1) } to { transform: scale(1.07) } }
+
+/* ----- Bảng thống kê quái (góc trên phải, dưới dãy nút cài đặt; nền trong suốt) ----- */
+#mp { position: absolute; right: .8em; top: 4.9em; width: 15em; display: flex; flex-direction: column; align-items: flex-end; gap: .08em; pointer-events: none; visibility: hidden; font-size: .74em; font-weight: 700; line-height: 1.35; text-align: right; text-shadow: 0 .06em .18em #000d, 0 0 .12em #000 }
+#mp .mh { margin-bottom: .2em; font-size: .82em; letter-spacing: .07em; color: #d4e6d6; opacity: .8 }
+#mp .mr2 { display: flex; align-items: center; justify-content: flex-end; gap: .5em; max-width: 100% }
+#mp .mr2 span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis }
+#mp .mr2 b { min-width: 1.9em; font-weight: 800; color: #fff0c8; opacity: .92 }
+#mp .mr2 i { flex: none; width: .55em; height: .55em; border-radius: 50%; opacity: .85 }
+#mp .mr2.bs span { font-weight: 800 }
+#mp .mr2.em { color: #c8d4c8; opacity: .6 }

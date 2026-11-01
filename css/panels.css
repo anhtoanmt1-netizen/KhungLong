@@ -54,3 +54,30 @@ input[type=range]::-moz-range-thumb { width: 1.4em; height: 1.4em; border-radius
 .sl.on .th { border-color: #ffd23a }
 .sl.em .th { border-style: dashed; opacity: .35; cursor: default }
 .sl .x { position: absolute; right: -.45em; top: -.5em; width: 1.5em; height: 1.5em; padding: 0; border: .1em solid #000; border-radius: 50%; background: #ff7a5a; color: #000; font: inherit; font-weight: bold; font-size: .8em; line-height: 1; cursor: pointer }
+
+/* Bảng Mod (ẩn) */
+.mod-pw { width: 34em; text-align: center; display: flex; flex-direction: column; align-items: center; gap: .7em }
+.mod-pw .ph { width: 100%; box-sizing: border-box }
+.mod-pw input, .mc input[type=number], .mc input[type=password] { font: inherit; width: 100%; box-sizing: border-box; padding: .45em .5em; background: #0a1124; color: #f3e6c4; border: .13em solid #5a3b10; border-radius: .45em; text-align: center }
+.mod-pw input { width: 70%; font-size: 1.1em; letter-spacing: .2em }
+.mod-pw input:focus, .mc input:focus { outline: .15em solid #ffd23a; outline-offset: .05em }
+.mod-panel { padding-bottom: 1em }
+#modb { display: flex; flex-direction: column; gap: .6em; max-height: 29em; overflow-y: auto; padding: 0 .3em .3em 0 }
+#modb .srow { min-height: 3.6em }
+.mgrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: .6em }
+.mc { display: flex; flex-direction: column; gap: .35em; padding: .6em; font-size: .88em; background: linear-gradient(#222c4a, #131b32); border: .15em solid #3a4466; border-radius: .7em }
+.mc > b, .mhd b { font-weight: 800; color: #ffe08a }
+.mc small { font-size: .82em; opacity: .8; line-height: 1.3 }
+.mc .b { padding: .35em .6em; min-height: 2.1em; font-size: .9em }
+.mc .row { gap: .4em }
+.mc .row .b { flex: 1 }
+.mwide { grid-column: 1 / -1 }
+.mhd { display: flex; align-items: center; justify-content: space-between; gap: .6em }
+.mbs { display: grid; grid-template-columns: repeat(6, 1fr); gap: .45em }
+.mb { display: flex; flex-direction: column; align-items: center; gap: .25em; padding: .35em; background: #0a1124; border: .12em solid #3a4466; border-radius: .5em; font-size: .85em; text-align: center }
+.mb b { font-size: .78em; line-height: 1.15; min-height: 2.3em; display: flex; align-items: center }
+.mb .mt { width: 100%; height: 3.2em; background: center/contain no-repeat }
+.mb input { padding: .25em; font-size: .9em }
+.mpw { align-items: stretch }
+.mpw input { text-align: center }
+input:disabled, .b:disabled { opacity: .5 }

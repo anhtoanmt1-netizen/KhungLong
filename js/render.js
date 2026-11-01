@@ -275,7 +275,81 @@ function mon(m) {
     rc("#4f4", cx - w / 2, yy, w * m.hp / m.mx, 2);
   }
 }
+/* ===== Boss: ảnh lớn + hào quang + chuyển động riêng từng kiểu (m.mv) + thanh máu có tên ===== */
+const BRGB = {};
+const brgba = (h, a) => {
+  const c = BRGB[h] || (BRGB[h] = [1, 3, 5].map((i) => parseInt(h.substr(i, 2), 16)));
+  return "rgba(" + c[0] + "," + c[1] + "," + c[2] + "," + a + ")";
+};
+function bossDraw(m) {
+  const b = m.b, im = BI[b.i];
+  if (!ld(im)) return;
+  const sz = m.sz, hh = sz * m.asp, cx = Math.round(m.x), z = m.z || 0, by = GY + 2 - z, t = CT, pu = 0.5 + 0.5 * Math.sin(t * 4 + m.ph), gy0 = by - hh * 0.5;
+  // bóng đổ co lại khi Boss bay cao / nhảy
+  const sk = Math.max(0.35, 1 - z / 110);
+  x.save();
+  x.fillStyle = "rgba(0,0,0,.34)";
+  x.beginPath();
+  x.ellipse(cx, GY + 2, sz * 0.4 * sk, 3 * sk + 1, 0, 0, 6.3);
+  x.fill();
+  // hào quang phát sáng theo nhịp
+  x.globalCompositeOperation = "lighter";
+  const R0 = sz * (0.64 + 0.09 * pu), gr = x.createRadialGradient(cx, gy0, 2, cx, gy0, R0);
+  gr.addColorStop(0, brgba(b.c, 0.36 + 0.14 * pu));
+  gr.addColorStop(1, brgba(b.c, 0));
+  x.fillStyle = gr;
+  x.fillRect(cx - R0, gy0 - R0, R0 * 2, R0 * 2);
+  x.restore();
+  // Hư Không: vòng bóng tối quay quanh
+  if (m.mv === "void" && !S.set.rm) for (let i = 0; i < 7; i++) {
+    const a = -t * 1.3 + i * 0.898 + m.ph;
+    rc(i % 2 ? "#2a0a4a" : "#b060ff", cx + Math.cos(a) * sz * 0.62, gy0 + Math.sin(a) * hh * 0.3, 4, 4);
+  }
+  // Chuyển động
+  let sx = 1, sy = 1, rot = 0, al = 1;
+  const en = Math.min(1, m.en / 0.6), ease = 1 - Math.pow(1 - en, 3), over = en < 1 ? 1 + Math.sin(en * Math.PI) * 0.18 : 1;
+  switch (m.mv) {
+    case "hop": { const s = z / 17; sy = 0.86 + 0.26 * s; sx = 1.12 - 0.16 * s; break }
+    case "stomp": sy = 1 + 0.035 * Math.sin(t * 10.8 + m.ph); sx = 2 - sy; rot = Math.sin(t * 5.4 + m.ph) * 0.035; break;
+    case "sway": sy = 1 + 0.03 * Math.sin(t * 4.4 + m.ph); sx = 2 - sy; rot = Math.sin(t * 2.2 + m.ph) * 0.07; break;
+    case "dash": if (m.dl > 0) { sx = 1.16; sy = 0.92; rot = -0.12 } else rot = Math.sin(t * 3 + m.ph) * 0.03; break;
+    case "swoop": { const fl = Math.sin(t * 13 + m.ph); sx = 1 + 0.1 * fl; sy = 1 - 0.06 * fl; rot = Math.sin(t * 4.5 + m.ph) * 0.08; break }
+    case "float": sx = sy = 1 + 0.04 * Math.sin(t * 3 + m.ph); rot = Math.sin(t * 1.8 + m.ph) * 0.06; break;
+    case "phase": al = 0.74 + 0.26 * Math.sin(t * 5 + m.ph); rot = Math.sin(t * 2 + m.ph) * 0.05; break;
+    case "void": sx = sy = 1 + 0.07 * Math.sin(t * 3 + m.ph); rot = Math.sin(t * 1.4 + m.ph) * 0.08; break;
+  }
+  if (m.dv > 0) { sy *= 1.12; rot -= 0.18 }
+  x.save();
+  x.imageSmoothingEnabled = true;
+  x.imageSmoothingQuality = "high";
+  x.translate(cx, by);
+  x.rotate(rot);
+  x.scale(sx * ease * over, sy * ease * over);
+  x.globalAlpha = al * ease;
+  // bóng mờ kéo theo (lao nhanh / mờ ảo)
+  if (m.dl > 0 && !S.set.rm) for (let i = 3; i >= 1; i--) { x.globalAlpha = 0.16 * (4 - i); x.drawImage(im, -sz / 2 + i * 9, -hh, sz, hh) }
+  if (m.mv === "phase" && !S.set.rm) for (const o of [-1, 1]) { x.globalAlpha = 0.2; x.drawImage(im, -sz / 2 + o * (3 + 2 * Math.sin(t * 9)), -hh + o * 1, sz, hh) }
+  x.globalAlpha = al * ease;
+  x.drawImage(im, -sz / 2, -hh, sz, hh);
+  x.globalCompositeOperation = "lighter";
+  x.globalAlpha = (m.fl > 0 ? 0.75 : 0.1 + 0.1 * pu) * ease;
+  x.drawImage(im, -sz / 2, -hh, sz, hh);
+  x.restore();
+  // tia sáng quay quanh
+  if (!S.set.rm) for (let i = 0; i < 5; i++) {
+    const a = t * 1.8 + i * 1.2566 + m.ph;
+    rc(i % 2 ? "#fff" : b.c, cx + Math.cos(a) * sz * 0.6, gy0 + Math.sin(a) * hh * 0.34, 3, 3);
+  }
+  // thanh máu + tên
+  const bw = Math.max(sz, 60), bx = Math.round(cx - bw / 2), yy = Math.round(GY - z - hh - 10), pc = Math.max(0, m.hp / m.mx);
+  rc("#000", bx - 1, yy - 1, bw + 2, 6);
+  rc("#2a0a0a", bx, yy, bw, 4);
+  rc(b.c, bx, yy, bw * pc, 4);
+  rc("rgba(255,255,255,.6)", bx, yy, bw * pc, 1);
+  tw("★ " + b.n, cx, yy - 3, "#fff", 7, "center");
+}
 function slime(m) {
+  if (m.k === "boss") return bossDraw(m);
   if (m.k) return mon(m);
   const d = SL[m.ti], s = Math.sin(CT * 8 + m.ph), w = m.w * (1 + 0.1 * s), h = m.h * (1 - 0.1 * s), gy = Math.round(GY - Math.max(0, Math.sin(CT * 5 + m.ph)) * (m.x > front() + m.w / 2 + 12 ? 4 : 0)), cx = Math.round(m.x), hh = Math.round(h), c = m.fl > 0 ? "#fff" : d[1];
   rc("rgba(0,0,0,.3)", cx - m.w / 2, GY + 1, m.w, 2);
@@ -294,12 +368,13 @@ function dino() {
   if (R && !R.al && DI.complete && DI.naturalWidth) {
     const f = R.dT < 0.25 ? 0 : R.dT < 0.55 ? 1 : R.dT < 0.9 ? 2 : 3;
     x.imageSmoothingEnabled = false;
-    x.drawImage(DI, f * 96, 0, 96, 70, DX - 48, GY + 4 - 70, 96, 70);
+    const kd = dk();
+    x.drawImage(DI, f * 96, 0, 96, 70, DX - 48 * kd, GY + 4 - 70 * kd, 96 * kd, 70 * kd);
     return;
   }
   const r = R, al = !r || r.al, im = IM[r && (r.atk > 0 || r.kick > 0) && al ? 4 : al ? Math.floor(CT * 8) % 4 : 0];
   if (!im.complete || !im.width) return;
-  const iw = im.width, ih = im.height, px = Math.round(DX - iw / 2), py = GY + 4 - ih;
+  const kd = dk(), iw = im.width * kd, ih = im.height * kd, px = Math.round(DX - iw / 2), py = GY + 4 - ih;
   x.save();
   if (r && !r.al) {
     x.translate(DX - 10, GY);
@@ -315,31 +390,31 @@ function dino() {
     x.translate(-DX, -GY - 4);
   }
   x.imageSmoothingEnabled = false;
-  x.drawImage(im, px, py);
+  x.drawImage(im, px, py, iw, ih);
   x.restore();
   if (al && S.evo > 0 && !S.set.rm) for (let i = 0; i < S.evo; i++) {
     const a = CT * 2 + i * 6.28 / S.evo;
-    rc(EVO[S.evo][3], DX + Math.cos(a) * 26, GY - 32 + Math.sin(a) * 14, 3, 3);
+    rc(EVO[S.evo][3], DX + Math.cos(a) * 26 * kd, GY - 32 * kd + Math.sin(a) * 14 * kd, 3, 3);
   }
   if (r && r.sh > 0 && al) {
     const A = atl("g"), wx = DX + iw * 0.42, fa = Math.min(1, r.sh / 0.5);
     for (let i = 0; i < 5; i++) {
-      const fi = 14 + (Math.floor(CT * 14) + i * 2) % 4, wy = GY - 4 - i * 15, ww = Math.sin(CT * 9 + i) * 1.5;
+      const fi = 14 + (Math.floor(CT * 14) + i * 2) % 4, wy = GY - 4 - i * 15 * kd, ww = Math.sin(CT * 9 + i) * 1.5;
       x.save();
-      fdraw(A, fi, wx + ww, wy, 40, 0.5, 0.5, 0, fa);
+      fdraw(A, fi, wx + ww, wy, 40 * kd, 0.5, 0.5, 0, fa);
       x.globalCompositeOperation = "lighter";
-      fdraw(A, fi, wx + ww, wy, 48, 0.5, 0.5, 0, 0.3 * fa);
+      fdraw(A, fi, wx + ww, wy, 48 * kd, 0.5, 0.5, 0, 0.3 * fa);
       x.restore();
     }
   }
   if (r && r.buf > 0 && r.al) {
     x.save();
     x.globalCompositeOperation = "lighter";
-    const gg = x.createRadialGradient(DX, GY - 30, 4, DX, GY - 30, 48);
+    const gg = x.createRadialGradient(DX, GY - 30 * kd, 4, DX, GY - 30 * kd, 48 * kd);
     gg.addColorStop(0, "rgba(255,70,20,.4)");
     gg.addColorStop(1, "rgba(255,70,20,0)");
     x.fillStyle = gg;
-    x.fillRect(DX - 52, GY - 82, 104, 104);
+    x.fillRect(DX - 52 * kd, GY - 30 * kd - 52 * kd, 104 * kd, 104 * kd);
     x.restore();
   }
 }
@@ -347,8 +422,23 @@ function draw() {
   x.setTransform(2, 0, 0, 2, 0, 0);
   x.clearRect(0, 0, W, H);
   if (R && R.hitT > 0.18 && !S.set.rm) x.translate(Math.round((rnd() - 0.5) * 4), Math.round((rnd() - 0.5) * 4));
+  if (R && R.shk > 0 && !S.set.rm) x.translate(Math.round((rnd() - 0.5) * Math.min(6, R.shk * 12)), Math.round((rnd() - 0.5) * Math.min(6, R.shk * 12)));
   bg();
   chests();
+  if (R) {
+    for (const g of R.rg) {
+      if (g.t < 0) continue;
+      const p = g.t / g.l, rr = 4 + p * g.r;
+      x.save();
+      x.globalAlpha = (1 - p) * 0.85;
+      x.strokeStyle = g.c;
+      x.lineWidth = 0.6 + 2.6 * (1 - p);
+      x.beginPath();
+      x.ellipse(g.x, g.y, rr, rr * 0.22, 0, 0, 6.3);
+      x.stroke();
+      x.restore();
+    }
+  }
   if (R) for (const m of R.mon) slime(m);
   dino();
   if (R) {
@@ -358,7 +448,7 @@ function draw() {
         x.save();
         x.translate(Math.round(l.x * 2) / 2, Math.round(l.y * 2) / 2);
         x.rotate(l.rot || 0);
-        const lw = S.cu.leaf.px > 0 ? S.cu.leaf.px : 16, lh = lw * c.height / c.width;
+        const lw = S.mod.on && S.cu.leaf.px > 0 ? S.cu.leaf.px : 16, lh = lw * c.height / c.width;
         x.drawImage(c, -lw / 2, -lh / 2, lw, lh);
         x.restore();
       } else fbullet(l);

@@ -1,7 +1,7 @@
-/* ===== Đạn lửa dùng atlas assets/fire.png (6×4 ô 160px), vụ nổ, bộ lọc màu theo bậc tiến hóa. ===== */
+/* ===== Đạn lửa dùng atlas assets1/fx/fire.png (6×4 ô 160px), vụ nổ, bộ lọc màu theo bậc tiến hóa. ===== */
 const FI = new Image();
-FI.src = "assets/fire.png";
-const FC = {}, FLY = [6, 10, 11, 12, 11, 10], CB = () => !!S.cu.leaf.sel && ld(AS.lf), evc = () => S.evo ? EVO[S.evo][3] : null;
+FI.src = "assets1/fx/fire.png";
+const FC = {}, FLY = [6, 10, 11, 12, 11, 10], CB = () => S.mod.on && !!S.cu.leaf.sel && ld(AS.lf), evc = () => S.evo ? EVO[S.evo][3] : null;
 const FXT = { p: ["hue-rotate(185deg) saturate(1.4)", "#7fd0ff", 0.7], a: ["hue-rotate(-22deg) saturate(1.8) brightness(.9)", "#ff2010", 0.55], s: [null, "#ffd23a", 0.45], g: ["hue-rotate(12deg) brightness(1.15)", "#ffd23a", 0.35] };
 function atl(k) {
   if (!ld(FI)) return null;

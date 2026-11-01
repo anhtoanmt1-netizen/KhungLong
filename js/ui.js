@@ -29,8 +29,8 @@ function act(a, k, i) {
     case 'menu': R = null; chkRel(); $('mg').textContent = S.gold; show('menu'); break;
     case 'newg': show('conf'); break;
     case 'donew': {
-      const st = S.set, cu = S.cu;
-      S = defS(); S.set = st; S.cu = cu;
+      const st = S.set, cu = S.cu, md = S.mod;
+      S = defS(); S.set = st; S.cu = cu; S.mod = md;   // giữ cài đặt, ảnh tùy chỉnh và Mod
       save(); R = null; $('mg').textContent = 0; show('menu');
       break;
     }
@@ -69,6 +69,9 @@ function act(a, k, i) {
     case 'zm': if (CS) zoomAt(k === '+' ? 1.18 : 1 / 1.18, CS.fw / 2, CS.fh / 2); break;
     case 'cancrop': endCrop(); show('cust'); break;
     case 'savecrop': finishCrop(); break;
+
+    // --- Bảng Mod (js/mod.js) ---
+    default: modAct(a, k);
   }
 }
 
@@ -82,6 +85,8 @@ document.addEventListener('keydown', e => {
   else if (scr === 'crop') act('cancrop');
   else if (scr === 'up') act('closeup');
   else if (scr === 'set') act('setclose');
+  else if (scr === 'cust') act('custback');
+  else if (scr === 'mod' || scr === 'modpw') act('modclose');
 });
 document.addEventListener('visibilitychange', () => {
   if (document.hidden) { save(); if (R && R.al && scr === null) act('pause') }
@@ -102,9 +107,33 @@ function hud() {
   document.querySelectorAll('[data-q]').forEach(b => b.classList.toggle('off', !S.set[b.dataset.k]));
   const si = $('qsnd'), want = UI + (S.set.snd ? 'btn_sound.png' : 'btn_mute.png');
   if (si && si.getAttribute('src') !== want) si.setAttribute('src', want);
+  // x3, x5 chỉ có khi bật Mod
+  if (!S.mod.on && GS > 2) GS = 1;
+  document.querySelectorAll('.mx').forEach(b => { b.style.display = S.mod.on ? '' : 'none' });
+  monPanel();
   if (!on) { $('bn').textContent = ''; return }
-  $('bn').textContent = R.bn > 0 && R.al ? 'ĐỢT ' + R.wave : '';
+  const bn = $('bn');
+  if (R.bb && R.al) { bn.textContent = R.bb.s; bn.style.color = R.bb.c; bn.classList.add('boss') }
+  else { bn.textContent = R.bn > 0 && R.al ? 'ĐỢT ' + R.wave : ''; bn.style.color = ''; bn.classList.remove('boss') }
   document.querySelectorAll('[data-a=spd]').forEach(b => b.classList.toggle('on', +b.dataset.k === GS));
+}
+
+/* Bảng thống kê quái đang có trên màn hình: nền trong suốt, xếp từ mạnh đến yếu, chữ màu pastel */
+const pastel = h => '#' + [1, 3, 5].map(i => { const c = parseInt(h.substr(i, 2), 16); return Math.round(c + (255 - c) * 0.5).toString(16).padStart(2, '0') }).join('');
+let mpLast = '';
+function monPanel() {
+  const el = $('mp');
+  if (!R) { if (mpLast !== 'x') { el.style.visibility = 'hidden'; mpLast = 'x' } return }
+  const c = {}; let n = 0;
+  for (const m of R.mon) { if (m.dead) continue; c[m.ti] = (c[m.ti] || 0) + 1; n++ }
+  const ks = Object.keys(c).map(Number).sort((a, b) => SL[b][2] - SL[a][2] || SL[b][3] - SL[a][3]);
+  let h = `<div class="mh">QUÁI TRÊN MÀN HÌNH · ${n}</div>`;
+  h += ks.slice(0, 12).map(ti => {
+    const d = SL[ti], col = pastel(d[1]), bs = d[7] === 'boss' || ti === 7 || ti === 15;
+    return `<div class="mr2${bs ? ' bs' : ''}"><span style="color:${col}">${bs ? '★ ' : ''}${d[0]}</span><b>×${c[ti]}</b><i style="background:${col}"></i></div>`;
+  }).join('') || '<div class="mr2 em">Chưa có quái</div>';
+  if (h !== mpLast) { el.innerHTML = h; mpLast = h }
+  el.style.visibility = 'visible';
 }
 function chkRel() { if (pendRel && (!R || !R.al)) location.reload() }
 
@@ -112,6 +141,7 @@ function chkRel() { if (pendRel && (!R || !R.al)) location.reload() }
 cv.addEventListener('pointerdown', e => {
   if (!R || !R.al || R.pz || scr !== null) return;
   const b = cv.getBoundingClientRect(), px = (e.clientX - b.left) * W / b.width, py = (e.clientY - b.top) * H / b.height;
+  if (modTap(px, py)) return;   // 3 lần chạm liên tiếp vào avatar = mở Bảng Mod
   let bc = null, bd = 1e9;
   for (const c of R.ch) {
     if (c.st !== 0) continue;

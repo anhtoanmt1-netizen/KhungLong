@@ -1,8 +1,8 @@
 /* ===== Biểu tượng & nút giao diện =====
-   Nút ảnh lấy từ assets/ui/btn_*.png (cắt từ Setting.png).
+   Nút ảnh lấy từ assets2/ui/btn_*.png (cắt từ Setting.png).
    Với chức năng không có sẵn ảnh (nhạc, số sát thương, giảm chuyển động...),
    dùng nút trống btn_blank.png + biểu tượng SVG màu nâu đặt lên giữa. */
-const UI = 'assets/ui/';
+const UI = 'assets2/ui/';
 const SW = 'fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"';
 const IC_ = {
   gear: `<circle cx="12" cy="12" r="8.2" fill="none" stroke="currentColor" stroke-width="3.2" stroke-dasharray="3.22 3.22"/><circle cx="12" cy="12" r="6.4"/><circle cx="12" cy="12" r="2.6" fill="#0b0d15"/>`,

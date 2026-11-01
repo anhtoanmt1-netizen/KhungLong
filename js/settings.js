@@ -21,10 +21,8 @@ function renderSet() {
       <span class="stx"><b>Âm lượng hiệu ứng</b><small>Kéo để chỉnh</small></span>
       <input type="range" class="vl" min="0" max="100" value="${v}" data-in="vol" style="--p:${v}%" aria-label="Âm lượng hiệu ứng">
       <em id="vv">${v}%</em></div>
-    <button type="button" class="srow nav" data-a="musm"><span class="stx"><b>Đổi nhạc nền</b><small>Tải lên tối đa 3 bản</small></span>
-      <span class="ibtn"><img src="${UI}btn_list.png" alt=""></span></button>
-    <button type="button" class="srow nav" data-a="cust"><span class="stx"><b>Tùy chỉnh hình ảnh</b><small>Nền, cây, cỏ, đạn lửa</small></span>
-      <span class="ibtn g"><img src="${UI}btn_blank.png" alt=""><i>${ico('image')}</i></span></button>`;
+    <button type="button" class="srow nav" data-a="musm" style="grid-column:1/-1"><span class="stx"><b>Đổi nhạc nền</b><small>Tải lên tối đa 3 bản</small></span>
+      <span class="ibtn"><img src="${UI}btn_list.png" alt=""></span></button>`;
   $('sets').innerHTML = h;
 }
 

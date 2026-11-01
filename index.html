@@ -21,12 +21,15 @@
 
   <!-- Nút nhanh trong lúc chơi -->
   <div id="qt">
-    <button class="ibtn q" data-a="tog" data-k="snd" data-q aria-label="Âm thanh"><img id="qsnd" src="assets/ui/btn_sound.png" alt=""></button>
-    <button class="ibtn g q" data-a="tog" data-k="mus" data-q aria-label="Nhạc nền"><img src="assets/ui/btn_blank.png" alt=""><i data-ic="music"></i></button>
-    <button class="ibtn g q" data-a="tog" data-k="dn" data-q aria-label="Số sát thương"><img src="assets/ui/btn_blank.png" alt=""><i data-ic="dmg"></i></button>
-    <button class="ibtn g q" data-a="tog" data-k="rm" data-q aria-label="Giảm chuyển động"><img src="assets/ui/btn_blank.png" alt=""><i data-ic="wave"></i></button>
-    <button class="ibtn" data-a="hudset" aria-label="Cài đặt"><img src="assets/ui/btn_gear.png" alt=""></button>
+    <button class="ibtn q" data-a="tog" data-k="snd" data-q aria-label="Âm thanh"><img id="qsnd" src="assets2/ui/btn_sound.png" alt=""></button>
+    <button class="ibtn g q" data-a="tog" data-k="mus" data-q aria-label="Nhạc nền"><img src="assets2/ui/btn_blank.png" alt=""><i data-ic="music"></i></button>
+    <button class="ibtn g q" data-a="tog" data-k="dn" data-q aria-label="Số sát thương"><img src="assets2/ui/btn_blank.png" alt=""><i data-ic="dmg"></i></button>
+    <button class="ibtn g q" data-a="tog" data-k="rm" data-q aria-label="Giảm chuyển động"><img src="assets2/ui/btn_blank.png" alt=""><i data-ic="wave"></i></button>
+    <button class="ibtn" data-a="hudset" aria-label="Cài đặt"><img src="assets2/ui/btn_gear.png" alt=""></button>
   </div>
+
+  <!-- Bảng thống kê quái đang có trên màn hình (nền trong suốt, xếp theo sức mạnh) -->
+  <div id="mp" aria-hidden="true"></div>
 
   <!-- Thanh dưới: nâng cấp, tốc độ, tạm dừng -->
   <div id="bb">
@@ -34,10 +37,10 @@
     <div class="row nowrap">
       <button class="b p on" data-a="spd" data-k="1" aria-label="Tốc độ x1">x1</button>
       <button class="b p" data-a="spd" data-k="2" aria-label="Tốc độ x2">x2</button>
-      <button class="b p" data-a="spd" data-k="3" aria-label="Tốc độ x3">x3</button>
-      <button class="b p" data-a="spd" data-k="5" aria-label="Tốc độ x5">x5</button>
+      <button class="b p mx" data-a="spd" data-k="3" aria-label="Tốc độ x3" style="display:none">x3</button>
+      <button class="b p mx" data-a="spd" data-k="5" aria-label="Tốc độ x5" style="display:none">x5</button>
     </div>
-    <button class="ibtn" data-a="pause" aria-label="Tạm dừng"><img src="assets/ui/btn_pause.png" alt=""></button>
+    <button class="ibtn" data-a="pause" aria-label="Tạm dừng"><img src="assets2/ui/btn_pause.png" alt=""></button>
   </div>
 
   <!-- Menu chính -->
@@ -63,7 +66,7 @@
     <p>Quái chết rơi vàng. Dùng vàng để nâng cấp bằng các thẻ: bấm vào thẻ là nâng cấp ngay.</p>
     <p>Thẻ chia 5 nhóm: Công, Thủ, Phụ trợ, Kỹ năng công và Kỹ năng thủ. Kỹ năng cần tiến hóa đủ bậc mới mở được.</p>
     <p>Thỉnh thoảng có rương kho báu chạy tới: hãy CHẠM vào rương để mở và nhận vàng; không chạm thì rương sẽ bị bỏ lỡ.</p>
-    <p>Dùng nút x1 / x2 / x3 / x5 để tăng tốc trò chơi. Cứ 20 giây là sang đợt mới, 45 giây có một con trùm.</p>
+    <p>Dùng nút x1 / x2 để tăng tốc trò chơi. Cứ 20 giây là sang đợt mới, 45 giây có một Boss: Slime Vua, Rồng Con rồi 12 Boss đặc biệt, có con bay, có con chạy. Bảng bên phải cho biết số quái đang có trên màn hình.</p>
     <p>HP về 0 thì hết lượt; lượt sau quay lại 3 đợt trước đó, vẫn giữ vàng và nâng cấp. NEW GAME sẽ xóa toàn bộ tiến trình.</p>
     <button class="b" data-a="menu">Quay lại</button>
   </div>
@@ -71,7 +74,7 @@
   <div class="sc" id="about">
     <h2>Giới thiệu</h2>
     <p id="aver"></p>
-    <p>Khủng long, nền, cây, cỏ, đạn lửa, rương, thẻ và nút giao diện dùng hình ảnh do người dùng cung cấp. Quái và hiệu ứng được vẽ bằng mã.</p>
+    <p>Khủng long, nền, cây, cỏ, đạn lửa, rương, thẻ và nút giao diện dùng hình ảnh do người dùng cung cấp. Quái thường và hiệu ứng được vẽ bằng mã; 12 Boss dùng hình ảnh riêng.</p>
     <button class="b" data-a="menu">Quay lại</button>
   </div>
 
@@ -80,7 +83,7 @@
     <div class="panel set-panel">
       <header class="ph">
         <h2 class="ptitle">CÀI ĐẶT</h2>
-        <button class="ibtn" data-a="setclose" aria-label="Đóng"><img src="assets/ui/btn_close.png" alt=""></button>
+        <button class="ibtn" data-a="setclose" aria-label="Đóng"><img src="assets2/ui/btn_close.png" alt=""></button>
       </header>
       <div id="sets"></div>
     </div>
@@ -91,8 +94,8 @@
     <div class="panel up-panel">
       <header class="ph">
         <h2 class="ptitle">THẺ NÂNG CẤP</h2>
-        <span class="gold"><img src="assets/ui/coin.png" alt="Vàng"><b id="upg">0</b></span>
-        <button class="ibtn" data-a="closeup" aria-label="Đóng"><img src="assets/ui/btn_close.png" alt=""></button>
+        <span class="gold"><img src="assets2/ui/coin.png" alt="Vàng"><b id="upg">0</b></span>
+        <button class="ibtn" data-a="closeup" aria-label="Đóng"><img src="assets2/ui/btn_close.png" alt=""></button>
       </header>
       <nav class="tabs" id="tabs"></nav>
       <div class="cards" id="cards"></div>
@@ -132,7 +135,7 @@
     <div class="panel set-panel">
       <header class="ph">
         <h2 class="ptitle">NHẠC NỀN</h2>
-        <button class="ibtn" data-a="setback" aria-label="Quay lại"><img src="assets/ui/btn_back.png" alt=""></button>
+        <button class="ibtn" data-a="setback" aria-label="Quay lại"><img src="assets2/ui/btn_back.png" alt=""></button>
       </header>
       <div id="ml"></div>
       <p id="mm" class="mm"></p>
@@ -145,10 +148,35 @@
     <div class="panel wide-panel">
       <header class="ph">
         <h2 class="ptitle">TÙY CHỈNH HÌNH ẢNH</h2>
-        <button class="ibtn" data-a="setback" aria-label="Quay lại"><img src="assets/ui/btn_back.png" alt=""></button>
+        <button class="ibtn" data-a="custback" aria-label="Quay lại"><img src="assets2/ui/btn_back.png" alt=""></button>
       </header>
       <div id="cg"></div>
       <p id="cm" class="mm"></p>
+    </div>
+  </div>
+
+  <!-- Bảng Mod (ẩn): chạm 3 lần liên tiếp vào avatar khủng long ở góc trên trái -->
+  <div class="sc" id="modpw">
+    <div class="panel mod-pw">
+      <header class="ph">
+        <h2 class="ptitle">BẢNG MOD</h2>
+        <button class="ibtn" data-a="modclose" aria-label="Đóng"><img src="assets2/ui/btn_close.png" alt=""></button>
+      </header>
+      <p class="mm">Nhập mật khẩu để mở các tính năng Mod.</p>
+      <input type="password" id="modin" autocomplete="off" maxlength="20" placeholder="Mật khẩu" aria-label="Mật khẩu Mod">
+      <button class="b s" data-a="modunlock">Mở khóa</button>
+      <p id="modpm" class="mm"></p>
+    </div>
+  </div>
+
+  <div class="sc" id="mod">
+    <div class="panel wide-panel mod-panel">
+      <header class="ph">
+        <h2 class="ptitle">BẢNG MOD</h2>
+        <button class="ibtn" data-a="modclose" aria-label="Đóng"><img src="assets2/ui/btn_close.png" alt=""></button>
+      </header>
+      <div id="modb"></div>
+      <p id="modm" class="mm"></p>
     </div>
   </div>
 
@@ -183,6 +211,7 @@
 <script src="js/music.js"></script>
 <script src="js/custom.js"></script>
 <script src="js/settings.js"></script>
+<script src="js/mod.js"></script>
 <script src="js/cards.js"></script>
 <script src="js/game.js"></script>
 <script src="js/ui.js"></script>
