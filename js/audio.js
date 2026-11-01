@@ -27,7 +27,7 @@ const AU = (() => {
       for (let i = 0; i < n; i++) d[i] = Math.random() * 2 - 1;
       NB = b;
       try {
-        fetch("assets/fire_breath.mp3").then((r) => r.arrayBuffer()).then((d2) => AC.decodeAudioData(d2, (q) => {
+        fetch("assets1/audio/fire_breath.mp3").then((r) => r.arrayBuffer()).then((d2) => AC.decodeAudioData(d2, (q) => {
           FB = q;
         }, () => {
         })).catch(() => {
@@ -36,7 +36,7 @@ const AU = (() => {
       }
       apT();
       try {
-        fetch("assets/bgm.mp3").then((r) => r.ok ? r.arrayBuffer() : Promise.reject()).then((d2) => AC.decodeAudioData(d2, (q) => {
+        fetch("assets1/audio/bgm.mp3").then((r) => r.ok ? r.arrayBuffer() : Promise.reject()).then((d2) => AC.decodeAudioData(d2, (q) => {
           DB = q;
           useMB();
         }, () => {
@@ -208,6 +208,12 @@ const AU = (() => {
       T(147, 1, "sawtooth", 0.06, { vib: 5 });
       N(0.8, "lowpass", 200, 900, 0.1);
       if (ti === 15) N(0.9, "bandpass", 900, 180, 0.14, { q: 3 });
+      if (ti >= 16) {
+        // Boss mới: tiếng gầm trầm + quét âm đi lên
+        N(1, "bandpass", 700, 160, 0.12, { q: 3 });
+        T(60, 0.9, "sine", 0.14, { to: 38 });
+        T(220, 0.6, "square", 0.04, { to: 440, at: 0.15 });
+      }
     },
     flyer(ti) {
       N(0.12, "bandpass", 900, 500, 0.04, { q: 3 });
@@ -295,7 +301,7 @@ const AU = (() => {
       }
       return;
     }
-    const w = run ? R.wave : 1, boss = run && R.mon.some((m) => m.ti === 7 || m.ti === 15), low = run && R.hp < 0.3 * sv().maxHp, bpm = run ? 104 + Math.min(w, 12) * 3 + (boss ? 14 : 0) : 84, lv = run ? 1 + (w >= 3) + (w >= 7) + (boss ? 1 : 0) : 0, sp = 60 / bpm / 4;
+    const w = run ? R.wave : 1, boss = run && R.mon.some((m) => m.ti === 7 || m.ti === 15 || m.k === "boss"), low = run && R.hp < 0.3 * sv().maxHp, bpm = run ? 104 + Math.min(w, 12) * 3 + (boss ? 14 : 0) : 84, lv = run ? 1 + (w >= 3) + (w >= 7) + (boss ? 1 : 0) : 0, sp = 60 / bpm / 4;
     if (nx < AC.currentTime - 0.5) nx = AC.currentTime;
     while (nx < AC.currentTime + 0.25) {
       const b = st >> 4 & 3, q = st & 15, r = 110 * 2 ** (([0, -4, 3, -2][b] - (boss ? 1 : 0)) / 12), ch = [0, b === 0 ? 3 : 4, 7].map((i) => r * 2 ** (i / 12)), base = nx - AC.currentTime, m = (f, d, ty, v, x = {}) => T(f, d, ty, v, { bus: MU, ...x, at: base + (x.at || 0) }), n = (d, ft, a, c, v, x = {}) => N(d, ft, a, c, v, { bus: MU, ...x, at: base + (x.at || 0) });

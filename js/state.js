@@ -1,5 +1,5 @@
 /* ===== Trạng thái lưu (localStorage): mặc định, nạp/lưu, giá nâng cấp cost(), chỉ số tổng hợp sv(). ===== */
-const defS = () => ({ v: 1, gold: 0, rw: 1, lv: Object.fromEntries(Object.keys(UP).map((k) => [k, 0])), st: { kills: 0, best: 0, deaths: 0 }, sk: { storm: 0, pierce: 0, boom: 0, revive: 0, ancient: 0, wall: 0 }, evo: 0, set: { snd: 1, mus: 1, dn: 1, rm: 0, sv: 0.5 }, cu: { bg: { sel: null }, tree: { sel: null, px: null }, leaf: { sel: null, px: null }, grass: { sel: null, px: null } } });
+const defS = () => ({ v: 1, gold: 0, rw: 1, lv: Object.fromEntries(Object.keys(UP).map((k) => [k, 0])), st: { kills: 0, best: 0, deaths: 0 }, sk: { storm: 0, pierce: 0, boom: 0, revive: 0, ancient: 0, wall: 0 }, evo: 0, set: { snd: 1, mus: 1, dn: 1, rm: 0, sv: 0.5 }, mod: { on: 0, pw: hpw(MODPW), dino: null, bs: {} }, cu: { bg: { sel: null }, tree: { sel: null, px: null }, leaf: { sel: null, px: null }, grass: { sel: null, px: null } } });
 let GS = 1, warn = 0;
 function load() {
   try {
@@ -20,6 +20,15 @@ function load() {
         const p = Math.round(+o.px);
         d.cu[k].px = p > 0 && p < 2e3 ? p : null;
       }
+    }
+    const jm = j.mod || {};
+    d.mod.on = jm.on ? 1 : 0;
+    if (typeof jm.pw === "string" && /^[0-9a-f]{1,8}$/.test(jm.pw)) d.mod.pw = jm.pw;
+    const dp = Math.round(+jm.dino);
+    d.mod.dino = dp >= 30 && dp <= 300 ? dp : null;
+    for (let i = 0; i < 12; i++) {
+      const b = Math.round(+(jm.bs || {})[i]);
+      if (b >= 30 && b <= 220) d.mod.bs[i] = b;
     }
     for (const k in d.sk) d.sk[k] = (j.sk || {})[k] ? 1 : 0;
     d.evo = Math.min(5, Math.max(0, Math.floor(+j.evo) || 0));

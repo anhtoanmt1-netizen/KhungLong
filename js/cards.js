@@ -1,6 +1,6 @@
 /* ===== Thẻ nâng cấp =====
-   Mỗi thẻ gồm: ảnh minh họa (assets/cards/art_<khóa>.png) đặt dưới khung
-   (assets/cards/frame_<màu>.png), nhãn cấp, giá, tên, mô tả.
+   Mỗi thẻ gồm: ảnh minh họa (assets2/cards/art_<khóa>.png) đặt dưới khung
+   (assets2/cards/frame_<màu>.png), nhãn cấp, giá, tên, mô tả.
    Bấm vào thẻ = nâng cấp ngay. */
 const TABS = [
   { id: 'atk', n: 'CÔNG' },
@@ -63,8 +63,8 @@ function cardHTML(k) {
   const c = CARDS[k], i = cardInfo(k);
   const price = i.pr ? `<b class="mx">${i.pr}</b>` : `<img src="${UI}coin.png" alt=""><b>${fmtP(i.price)}</b>`;
   return `<button type="button" class="card st-${i.st}" data-a="card" data-k="${k}" aria-label="${c.n}, cấp ${i.lv}">
-    <span class="c-art" style="background-image:url(assets/cards/art_${k}.png)"></span>
-    <img class="c-frame" src="assets/cards/frame_${c.frame}.png" alt="" draggable="false">
+    <span class="c-art" style="background-image:url(assets2/cards/art_${k}.png)"></span>
+    <img class="c-frame" src="assets2/cards/frame_${c.frame}.png" alt="" draggable="false">
     <span class="c-lv">Lv.<b>${i.lv}</b></span>
     <span class="c-price">${price}</span>
     <span class="c-name${c.n.length > 13 ? ' long' : ''}">${c.n}</span>

@@ -40,7 +40,7 @@ const idbOpen = () => new Promise((res) => {
 };
 function applyCust() {
   for (const k of CUK) {
-    const it = IC[k].find((o) => o.id === S.cu[k].sel);
+    const it = S.mod.on ? IC[k].find((o) => o.id === S.cu[k].sel) : null;
     setAsset(CATK[k], it ? it.d : DEFSRC[CATK[k]]);
   }
 }

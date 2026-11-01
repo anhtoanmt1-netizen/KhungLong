@@ -6,6 +6,9 @@ function startRun() {
   R.cq = [];
   R.ex = [];
   R.kick = 0;
+  R.rg = [];     // vòng sóng xung kích (Boss)
+  R.bb = null;   // biểu ngữ Boss {s, t, c}
+  R.shk = 0;     // thời gian rung màn hình
   R.th = R.dr = R.ph = R.hp;
   R.tl = 0;
   chestRoll();
@@ -17,7 +20,11 @@ function tx(X, Y, s, c) {
 function spawn(king) {
   const r = R;
   let ti = 7;
-  if (king) ti = Math.round((r.king - 100) / 45) % 2 ? 15 : 7;
+  if (king) {
+    // 14 lượt đầu: Slime Vua → Rồng Con → 12 Boss mới (yếu → mạnh); sau đó chọn ngẫu nhiên
+    const n = Math.round((r.king - 100) / 45);
+    ti = n < BOSSORD.length ? BOSSORD[n] : rnd() < 0.15 ? (rnd() < 0.5 ? 7 : 15) : BOSS0 + Math.floor(rnd() * BOSS.length);
+  }
   else {
     const lo = r.wave < 8 ? Math.max(0, r.wave - 2) : 1, hi = r.wave < 8 ? r.wave - 1 : 6;
     ti = lo + Math.floor(rnd() * (hi - lo + 1));
@@ -25,12 +32,24 @@ function spawn(king) {
     if (u.length && rnd() < 0.5) ti = u[Math.floor(rnd() * u.length)][0];
   }
   const d = SL[ti], hm = 1 + r.t * 0.012;
-  if (king) sfx("boss", ti);
-  else if (d[8]) sfx("flyer", ti);
+  if (king) {
+    sfx("boss", ti);
+    r.bb = { s: "⚠ BOSS · " + d[0].toUpperCase(), t: 3, c: d[1] };
+    r.shk = 0.5;
+    r.rg.push({ x: W - 30, y: GY + 1, t: 0, l: 0.7, c: d[1], r: 120 }, { x: W - 30, y: GY + 1, t: -0.12, l: 0.7, c: "#fff", r: 80 });
+    r.ex.push({ x: W - 36, y: GY - 40, t: 0, sc: 2.4, col: "a", ring: d[1], rr: 70 });
+  } else if (d[8]) sfx("flyer", ti);
   if (d[2] > SL[r.tier][2]) r.tier = ti;
-  r.mon.push({ ti, k: d[7] || "", z: d[8] || 0, z0: d[8] || 0, dv: 0, ai: { bee: 0.7, bird: 0.8, dragon: 0.8 }[d[7]] || 1, x: W + 12, hp: d[2] * hm, mx: d[2] * hm, dm: d[3] * (1 + r.t * 4e-3), sp: d[5] * 2 * (1 + Math.min(0.5, r.t / 400)), gd: d[4] * (1 + r.t / 240), w: d[6], h: Math.round(d[6] * 0.7), cd: 0, fl: 0, ph: rnd() * 6, of: rnd() * 10 });
+  const mo = { ti, k: d[7] || "", z: d[8] || 0, z0: d[8] || 0, dv: 0, ai: { bee: 0.7, bird: 0.8, dragon: 0.8 }[d[7]] || 1, x: W + 12, hp: d[2] * hm, mx: d[2] * hm, dm: d[3] * (1 + r.t * 4e-3), sp: d[5] * 2 * (1 + Math.min(0.5, r.t / 400)), gd: d[4] * (1 + r.t / 240), w: d[6], h: Math.round(d[6] * 0.7), cd: 0, fl: 0, ph: rnd() * 6, of: rnd() * 10 };
+  if (d[7] === "boss") {
+    // Boss: kích thước theo ảnh (có thể chỉnh trong Mod), vùng trúng đòn theo hình ảnh
+    const b = BOSS[ti - BOSS0], im = BI[b.i], sz = bossPx(b.i), asp = ld(im) ? im.naturalHeight / im.naturalWidth : 0.92;
+    Object.assign(mo, { b, sz, asp, mv: b.mv, ai: b.ai, w: Math.round(sz * 0.78), h: Math.round(sz * asp * 0.88), en: 0, au: 0, lz: 0, fl: 0 });
+    if (b.mv === "swoop") { mo.zs = 4.5; mo.za = 10 } else if (b.z) { mo.zs = 2.4; mo.za = 6 }
+  }
+  r.mon.push(mo);
 }
-const front = () => DX + (IM[0].width || 80) * 0.3;
+const front = () => DX + (IM[0].width || 80) * dk() * 0.3;
 function hurt(m, s) {
   if (R.sh > 0) return;
   const r = R, d = Math.max(1, Math.round(m.dm * (1 - s.def)));
@@ -68,7 +87,15 @@ function kill(m, s) {
   const n = S.set.rm ? 3 : 10;
   for (let i = 0; i < n; i++) R.fx.push({ x: m.x, y: GY - (m.z || 0) - m.h / 2, vx: (rnd() - 0.5) * 70, vy: -rnd() * 60 - 10, l: 0.6, c: SL[m.ti][1], s: 2 });
   R.fx.push({ x: m.x, y: GY - 6, vx: 0, vy: -30, l: 0.5, c: "#ffd23a", s: 3 });
-  sfx("kill", m);
+  if (m.k === "boss") {
+    const R_ = R, c = m.b.c, cy = GY - (m.z || 0) - m.h / 2;
+    R_.shk = 0.5;
+    R_.rg.push({ x: m.x, y: GY + 1, t: 0, l: 0.8, c, r: 150 }, { x: m.x, y: GY + 1, t: -0.15, l: 0.8, c: "#fff", r: 100 });
+    R_.ex.push({ x: m.x, y: cy, t: 0, sc: 2.6, col: "g", ring: c, rr: 90 });
+    for (let i = 0; i < (S.set.rm ? 14 : 46); i++) R_.fx.push({ x: m.x + (rnd() - 0.5) * m.sz * 0.6, y: cy + (rnd() - 0.5) * m.h * 0.6, vx: (rnd() - 0.5) * 220, vy: -rnd() * 170 - 20, l: 0.9 + rnd() * 0.6, c: i % 3 ? c : i % 2 ? "#fff" : "#ffd23a", s: rnd() < 0.35 ? 3 : 2 });
+    R_.tx.push({ x: m.x, y: cy - 22, s: "BOSS HẠ GỤC!", c: c, l: 1.8, z: 14 });
+    sfx("evo");
+  } else sfx("kill", m);
 }
 function hit(m, s) {
   const cr = rnd() < CFG.crit, d = Math.round(s.dmg * (cr ? 2 : 1)), a = Math.min(d, m.hp);
@@ -89,7 +116,7 @@ function splash(o, s) {
   if (o.hp <= 0) kill(o, s);
 }
 function fire(s, tg) {
-  const r = R, iw = IM[0].width || 80, ox = DX + iw * 0.35, oy = GY - (IM[0].height || 70) * 0.75, ts = r.mon.filter((m) => !m.dead && m.x > front() + 8 && m.x < W - 4).sort((p, q) => p.x - q.x);
+  const r = R, kd = dk(), iw = (IM[0].width || 80) * kd, ox = DX + iw * 0.35, oy = GY - (IM[0].height || 70) * kd * 0.75, ts = r.mon.filter((m) => !m.dead && m.x > front() + 8 && m.x < W - 4).sort((p, q) => p.x - q.x);
   for (let i = 0; i < s.n; i++) {
     const t = ts[i % ts.length] || tg, a = Math.atan2(GY - (t.z || 0) - t.h / 2 - oy, t.x - ox) + (i - (s.n - 1) / 2) * 0.06;
     r.lv.push({ x: ox, y: oy, vx: Math.cos(a) * CFG.leafSpd, vy: Math.sin(a) * CFG.leafSpd, a, tg: t, p: S.sk.pierce ? 3 : 1, hs: [], ag: 0, pc: S.sk.pierce ? 1 : 0, k: r.buf > 0 ? "a" : "" });
@@ -97,6 +124,44 @@ function fire(s, tg) {
   for (let i = 0; i < 6; i++) r.fx.push({ x: ox + 2, y: oy + (rnd() - 0.5) * 6, vx: 60 + rnd() * 110, vy: (rnd() - 0.5) * 70, g: -20, l: 0.25 + rnd() * 0.15, c: i % 2 ? "#ffd23a" : "#ff8a2a", s: 2 });
   r.atk = 0.15;
   sfx("shoot", { iv: 1 / s.rate, pc: S.sk.pierce });
+}
+/* Chuyển động & hiệu ứng riêng của Boss. Trả về hệ số tốc độ (dash lao nhanh). */
+function bossLand(m, big) {
+  const r = R, c = m.b.c;
+  r.rg.push({ x: m.x, y: GY + 1, t: 0, l: big ? 0.5 : 0.35, c: c, r: big ? 70 : 40 });
+  if (!S.set.rm) {
+    for (let i = 0; i < (big ? 12 : 7); i++) r.fx.push({ x: m.x + (rnd() - 0.5) * m.sz * 0.7, y: GY, vx: (rnd() - 0.5) * 90, vy: -rnd() * 50, l: 0.4, c: i % 2 ? "#d8c090" : c, s: 2 });
+    if (m.x < W - 10) r.shk = Math.max(r.shk, big ? 0.16 : 0.08);
+  }
+}
+function bossMove(m, dt) {
+  const r = R;
+  m.en += dt;
+  let f = 1;
+  if (m.mv === "hop") {
+    const z = Math.max(0, Math.sin(CT * 4.2 + m.ph)) * 17;
+    if (m.lz > 4 && z <= 1.5) bossLand(m, false);
+    m.lz = m.z = z;
+  } else if (m.mv === "stomp") {
+    const z = Math.max(0, Math.sin(CT * 5.4 + m.ph)) * 5;
+    if (m.lz > 2 && z <= 0.6) bossLand(m, true);
+    m.lz = m.z = z;
+  } else if (m.mv === "dash") {
+    m.dsh = (m.dsh == null ? 1.5 + rnd() * 2 : m.dsh) - dt;
+    if (m.dsh <= 0) { m.dsh = 3 + rnd() * 2; m.dl = 0.55 }
+    if (m.dl > 0) {
+      m.dl -= dt;
+      f = 3.2;
+      if (r.fx.length < 380) r.fx.push({ x: m.x + m.sz * 0.3, y: GY - rnd() * m.h, vx: 40 + rnd() * 60, vy: (rnd() - 0.5) * 20, g: 0, l: 0.3, c: rnd() < 0.5 ? m.b.c : "#fff", s: 2 });
+    }
+  }
+  // hạt hào quang bay lên quanh Boss
+  if ((m.au -= dt) <= 0 && r.fx.length < 380) {
+    m.au = S.set.rm ? 0.3 : 0.06;
+    const q = rnd();
+    r.fx.push({ x: m.x + (rnd() - 0.5) * m.sz * 0.8, y: GY - (m.z || 0) - rnd() * m.h, vx: (rnd() - 0.5) * 16, vy: -22 - rnd() * 34, g: -30, l: 0.45 + rnd() * 0.4, c: q < 0.5 ? m.b.c : q < 0.8 ? "#fff" : "#ffd23a", s: rnd() < 0.3 ? 2 : 1 });
+  }
+  return f;
 }
 function upd(dt) {
   const r = R, s = sv();
@@ -107,6 +172,10 @@ function upd(dt) {
     f.l -= dt;
   }
   r.fx = r.fx.filter((f) => f.l > 0);
+  for (const g of r.rg) g.t += dt;
+  r.rg = r.rg.filter((g) => g.t < g.l);
+  if (r.shk > 0) r.shk -= dt;
+  if (r.bb && (r.bb.t -= dt) <= 0) r.bb = null;
   for (const e of r.ex) e.t += dt;
   r.ex = r.ex.filter((e) => e.t < 0.4);
   for (const t of r.tx) {
@@ -150,7 +219,7 @@ function upd(dt) {
   if (S.sk.revive) r.cr -= dt;
   if (S.sk.storm && (r.cs -= dt) <= 0) {
     r.cs = 15;
-    const ox = DX + (IM[0].width || 80) * 0.35, oy = GY - (IM[0].height || 70) * 0.75;
+    const kd = dk(), ox = DX + (IM[0].width || 80) * kd * 0.35, oy = GY - (IM[0].height || 70) * kd * 0.75;
     for (let i = 0; i < 8; i++) {
       const a = (i - 3.5) * 0.06 + 0.1;
       r.lv.push({ x: ox, y: oy, vx: Math.cos(a) * CFG.leafSpd, vy: Math.sin(a) * CFG.leafSpd, a, p: S.sk.pierce ? 3 : 1, hs: [], ag: 0, pc: S.sk.pierce ? 1 : 0, k: "s" });
@@ -195,10 +264,12 @@ function upd(dt) {
     m.cd -= dt;
     if (m.z0) {
       m.dv -= dt;
-      m.z = m.z0 + Math.sin(CT * (m.k === "bat" ? 7 : 3) + m.ph) * (m.k === "bat" ? 9 : 5) - (m.dv > 0 ? m.z0 * 0.5 * Math.sin(Math.PI * (1 - m.dv / 0.4)) : 0);
+      m.z = m.z0 + Math.sin(CT * (m.zs || (m.k === "bat" ? 7 : 3)) + m.ph) * (m.za || (m.k === "bat" ? 9 : 5)) - (m.dv > 0 ? m.z0 * 0.5 * Math.sin(Math.PI * (1 - m.dv / 0.4)) : 0);
     }
+    let msp = m.sp;
+    if (m.k === "boss") msp *= bossMove(m, dt);
     const lim = fx + m.w / 2 + m.of;
-    if (m.x > lim) m.x = Math.max(lim, m.x - m.sp * dt);
+    if (m.x > lim) m.x = Math.max(lim, m.x - msp * dt);
     else if (m.cd <= 0 && r.inv <= 0 && r.al) {
       m.cd = m.ai;
       if (m.z0) {
