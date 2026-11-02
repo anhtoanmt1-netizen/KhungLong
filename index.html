@@ -13,6 +13,7 @@
 <link rel="stylesheet" href="css/base.css">
 <link rel="stylesheet" href="css/panels.css">
 <link rel="stylesheet" href="css/cards.css">
+<link rel="stylesheet" href="css/keypad.css">
 </head>
 <body>
 <div id="w">
@@ -117,7 +118,7 @@
         <button class="ibtn" data-a="wjclose" aria-label="Đóng"><img src="assets2/ui/btn_close.png" alt=""></button>
       </header>
       <p class="mm" id="wjcur"></p>
-      <input type="number" id="wjin" inputmode="numeric" min="1" max="9999" step="1" placeholder="Số đợt" aria-label="Đợt muốn nhảy tới">
+      <input type="number" id="wjin" inputmode="none" readonly min="1" max="9999" step="1" placeholder="Số đợt" aria-label="Đợt muốn nhảy tới">
       <button class="b s" data-a="wjgo">Nhảy tới đợt này</button>
       <p id="wjm" class="mm"></p>
     </div>
@@ -186,7 +187,7 @@
         <button class="ibtn" data-a="modclose" aria-label="Đóng"><img src="assets2/ui/btn_close.png" alt=""></button>
       </header>
       <p class="mm">Nhập mật khẩu để mở các tính năng Mod.</p>
-      <input type="password" id="modin" autocomplete="off" maxlength="20" placeholder="Mật khẩu" aria-label="Mật khẩu Mod">
+      <input type="password" id="modin" inputmode="none" readonly autocomplete="off" maxlength="20" placeholder="Mật khẩu" aria-label="Mật khẩu Mod">
       <button class="b s" data-a="modunlock">Mở khóa</button>
       <p id="modpm" class="mm"></p>
     </div>
@@ -239,6 +240,7 @@
 <script src="js/cards.js"></script>
 <script src="js/game.js"></script>
 <script src="js/ui.js"></script>
+<script src="js/keypad.js"></script>
 <script src="js/main.js"></script>
 </body>
 </html>

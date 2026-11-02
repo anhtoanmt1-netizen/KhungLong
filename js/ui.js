@@ -6,6 +6,7 @@ function show(id) {
   scr = id;
   document.querySelectorAll('.sc').forEach(e => e.classList.toggle('on', e.id === id));
   if (id === 'menu') dfLabel();
+  if (window.kpClose) kpClose(true);   // đóng bàn phím số khi đổi màn hình
 }
 /* Chế độ độ khó: chọn ở màn "Trò chơi mới", lưu trong S.df */
 let newDf = 0;

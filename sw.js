@@ -1,6 +1,6 @@
 /* Service Worker: ưu tiên mạng (chờ tối đa 4 giây), rơi về bộ nhớ đệm khi offline.
    Đổi số phiên bản CACHE mỗi khi phát hành để máy người chơi tải bản mới. */
-const CACHE = 'pds-v21';
+const CACHE = 'pds-v22';
 const ASSETS = [
   "./",
   "index.html",
@@ -87,6 +87,7 @@ const ASSETS = [
   "assets2/ui/coin.png",
   "css/base.css",
   "css/cards.css",
+  "css/keypad.css",
   "css/panels.css",
   "js/assets.js",
   "js/audio.js",
@@ -100,6 +101,7 @@ const ASSETS = [
   "js/main.js",
   "js/mod.js",
   "js/skills.js",
+  "js/keypad.js",
   "js/music.js",
   "js/render.js",
   "js/settings.js",

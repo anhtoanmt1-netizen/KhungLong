@@ -88,7 +88,7 @@ function renderMod() {
   const m = S.mod, on = !!m.on, dis = on ? '' : ' disabled';
   const dd = IM[0].naturalWidth || 89;
   const boss = BOSS.map(b => `<label class="mb"><span class="mt" style="background-image:url(${b.src})"></span><b style="color:${b.c}">${b.n}</b>
-      <input type="number" inputmode="numeric" min="30" max="220" step="1" placeholder="${b.w}" value="${m.bs[b.i] || ''}" data-in="mboss" data-k="${b.i}"${dis} aria-label="Kích thước ${b.n} (px)"></label>`).join('');
+      <input type="number" inputmode="none" readonly min="30" max="220" step="1" placeholder="${b.w}" value="${m.bs[b.i] || ''}" data-in="mboss" data-k="${b.i}"${dis} aria-label="Kích thước ${b.n} (px)"></label>`).join('');
   $('modb').innerHTML = `
     <button type="button" class="srow tgl ${on ? 'on' : 'off'}" data-a="modtog" role="switch" aria-checked="${on}">
       <span class="stx"><b>Bật Mod</b><small>${on ? 'Đang dùng các tính năng Mod bên dưới.' : 'Đang TẮT: game ở trạng thái mặc định, các tính năng Mod bị ẩn và không áp dụng.'}</small></span><em>${on ? 'BẬT' : 'TẮT'}</em></button>
@@ -97,11 +97,11 @@ function renderMod() {
     <div class="mgrid">
       <div class="mc"><b>Vàng trong game</b>
         <small>Hiện có: ${fmtP(S.gold)}</small>
-        <input type="number" inputmode="numeric" min="0" max="1000000000000" step="1" id="modgold" placeholder="Nhập số vàng"${dis} aria-label="Số vàng">
+        <input type="number" inputmode="none" readonly min="0" max="1000000000000" step="1" id="modgold" placeholder="Nhập số vàng"${dis} aria-label="Số vàng">
         <div class="row nowrap"><button class="b" data-a="modgold" data-k="set"${dis}>Đặt vàng</button><button class="b" data-a="modgold" data-k="add"${dis}>＋ Cộng</button></div></div>
       <div class="mc"><b>Khủng long (px)</b>
         <small>Chiều rộng hiển thị. Mặc định ${dd} px, nhập 30–300.</small>
-        <input type="number" inputmode="numeric" min="30" max="300" step="1" placeholder="${dd}" value="${m.dino || ''}" data-in="mdino"${dis} aria-label="Kích thước khủng long (px)">
+        <input type="number" inputmode="none" readonly min="30" max="300" step="1" placeholder="${dd}" value="${m.dino || ''}" data-in="mdino"${dis} aria-label="Kích thước khủng long (px)">
         <button class="b a" data-a="modrstd"${dis}>↺ Mặc định</button></div>
       <div class="mc"><b>Tốc độ &amp; hình ảnh</b>
         <small>Tốc độ x3, x5 hiện ở thanh dưới khi chơi (lúc Mod bật).</small>
@@ -112,7 +112,7 @@ function renderMod() {
       <small>Đổi chiều rộng hình Boss (30–220). Bỏ trống là kích thước mặc định (ô mờ). Áp dụng cho Boss xuất hiện từ lúc này.</small>
       <div class="mbs">${boss}</div></div>
     <div class="mc mwide mpw"><b>Đổi mật khẩu Mod</b>
-      <input type="password" id="modnp" autocomplete="new-password" maxlength="20" placeholder="Mật khẩu mới (4–20 ký tự)" aria-label="Mật khẩu mới">
+      <input type="password" id="modnp" inputmode="none" readonly autocomplete="new-password" maxlength="20" placeholder="Mật khẩu mới (4–20 ký tự)" aria-label="Mật khẩu mới">
       <button class="b" data-a="modnp">Lưu mật khẩu</button></div>`;
 }
 

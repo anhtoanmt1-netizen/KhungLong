@@ -23,6 +23,7 @@ js/    (nạp theo đúng thứ tự trong index.html)
   assets.js           nạp ảnh khủng long, Boss (BI), nền, cây, cỏ, lá, rương; dk() bossPx()
   audio.js · fire.js · icons.js · render.js (có bossDraw) · chest.js · music.js · custom.js · settings.js
   mod.js              Bảng Mod ẩn (mật khẩu, bật/tắt, nhập vàng, cỡ khủng long, cỡ Boss, Nhập đợt)
+  keypad.js           (v2.1) bàn phím số riêng cho mọi ô nhập số / mật khẩu (css/keypad.css)
   skills.js           (v2.1) logic + hiệu ứng: chí mạng, hút máu có trần, Thiêu đốt, Choáng, Phá Huyết, Cuồng Phong
   cards.js · game.js (có bossMove) · ui.js (điều hướng, bảng quái monPanel) · main.js
 assets1/  (32 file) nhân vật, quái, môi trường, âm thanh
@@ -94,7 +95,15 @@ Bảng Mod > Tùy chỉnh hình ảnh (chỉ khi bật Mod): tải ảnh Nền, 
 ## Âm thanh
 Tiếng bắn dùng `assets1/audio/fire_breath.mp3`, nhạc nền mặc định `assets1/audio/bgm.mp3` (thiếu file thì dùng âm tổng hợp bằng WebAudio). Có thể đổi nhạc nền trong Cài đặt > Đổi nhạc nền.
 
+## Bàn phím số riêng (v2.1)
+- Mọi ô `input[type=number]` và `input[type=password]` (mật khẩu Mod và mật khẩu mới, số vàng, cỡ khủng long / 12 Boss / cây / lá / cỏ, nhập đợt) dùng bàn phím này thay cho bàn phím hệ thống, nên **bàn phím điện thoại không bao giờ bật lên che game**.
+- Bố cục 2 hàng × 6 phím: `1 2 3 4 5 ⌫` / `6 7 8 9 0 OK`, kèm một dòng hiển thị (tên ô, giá trị; mật khẩu hiện dấu •) và nút ✕ xóa hết. Cố định giữa mép dưới khung game, rộng tối đa 27em; màn hình nội dung tự chừa chỗ phía dưới khi bàn phím mở.
+- Tự hiện khi chạm vào ô số (hoặc khi hộp thoại tự đặt con trỏ vào ô, như Nhập đợt / Mật khẩu), tự ẩn khi bấm OK, bấm ra ngoài hoặc đổi màn hình. Chạm số đầu tiên sẽ thay giá trị có sẵn. OK phát phím Enter nên các bộ xử lý cũ (`mod.js`, `custom.js`) không cần sửa; giá trị đổi được lưu qua sự kiện `change` như khi gõ thật.
+- Máy tính: gõ phím số, Backspace, Enter (OK), Esc (đóng) cũng hoạt động. Các ô được đặt `readonly` + `inputmode="none"` để trình duyệt di động không mở bàn phím hệ thống.
+- Thêm ô số mới: chỉ cần dùng `<input type="number">` (hoặc `password`) có `inputmode="none" readonly`, `aria-label` (hiện làm tên ô) và `min`/`max` (quyết định số chữ số tối đa).
+
 ## Nhật ký v2.1
+- Bàn phím số riêng (0–9, ⌫, OK) cho mọi ô nhập số; cache `pds-v22`.
 - Âm thanh: tiếng phun lửa, đạn trúng quái, chí mạng và nổ lan giảm 60% (`QUIET` trong `js/audio.js`). Thêm âm thanh Choáng, Phá Huyết, Cuồng Phong.
 - Bảng nâng cấp: vuốt/kéo/cuộn ngang giữa các thẻ; thêm tab Hiệu ứng; 6 thẻ mới (Tỷ lệ chí mạng, Sát thương chí mạng, Thiêu đốt, Choáng, Phá Huyết, Cuồng Phong Hộ Thân) với ảnh từ skill_library; kỹ năng có 5 cấp.
 - Nhảy đợt: bấm ô ĐỢT để nhập đợt (công tắc trong Bảng Mod, mặc định TẮT). Ô ĐỢT nay hiển thị đúng đợt hiện tại (trước đây thấp hơn 1).
