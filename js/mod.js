@@ -5,7 +5,8 @@
      · tốc độ x3, x5          · Tùy chỉnh hình ảnh (nền, cây, lá, cỏ)
      · đặt/cộng vàng           · kích thước khủng long (px)
      · kích thước 12 Boss (px)
-   Dữ liệu lưu trong S.mod: { on, pw (đã băm), dino, bs: { chỉ số Boss: px } }. */
+     · Nhập đợt: bấm vào ô ĐỢT trên thanh trạng thái để nhảy tới đợt bất kỳ (công tắc riêng, mặc định TẮT)
+   Dữ liệu lưu trong S.mod: { on, pw (đã băm), dino, bs: { chỉ số Boss: px }, wj: 0|1 }. */
 let mFrom = '', mTaps = [];
 const mMsg = (t, id) => { const e = $(id || 'modm'); if (e) e.textContent = t || '' };
 
@@ -18,6 +19,47 @@ function modTap(px, py) {
   if (mTaps.length >= 3) { mTaps = []; openMod() }
   return true;
 }
+/* Nhập đợt: chỉ hoạt động khi Mod BẬT và công tắc "Nhập đợt" BẬT. Ô ĐỢT được vẽ trong hudc() và lưu vùng bấm ở R.wr. */
+const WJMAX = 9999;
+const wjOn = () => !!(S.mod.on && S.mod.wj);
+function wjTap(px, py) {
+  const b = R && R.wr;
+  if (!wjOn() || !b || px < b.x || px > b.x + b.w || py < b.y || py > b.y + b.h) return false;
+  openWJ();
+  return true;
+}
+function openWJ() {
+  if (!R || !R.al) return;
+  R.pz = 1;
+  $('wjcur').textContent = 'Đang ở đợt ' + R.wave + '. Nhập đợt muốn nhảy tới (1–' + WJMAX + ').';
+  $('wjin').value = R.wave;
+  mMsg('', 'wjm');
+  show('wj');
+  setTimeout(() => { try { $('wjin').focus(); $('wjin').select() } catch (_) { } }, 60);
+}
+function closeWJ() {
+  if (R && R.al) { R.pz = 0; show(null) } else show('menu');
+}
+function wjGo() {
+  const v = Math.floor(+$('wjin').value);
+  if ($('wjin').value === '' || !(v >= 1) || v > WJMAX) { mMsg('Hãy nhập số đợt từ 1 đến ' + WJMAX + '.', 'wjm'); sfx('miss'); return }
+  jumpWave(v);
+  closeWJ();
+}
+/* Đưa lượt chơi hiện tại tới đợt n: đặt lại đồng hồ, xóa quái/rương trên màn, tính lại lịch Boss; giữ nguyên máu, vàng và nâng cấp. */
+function jumpWave(n) {
+  const r = R;
+  if (!r || !r.al) return;
+  r.t = (n - 1) * 20;
+  r.wave = n;
+  r.bn = 2;
+  r.king = 100 + 45 * Math.max(0, Math.ceil((r.t - 100) / 45));
+  r.mon = []; r.lv = []; r.ch = []; r.cq = []; r.ex = []; r.fx = []; r.tx = []; r.rg = [];
+  r.bb = null; r.gw = null; r.sp = 1.2; r.tier = 0;
+  chestRoll();
+  sfx('wave');
+}
+
 function openMod() {
   if (!R || !R.al) return;
   R.pz = 1; mFrom = 'g';
@@ -50,6 +92,8 @@ function renderMod() {
   $('modb').innerHTML = `
     <button type="button" class="srow tgl ${on ? 'on' : 'off'}" data-a="modtog" role="switch" aria-checked="${on}">
       <span class="stx"><b>Bật Mod</b><small>${on ? 'Đang dùng các tính năng Mod bên dưới.' : 'Đang TẮT: game ở trạng thái mặc định, các tính năng Mod bị ẩn và không áp dụng.'}</small></span><em>${on ? 'BẬT' : 'TẮT'}</em></button>
+    <button type="button" class="srow tgl ${m.wj ? 'on' : 'off'}" data-a="modwj" role="switch" aria-checked="${!!m.wj}"${dis}>
+      <span class="stx"><b>Nhập đợt (nhảy đợt)</b><small>${m.wj ? 'Đang BẬT: khi chơi, bấm vào ô ĐỢT ở thanh trạng thái để nhập đợt muốn nhảy tới.' : 'Đang TẮT (mặc định): bấm vào ô ĐỢT không có tác dụng.'}</small></span><em>${m.wj ? 'BẬT' : 'TẮT'}</em></button>
     <div class="mgrid">
       <div class="mc"><b>Vàng trong game</b>
         <small>Hiện có: ${fmtP(S.gold)}</small>
@@ -83,6 +127,14 @@ function modAct(a, k) {
       save(); applyCust(); renderMod();
       mMsg(m.on ? 'Mod đã BẬT.' : 'Mod đã TẮT: game trở về mặc định.');
       break;
+    case 'modwj':
+      if (!m.on) break;
+      m.wj ^= 1;
+      save(); renderMod();
+      mMsg(m.wj ? 'Đã BẬT nhập đợt: bấm vào ô ĐỢT khi đang chơi.' : 'Đã TẮT nhập đợt.');
+      break;
+    case 'wjgo': wjGo(); break;
+    case 'wjclose': closeWJ(); break;
     case 'modgold': {
       if (!m.on) break;
       const v = Math.floor(+$('modgold').value);
@@ -124,3 +176,5 @@ document.addEventListener('change', e => {
   }
 });
 $('modin').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); modUnlock() } });
+
+$('wjin').addEventListener('keydown', e => { if (e.key === 'Enter') wjGo() });

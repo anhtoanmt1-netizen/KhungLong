@@ -1,5 +1,5 @@
 /* ===== Trạng thái lưu (localStorage): mặc định, nạp/lưu, giá nâng cấp cost(), chỉ số tổng hợp sv(). ===== */
-const defS = () => ({ v: 1, gold: 0, rw: 1, lv: Object.fromEntries(Object.keys(UP).map((k) => [k, 0])), st: { kills: 0, best: 0, deaths: 0 }, sk: { storm: 0, pierce: 0, boom: 0, revive: 0, ancient: 0, wall: 0 }, evo: 0, set: { snd: 1, mus: 1, dn: 1, rm: 0, sv: 0.5 }, mod: { on: 0, pw: hpw(MODPW), dino: null, bs: {} }, cu: { bg: { sel: null }, tree: { sel: null, px: null }, leaf: { sel: null, px: null }, grass: { sel: null, px: null } } });
+const defS = () => ({ v: 1, df: 0, gold: 0, rw: 1, lv: Object.fromEntries(Object.keys(UP).map((k) => [k, 0])), st: { kills: 0, best: 0, deaths: 0 }, sk: Object.fromEntries(Object.keys(SK).map((k) => [k, 0])), evo: 0, set: { snd: 1, mus: 1, dn: 1, rm: 0, sv: 0.5 }, mod: { on: 0, pw: hpw(MODPW), dino: null, bs: {}, wj: 0 }, cu: { bg: { sel: null }, tree: { sel: null, px: null }, leaf: { sel: null, px: null }, grass: { sel: null, px: null } } });
 let GS = 1, warn = 0;
 function load() {
   try {
@@ -7,6 +7,7 @@ function load() {
     if (!j || j.v !== 1) throw 0;
     const d = defS();
     d.gold = Math.max(0, Math.floor(+j.gold) || 0);
+    d.df = Math.min(DIFF.length - 1, Math.max(0, Math.floor(+j.df) || 0));
     d.rw = Math.min(9999, Math.max(1, Math.floor(+j.rw) || 1));
     for (const k in UP) d.lv[k] = Math.min(UP[k].m, Math.max(0, Math.floor(+(j.lv || {})[k]) || 0));
     d.st.kills = Math.max(0, Math.floor(+(j.st || {}).kills) || 0);
@@ -23,6 +24,7 @@ function load() {
     }
     const jm = j.mod || {};
     d.mod.on = jm.on ? 1 : 0;
+    d.mod.wj = jm.wj ? 1 : 0;
     if (typeof jm.pw === "string" && /^[0-9a-f]{1,8}$/.test(jm.pw)) d.mod.pw = jm.pw;
     const dp = Math.round(+jm.dino);
     d.mod.dino = dp >= 30 && dp <= 300 ? dp : null;
@@ -30,8 +32,8 @@ function load() {
       const b = Math.round(+(jm.bs || {})[i]);
       if (b >= 30 && b <= 220) d.mod.bs[i] = b;
     }
-    for (const k in d.sk) d.sk[k] = (j.sk || {})[k] ? 1 : 0;
-    d.evo = Math.min(5, Math.max(0, Math.floor(+j.evo) || 0));
+    for (const k in d.sk) d.sk[k] = Math.min(SK[k].m, Math.max(0, Math.floor(+(j.sk || {})[k]) || 0));
+    d.evo = Math.min(EVO.length - 1, Math.max(0, Math.floor(+j.evo) || 0));
     for (const k in d.set) if (j.set && k in j.set) d.set[k] = k === "sv" ? Math.min(1, Math.max(0, +j.set[k] || 0)) : j.set[k] ? 1 : 0;
     return d;
   } catch (e) {
@@ -49,8 +51,26 @@ const save = () => {
   } catch (e) {
   }
 };
-const cost = (k, l) => Math.min(1e7, Math.round(UP[k].b * Math.pow(UP[k].g, l)));
+const cost = (k, l) => Math.min(1e12, Math.round(UP[k].b * Math.pow(UP[k].g, l)));
+const skCost = (k, l) => Math.min(1e12, Math.round(SK[k].c * Math.pow(SK[k].g, l)));
+const skl = (k) => S.sk[k] > 0 ? SKV[k](S.sk[k]) : null;
+/* Chỉ số tổng hợp từ nâng cấp + tiến hóa + kỹ năng (Cổ Đại làm tăng sát thương/tốc độ bắn tạm thời) */
 const sv = () => {
-  const L = S.lv, e = S.evo, b = R && R.buf > 0 ? 1.5 : 1;
-  return { maxHp: UP.hp.f(L.hp) + 20 * e, dmg: Math.round(UP.dmg.f(L.dmg) * (1 + 0.1 * e) * b), rate: Math.min(6, UP.rate.f(L.rate) * b), n: UP.multi.f(L.multi), regen: L.regen, steal: L.steal * 0.05, gm: 1 + 0.1 * L.gold, def: Math.min(0.5, 0.05 * L.def) };
+  const L = S.lv, e = S.evo, bm = R && R.buf > 0 ? (R.bm || 1.5) : 1, mh = UP.hp.f(L.hp) + CFG.evoHp * e;
+  return {
+    maxHp: mh,
+    dmg: Math.round(UP.dmg.f(L.dmg) * (1 + CFG.evoDmg * e) * bm),
+    rate: Math.min(CFG.rateCap, UP.rate.f(L.rate) * bm),
+    n: UP.multi.f(L.multi),
+    cr: Math.min(0.95, (UP.critR.f(L.critR) + CFG.evoCrit * e) / 100),
+    cd: UP.critD.f(L.critD) / 100,
+    regen: UP.regen.f(L.regen),
+    steal: UP.steal.f(L.steal) / 100,
+    stealCap: (0.005 + 0.004 * L.steal) * mh,
+    gm: (UP.gold.f(L.gold) + CFG.evoGold * e) / 100,
+    def: Math.min(CFG.defCap, UP.def.f(L.def) / 100),
+    burn: L.burn ? UP.burn.f(L.burn) / 100 : 0,
+    stunP: L.stun ? UP.stun.f(L.stun) / 100 : 0,
+    stunT: 0.5 + 0.06 * L.stun
+  };
 };

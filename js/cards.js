@@ -6,27 +6,35 @@ const TABS = [
   { id: 'atk', n: 'CÔNG' },
   { id: 'def', n: 'THỦ' },
   { id: 'sup', n: 'PHỤ TRỢ' },
+  { id: 'fx', n: 'HIỆU ỨNG' },
   { id: 'sk1', n: 'KỸ NĂNG CÔNG' },
   { id: 'sk2', n: 'KỸ NĂNG THỦ' }
 ];
-/* frame: dmg=fire(đỏ cam) · rate/pierce=silver(bạc) · multi/storm=shadow(tím tối) · hp/steal/boom=blood(đỏ thẫm)
+/* Thẻ mới v2.1: critR=bronze · critD=fire · burn=blood · stun=lotus · exec=shadow · gale=steel (ảnh lấy từ skill_library).
+   frame: dmg=fire(đỏ cam) · rate/pierce=silver(bạc) · multi/storm=shadow(tím tối) · hp/steal/boom=blood(đỏ thẫm)
           regen/revive=lotus(sen xanh hồng) · def/wall=steel(thép xanh) · gold=jade(lục) · evo/ancient=bronze/fire */
 const CARDS = {
   dmg:     { tab: 'atk', frame: 'fire',   n: 'Sức mạnh',          d: 'Tăng sát thương mỗi viên đạn.' },
   rate:    { tab: 'atk', frame: 'silver', n: 'Tốc độ bắn',        d: 'Bắn nhanh và dồn dập hơn.' },
   multi:   { tab: 'atk', frame: 'shadow', n: 'Đa mục tiêu',       d: 'Mỗi lượt bắn thêm đạn tự nhắm.' },
+  critR:   { tab: 'atk', frame: 'bronze', n: 'Tỷ lệ chí mạng',    d: 'Tăng xác suất ra đòn chí mạng.' },
+  critD:   { tab: 'atk', frame: 'fire',   n: 'Sát thương chí mạng', d: 'Khuếch đại sát thương khi chí mạng.' },
   hp:      { tab: 'def', frame: 'blood',  n: 'Sinh lực',          d: 'Tăng sinh lực tối đa.' },
   regen:   { tab: 'def', frame: 'lotus',  n: 'Hồi phục',          d: 'Tự hồi máu theo thời gian.' },
   def:     { tab: 'def', frame: 'steel',  n: 'Phòng thủ',         d: 'Giảm sát thương nhận vào.' },
-  evo:     { tab: 'sup', frame: 'bronze', n: 'Tiến hóa',          d: 'Mỗi bậc +10% sát thương, +20 HP.' },
+  evo:     { tab: 'sup', frame: 'bronze', n: 'Tiến hóa',          d: 'Mỗi bậc +12% sát thương, +30 HP, +1% chí mạng.' },
   gold:    { tab: 'sup', frame: 'jade',   n: 'Kinh tế',           d: 'Nhận thêm vàng khi hạ quái.' },
-  steal:   { tab: 'sup', frame: 'blood',  n: 'Hút máu',           d: 'Hồi máu theo sát thương gây ra.' },
-  pierce:  { tab: 'sk1', frame: 'silver', n: 'Lửa Xuyên Phá',     d: 'Cầu lửa xanh dài, xuyên 3 quái.' },
-  boom:    { tab: 'sk1', frame: 'blood',  n: 'Lửa Bùng Nổ',       d: 'Nổ lớn, lan 50% sát thương.' },
-  storm:   { tab: 'sk1', frame: 'shadow', n: 'Bão Lửa',           d: 'Mỗi 15s bắn loạt 8 cầu lửa vàng.' },
-  ancient: { tab: 'sk1', frame: 'fire',   n: 'Hỏa Ngục Cổ Đại',   d: 'Mỗi 20s: 6s +50% sát thương, tốc độ.' },
-  revive:  { tab: 'sk2', frame: 'lotus',  n: 'Phượng Hoàng Lửa',  d: 'Giữ 1 HP khi chí mạng. Hồi chiêu 60s.' },
-  wall:    { tab: 'sk2', frame: 'steel',  n: 'Tường Lửa',         d: 'Mỗi 20s: 3s bất tử.' }
+  steal:   { tab: 'sup', frame: 'blood',  n: 'Hút máu',           d: 'Hồi máu theo sát thương (có trần hồi mỗi giây).' },
+  burn:    { tab: 'fx',  frame: 'blood',  n: 'Thiêu đốt',         d: 'Mỗi đòn đánh gây thêm lửa cháy theo thời gian.' },
+  stun:    { tab: 'fx',  frame: 'lotus',  n: 'Choáng',            d: 'Đòn đánh có thể làm quái bất động trong chốc lát.' },
+  exec:    { tab: 'fx',  frame: 'shadow', n: 'Phá Huyết',         d: 'Có cơ hội gây thêm 2% máu tối đa của quái (Boss 0,5%).' },
+  pierce:  { tab: 'sk1', frame: 'silver', n: 'Lửa Xuyên Phá',     d: 'Cầu lửa xanh dài, xuyên nhiều quái.' },
+  boom:    { tab: 'sk1', frame: 'blood',  n: 'Lửa Bùng Nổ',       d: 'Nổ lớn, sát thương lan sang quái bên cạnh.' },
+  storm:   { tab: 'sk1', frame: 'shadow', n: 'Bão Lửa',           d: 'Định kỳ bắn một loạt cầu lửa vàng.' },
+  ancient: { tab: 'sk1', frame: 'fire',   n: 'Hỏa Ngục Cổ Đại',   d: 'Định kỳ tăng sát thương và tốc độ bắn.' },
+  revive:  { tab: 'sk2', frame: 'lotus',  n: 'Phượng Hoàng Lửa',  d: 'Chí mạng vẫn sống, hồi sinh bằng lửa.' },
+  wall:    { tab: 'sk2', frame: 'steel',  n: 'Tường Lửa',         d: 'Định kỳ bất tử trong vài giây.' },
+  gale:    { tab: 'sk2', frame: 'steel',  n: 'Cuồng Phong Hộ Thân', d: 'Bị bao vây: lốc xoáy đẩy lùi quái.' }
 };
 let upTab = 'atk', hintT = 0;
 const cardKeys = t => Object.keys(CARDS).filter(k => CARDS[k].tab === t);
@@ -45,13 +53,14 @@ function cardInfo(k) {
     };
   }
   if (SK[k]) {
-    const o = SK[k];
-    if (S.sk[k]) return { lv: 1, st: 'max', pr: 'ĐÃ MỞ', d2: 'Đã kích hoạt' };
-    if (S.evo < o.e) {
+    const o = SK[k], l = S.sk[k];
+    if (l >= o.m) return { lv: l, st: 'max', pr: 'MAX', d2: o.f(l) + ' (tối đa)' };
+    if (!l && S.evo < o.e) {
       const t = 'Cần tiến hóa: ' + EVO[o.e][0];
-      return { lv: 0, st: 'lock', price: o.c, d2: t, need: t, warn: true };
+      return { lv: 0, st: 'lock', price: skCost(k, 0), d2: t, need: t, warn: true };
     }
-    return { lv: 0, st: S.gold >= o.c ? 'ok' : 'poor', price: o.c, d2: 'Chạm để mở khóa', need: 'Chưa đủ vàng' };
+    const c = skCost(k, l);
+    return { lv: l, st: S.gold >= c ? 'ok' : 'poor', price: c, need: 'Chưa đủ vàng', d2: (l ? o.f(l) : 'Chưa mở') + ' → ' + o.f(l + 1) };
   }
   const u = UP[k], l = S.lv[k], pc = u.u[0] === '%' ? '%' : '', tail = u.u.replace(/^%/, '');
   if (l >= u.m) return { lv: l, st: 'max', pr: 'MAX', d2: u.f(l) + pc + tail + ' (tối đa)' };
@@ -67,7 +76,7 @@ function cardHTML(k) {
     <img class="c-frame" src="assets2/cards/frame_${c.frame}.png" alt="" draggable="false">
     <span class="c-lv">Lv.<b>${i.lv}</b></span>
     <span class="c-price">${price}</span>
-    <span class="c-name${c.n.length > 13 ? ' long' : ''}">${c.n}</span>
+    <span class="c-name${c.n.length > 17 ? ' xl' : c.n.length > 13 ? ' long' : ''}">${c.n}</span>
     <span class="c-desc"><span>${c.d}</span><em${i.warn ? ' class="warn"' : ''}>${i.d2}</em></span>
     ${i.st === 'lock' ? `<span class="c-lock"><img src="${UI}btn_lock.png" alt=""></span>` : ''}
     <i class="c-fx"><b></b><s></s></i>
@@ -89,7 +98,11 @@ function renderUp(fk, ft) {
     const ready = cardKeys(t.id).some(k => cardInfo(k).st === 'ok');
     return `<button type="button" class="tab${t.id === upTab ? ' on' : ''}" data-a="tab" data-k="${t.id}">${t.n}${ready ? '<i class="dot"></i>' : ''}</button>`;
   }).join('');
-  $('cards').innerHTML = cardKeys(upTab).map(cardHTML).join('');
+  const cs = $('cards'), keep = cs._tab === upTab ? cs.scrollLeft : 0;   // mua thẻ không làm nhảy vị trí cuộn
+  cs.innerHTML = cardKeys(upTab).map(cardHTML).join('');
+  cs._tab = upTab;
+  cs.scrollLeft = keep;
+  requestAnimationFrame(cardNav);
   if (fk) {
     const el = document.querySelector('.card[data-k="' + fk + '"]');
     if (el) el.classList.add(ft === 'ok' ? 'fx-buy' : 'fx-no');
@@ -103,10 +116,10 @@ function buyCard(k) {
   if (k === 'evo') {
     const n = EVO[S.evo + 1];
     S.gold -= n[1]; S.evo++;
-    if (R && R.al) R.hp += 20;
+    if (R && R.al) R.hp += CFG.evoHp;
     sfx('evo');
   } else if (SK[k]) {
-    S.gold -= SK[k].c; S.sk[k] = 1;
+    S.gold -= skCost(k, S.sk[k]); S.sk[k]++;
     sfx('skill');
   } else {
     const old = sv().maxHp;
@@ -118,3 +131,53 @@ function buyCard(k) {
   upHint();
   renderUp(k, 'ok');
 }
+
+/* ----- Vuốt / kéo / cuộn ngang giữa các thẻ trong một tab ----- */
+function cardNav() {
+  const cs = $('cards'), w = $('cwrap'), mx = cs.scrollWidth - cs.clientWidth, ov = mx > 4;
+  w.classList.toggle('al', ov && cs.scrollLeft > 4);
+  w.classList.toggle('ar', ov && cs.scrollLeft < mx - 4);
+  $('swh').classList.toggle('on', ov);
+}
+let csAnim = 0;
+function cardScroll(d) {
+  const cs = $('cards'), from = cs.scrollLeft, to = Math.max(0, Math.min(cs.scrollWidth - cs.clientWidth, from + d * Math.max(200, cs.clientWidth * 0.7)));
+  if (Math.abs(to - from) < 1) return;
+  const id = ++csAnim, t0 = performance.now(), dur = S.set.rm ? 1 : 260;
+  cs.classList.add('drag');   // tạm tắt scroll-snap trong lúc chạy hoạt ảnh
+  (function step(now) {
+    if (id !== csAnim) return;
+    const p = Math.min(1, (now - t0) / dur), e = 1 - Math.pow(1 - p, 3);
+    cs.scrollLeft = from + (to - from) * e;
+    if (p < 1) requestAnimationFrame(step);
+    else cs.classList.remove('drag');
+  })(t0);
+}
+(() => {
+  const cs = $('cards');
+  let dn = null, mv = 0;
+  cs.addEventListener('scroll', cardNav, { passive: true });
+  addEventListener('resize', cardNav);
+  // Chuột: giữ và kéo (màn hình cảm ứng dùng cuộn ngang gốc của trình duyệt)
+  cs.addEventListener('pointerdown', e => { if (e.pointerType === 'mouse' && e.button === 0) { dn = { x: e.clientX, s: cs.scrollLeft }; mv = 0 } });
+  addEventListener('pointermove', e => {
+    if (!dn) return;
+    const d = e.clientX - dn.x;
+    if (!mv && Math.abs(d) > 6) { mv = 1; cs.classList.add('drag') }
+    if (mv) cs.scrollLeft = dn.s - d;
+  });
+  const end = () => { if (dn) { dn = null; cs.classList.remove('drag') } };
+  addEventListener('pointerup', end);
+  addEventListener('pointercancel', end);
+  // Vừa kéo xong thì không tính là bấm vào thẻ
+  cs.addEventListener('click', e => { if (mv) { e.stopPropagation(); e.preventDefault(); mv = 0 } }, true);
+  // Lăn chuột dọc = cuộn ngang
+  cs.addEventListener('wheel', e => {
+    if (cs.scrollWidth <= cs.clientWidth + 4 || Math.abs(e.deltaY) < Math.abs(e.deltaX)) return;
+    cs.scrollLeft += e.deltaY;
+    e.preventDefault();
+  }, { passive: false });
+  document.addEventListener('keydown', e => {
+    if (scr === 'up' && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) { cardScroll(e.key === 'ArrowLeft' ? -1 : 1); e.preventDefault() }
+  });
+})();

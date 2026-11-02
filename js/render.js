@@ -81,8 +81,15 @@ function hudc() {
   cx += 19;
   cx += tw("×" + p2(S.st.deaths), cx, Y0 + 17, "#fff", 11) + 8;
   panel(cx, Y0, 32, 26);
+  r.wr = { x: cx, y: Y0, w: 32, h: 26 };   // vùng bấm của ô ĐỢT (Mod: nhập đợt)
   tw("ĐỢT", cx + 16, Y0 + 11, "#ff4a4a", 7, "center");
-  tw(p2(r.wave - 1), cx + 16, Y0 + 22, "#fff", 11, "center");
+  tw(p2(r.wave), cx + 16, Y0 + 22, "#fff", 11, "center");
+  if (wjOn()) {
+    x.strokeStyle = "rgba(255,210,58," + (0.55 + 0.35 * Math.sin(CT * 4)).toFixed(2) + ")";
+    x.lineWidth = 1;
+    x.strokeRect(cx + 0.5, Y0 + 0.5, 31, 25);
+    tw("✎", cx + 29, Y0 + 9, "#ffd23a", 7, "right");
+  }
   const BX = X0, BY = Y0 + 31, hw = 16.5, gp = 2, BW = Math.round(N * hw + (N - 1) * gp + 16), BH = 27;
   let ox = 0, oy = 0;
   if (r.hitT > 0.12 && !S.set.rm) {
@@ -440,7 +447,9 @@ function draw() {
     }
   }
   if (R) for (const m of R.mon) slime(m);
+  drawStatus();
   dino();
+  drawGale();
   if (R) {
     for (const l of R.lv) {
       if (CB() && LF[S.evo]) {

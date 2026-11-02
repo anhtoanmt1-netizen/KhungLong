@@ -5,6 +5,18 @@ let pendRel = 0;  // có bản cập nhật mới, chờ về menu rồi tải l
 function show(id) {
   scr = id;
   document.querySelectorAll('.sc').forEach(e => e.classList.toggle('on', e.id === id));
+  if (id === 'menu') dfLabel();
+}
+/* Chế độ độ khó: chọn ở màn "Trò chơi mới", lưu trong S.df */
+let newDf = 0;
+function dfLabel() {
+  const e = $('dfl'), d = DF();
+  e.textContent = 'Chế độ: ' + d.n;
+  e.style.setProperty('--c', d.c);
+}
+function renderDf() {
+  $('dfsel').innerHTML = DIFF.map((d, i) => `<button type="button" class="dfb${i === newDf ? ' on' : ''}" style="--c:${d.c}" data-a="dfpick" data-k="${i}">${d.n}</button>`).join('');
+  $('dfd').textContent = DIFF[newDf].d + ' (Quái ×' + DIFF[newDf].hp + ' máu, ×' + DIFF[newDf].dm + ' sát thương · Vàng ×' + DIFF[newDf].gd + ')';
 }
 
 function act(a, k, i) {
@@ -22,15 +34,18 @@ function act(a, k, i) {
       break;
     case 'tab': upTab = k; renderUp(); break;
     case 'card': buyCard(k); break;
+    case 'cprev': cardScroll(-1); break;
+    case 'cnext': cardScroll(1); break;
 
     // --- Chơi / tạm dừng / menu ---
     case 'pause': if (R && R.al) { R.pz = 1; show('pause') } break;
     case 'resume': if (R) R.pz = 0; show(null); break;
     case 'menu': R = null; chkRel(); $('mg').textContent = S.gold; show('menu'); break;
-    case 'newg': show('conf'); break;
+    case 'newg': newDf = S.df | 0; renderDf(); show('conf'); break;
+    case 'dfpick': newDf = +k; renderDf(); break;
     case 'donew': {
       const st = S.set, cu = S.cu, md = S.mod;
-      S = defS(); S.set = st; S.cu = cu; S.mod = md;   // giữ cài đặt, ảnh tùy chỉnh và Mod
+      S = defS(); S.set = st; S.cu = cu; S.mod = md; S.df = newDf;   // giữ cài đặt, ảnh tùy chỉnh và Mod
       save(); R = null; $('mg').textContent = 0; show('menu');
       break;
     }
@@ -87,6 +102,7 @@ document.addEventListener('keydown', e => {
   else if (scr === 'set') act('setclose');
   else if (scr === 'cust') act('custback');
   else if (scr === 'mod' || scr === 'modpw') act('modclose');
+  else if (scr === 'wj') act('wjclose');
 });
 document.addEventListener('visibilitychange', () => {
   if (document.hidden) { save(); if (R && R.al && scr === null) act('pause') }
@@ -141,6 +157,7 @@ function chkRel() { if (pendRel && (!R || !R.al)) location.reload() }
 cv.addEventListener('pointerdown', e => {
   if (!R || !R.al || R.pz || scr !== null) return;
   const b = cv.getBoundingClientRect(), px = (e.clientX - b.left) * W / b.width, py = (e.clientY - b.top) * H / b.height;
+  if (wjTap(px, py)) return;    // Mod: bấm ô ĐỢT = nhập đợt muốn nhảy tới
   if (modTap(px, py)) return;   // 3 lần chạm liên tiếp vào avatar = mở Bảng Mod
   let bc = null, bd = 1e9;
   for (const c of R.ch) {
@@ -150,3 +167,4 @@ cv.addEventListener('pointerdown', e => {
   }
   if (bc) { bc.st = 1; bc.vz = 150; bc.vx = 0; sfx('tap') }
 });
+dfLabel();

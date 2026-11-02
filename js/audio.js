@@ -1,7 +1,9 @@
 /* ===== Âm thanh WebAudio: nhạc nền tổng hợp, hiệu ứng, tiếng bắn; AU.* và sfx(). ===== */
 let AC, NB;
+/* v2.1: tiếng phun lửa (shoot), đạn trúng quái (hit, crit) và nổ (boomf) bị ồn → nhân 0,4 (giảm 60%) so với âm lượng mặc định cũ. */
+const QUIET = 0.4, QUIETSET = { shoot: 1, hit: 1, crit: 1, boomf: 1 };
 const AU = (() => {
-  let M, SB, MU, FB, MB = null, MS = null, DB = null, UB = null, PA = null, gen = 0, vo = 0, cd = {}, kc = 0, kt = -9, nx = 0, st = 0, md = "";
+  let M, SB, QB, cur = null, MU, FB, MB = null, MS = null, DB = null, UB = null, PA = null, gen = 0, vo = 0, cd = {}, kc = 0, kt = -9, nx = 0, st = 0, md = "";
   const on = () => S.set.snd, mo = () => S.set.mus !== 0 && S.set.mus !== false, p = (f, s2 = 0.05) => f * (1 + (Math.random() - 0.5) * s2 * 2);
   function init() {
     if (AC) {
@@ -19,6 +21,9 @@ const AU = (() => {
       SB.gain.value = S.set.sv;
       MU = AC.createGain();
       MU.gain.value = 0;
+      QB = AC.createGain();
+      QB.gain.value = QUIET;   // bus riêng cho tiếng phun lửa + va chạm: nhỏ hơn mặc định 60%
+      QB.connect(SB);
       SB.connect(M);
       MU.connect(M);
       M.connect(c);
@@ -101,7 +106,7 @@ const AU = (() => {
     g.gain.linearRampToValueAtTime(v, t + 6e-3);
     g.gain.exponentialRampToValueAtTime(1e-4, t + d);
     s2.connect(g);
-    g.connect(o.bus || SB);
+    g.connect(o.bus || cur || SB);
     vo++;
     s2.onended = () => vo--;
     s2.start(t);
@@ -119,13 +124,13 @@ const AU = (() => {
     g.gain.exponentialRampToValueAtTime(1e-4, t + d);
     s2.connect(fl);
     fl.connect(g);
-    g.connect(o.bus || SB);
+    g.connect(o.bus || cur || SB);
     vo++;
     s2.onended = () => vo--;
     s2.start(t, Math.random() * 0.4);
     s2.stop(t + d + 0.03);
   }
-  const arp = (a, ty, v, g = 0.07, d = 0.14) => a.forEach((f, i) => T(f, d, ty, v, { at: i * g })), CD = { boomf: 0.1, shoot: 0.05, hit: 0.035, kill: 0.04, flyer: 0.45, hurt: 0.1, ui: 0.05, dive: 0.2 };
+  const arp = (a, ty, v, g = 0.07, d = 0.14) => a.forEach((f, i) => T(f, d, ty, v, { at: i * g })), CD = { stun: 0.12, exec: 0.1, gale: 0.5, boomf: 0.1, shoot: 0.05, hit: 0.035, kill: 0.04, flyer: 0.45, hurt: 0.1, ui: 0.05, dive: 0.2 };
   const PE = [0, 2, 4, 7, 9], R_ = {
     shoot(a) {
       const iv = a && a.iv || 1, pc = a && a.pc;
@@ -143,7 +148,7 @@ const AU = (() => {
       g.gain.setValueAtTime(0.5, t + d * 0.7);
       g.gain.linearRampToValueAtTime(1e-4, t + d);
       s2.connect(g);
-      g.connect(SB);
+      g.connect(cur || SB);
       s2.start(t, 0);
       s2.stop(t + d + 0.02);
     },
@@ -266,6 +271,20 @@ const AU = (() => {
       arp([262, 330, 392, 523, 659, 784, 1047], "triangle", 0.07, 0.08, 0.25);
       N(0.7, "highpass", 1e3, 8e3, 0.05);
     },
+    stun() {
+      T(1500, 0.07, "triangle", 0.025, { to: 900 });
+      T(1900, 0.06, "sine", 0.018, { at: 0.05 });
+    },
+    exec() {
+      T(80, 0.2, "sine", 0.13, { to: 38 });
+      N(0.12, "lowpass", 1800, 200, 0.09);
+      T(240, 0.12, "sawtooth", 0.035, { to: 90 });
+    },
+    gale() {
+      N(0.9, "bandpass", 300, 2400, 0.13, { q: 1.2 });
+      N(0.8, "highpass", 1500, 6000, 0.04);
+      T(180, 0.8, "sawtooth", 0.035, { to: 520, vib: 14 });
+    },
     skill() {
       arp([392, 523, 784], "triangle", 0.07, 0.08, 0.22);
       N(0.4, "highpass", 3e3, 9e3, 0.04);
@@ -279,7 +298,9 @@ const AU = (() => {
     const now = AC.currentTime;
     if (cd[n] && now - cd[n] < (CD[n] || 0)) return;
     cd[n] = now;
+    cur = QUIETSET[n] ? QB : null;
     R_[n] && R_[n](a);
+    cur = null;
     if (n === "die") kt = -9;
   }
   function tick() {

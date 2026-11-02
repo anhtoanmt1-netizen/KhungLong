@@ -48,6 +48,7 @@
     <h1>PIXEL DINO<br>SURVIVOR</h1>
     <p>Khủng long sinh tồn · Vàng: <b id="mg"></b></p>
     <p id="warn"></p>
+    <p class="dfl" id="dfl"></p>
     <p class="ver" id="ver"></p>
     <button class="b" id="bp" data-a="play">▶ CHƠI</button>
     <button class="b a" id="bf" data-a="play1" style="display:none">↺ Từ đầu (đợt 1)</button>
@@ -64,7 +65,7 @@
     <h2>Cách chơi</h2>
     <p>Khủng long tự động phun cầu lửa vào quái. Quái đi từ phải sang trái, chạm vào bạn sẽ mất HP.</p>
     <p>Quái chết rơi vàng. Dùng vàng để nâng cấp bằng các thẻ: bấm vào thẻ là nâng cấp ngay.</p>
-    <p>Thẻ chia 5 nhóm: Công, Thủ, Phụ trợ, Kỹ năng công và Kỹ năng thủ. Kỹ năng cần tiến hóa đủ bậc mới mở được.</p>
+    <p>Thẻ chia 6 nhóm: Công (gồm chí mạng), Thủ, Phụ trợ, Hiệu ứng (Thiêu đốt, Choáng, Phá Huyết), Kỹ năng công và Kỹ năng thủ. Kỹ năng có 5 cấp và cần tiến hóa đủ bậc mới mở được. Vuốt ngang (hoặc kéo chuột, lăn chuột, bấm mũi tên) để xem hết các thẻ trong một nhóm.</p>
     <p>Thỉnh thoảng có rương kho báu chạy tới: hãy CHẠM vào rương để mở và nhận vàng; không chạm thì rương sẽ bị bỏ lỡ.</p>
     <p>Dùng nút x1 / x2 để tăng tốc trò chơi. Cứ 20 giây là sang đợt mới, 45 giây có một Boss: Slime Vua, Rồng Con rồi 12 Boss đặc biệt, có con bay, có con chạy. Bảng bên phải cho biết số quái đang có trên màn hình.</p>
     <p>HP về 0 thì hết lượt; lượt sau quay lại 3 đợt trước đó, vẫn giữ vàng và nâng cấp. NEW GAME sẽ xóa toàn bộ tiến trình.</p>
@@ -98,8 +99,27 @@
         <button class="ibtn" data-a="closeup" aria-label="Đóng"><img src="assets2/ui/btn_close.png" alt=""></button>
       </header>
       <nav class="tabs" id="tabs"></nav>
-      <div class="cards" id="cards"></div>
+      <div class="cwrap" id="cwrap">
+        <button type="button" class="cnav l" data-a="cprev" aria-label="Xem thẻ trước"><img src="assets2/ui/btn_prev.png" alt=""></button>
+        <div class="cards" id="cards"></div>
+        <button type="button" class="cnav r" data-a="cnext" aria-label="Xem thẻ sau"><img src="assets2/ui/btn_next.png" alt=""></button>
+      </div>
+      <p class="swh" id="swh">‹ Vuốt ngang để xem thêm thẻ ›</p>
       <p class="hint" id="uphint"></p>
+    </div>
+  </div>
+
+  <!-- Mod: nhập đợt muốn nhảy tới (bấm vào ô ĐỢT khi công tắc "Nhập đợt" bật) -->
+  <div class="sc" id="wj">
+    <div class="panel mod-pw">
+      <header class="ph">
+        <h2 class="ptitle">NHẢY ĐỢT</h2>
+        <button class="ibtn" data-a="wjclose" aria-label="Đóng"><img src="assets2/ui/btn_close.png" alt=""></button>
+      </header>
+      <p class="mm" id="wjcur"></p>
+      <input type="number" id="wjin" inputmode="numeric" min="1" max="9999" step="1" placeholder="Số đợt" aria-label="Đợt muốn nhảy tới">
+      <button class="b s" data-a="wjgo">Nhảy tới đợt này</button>
+      <p id="wjm" class="mm"></p>
     </div>
   </div>
 
@@ -124,6 +144,9 @@
   <div class="sc" id="conf">
     <h2>Trò chơi mới?</h2>
     <p>Bạn có chắc chắn muốn bắt đầu trò chơi mới? Toàn bộ vàng, nâng cấp và tiến trình hiện tại sẽ bị xóa.</p>
+    <p class="dft">Chọn chế độ chơi (cố định cho đến khi bắt đầu game mới):</p>
+    <div class="dfsel" id="dfsel"></div>
+    <p class="mm" id="dfd"></p>
     <div class="row">
       <button class="b" data-a="menu">Hủy</button>
       <button class="b r" data-a="donew">Xác nhận trò chơi mới</button>
@@ -212,6 +235,7 @@
 <script src="js/custom.js"></script>
 <script src="js/settings.js"></script>
 <script src="js/mod.js"></script>
+<script src="js/skills.js"></script>
 <script src="js/cards.js"></script>
 <script src="js/game.js"></script>
 <script src="js/ui.js"></script>

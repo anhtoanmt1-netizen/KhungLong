@@ -1,7 +1,7 @@
 /* ===== Logic ván chơi: startRun, sinh quái, sát thương, giết quái, bắn, cập nhật mỗi khung hình upd(). ===== */
 function startRun() {
   const s = sv();
-  R = { t: (S.rw - 1) * 20, hp: s.maxHp, kills: 0, gold: 0, dmgT: 0, tier: 0, mon: [], lv: [], fx: [], tx: [], cd: 0.3, sp: 1.2, inv: 0, al: 1, dT: 0, pz: 0, wave: S.rw, bn: 2, hitT: 0, atk: 0, king: 100 + 45 * Math.max(0, Math.ceil(((S.rw - 1) * 20 - 100) / 45)), dust: 0, ov: 0, cs: 8, ca: 10, cw: 12, cr: 0, buf: 0, sh: 0 };
+  R = { t: (S.rw - 1) * 20, hp: s.maxHp, kills: 0, gold: 0, dmgT: 0, tier: 0, mon: [], lv: [], fx: [], tx: [], cd: 0.3, sp: 1.2, inv: 0, al: 1, dT: 0, pz: 0, wave: S.rw, bn: 2, hitT: 0, atk: 0, king: 100 + 45 * Math.max(0, Math.ceil(((S.rw - 1) * 20 - 100) / 45)), dust: 0, ov: 0, cs: 8, ca: 10, cw: 12, cr: 0, buf: 0, sh: 0, bm: 1.5, sbT: 1, sbU: 0, gc: 4, gk: 0, gw: null };
   R.ch = [];
   R.cq = [];
   R.ex = [];
@@ -26,12 +26,13 @@ function spawn(king) {
     ti = n < BOSSORD.length ? BOSSORD[n] : rnd() < 0.15 ? (rnd() < 0.5 ? 7 : 15) : BOSS0 + Math.floor(rnd() * BOSS.length);
   }
   else {
-    const lo = r.wave < 8 ? Math.max(0, r.wave - 2) : 1, hi = r.wave < 8 ? r.wave - 1 : 6;
+    // Từ đợt 8 trở đi quái yếu dần biến mất khỏi đợt sinh (đợt 14 bỏ Slime Cỏ/Lam, ... đợt 32+ chỉ còn 5-6), quái đặc biệt yếu cũng bị loại dần
+    const lo = r.wave < 8 ? Math.max(0, r.wave - 2) : Math.min(5, 1 + Math.floor((r.wave - 8) / 6)), hi = r.wave < 8 ? r.wave - 1 : 6;
     ti = lo + Math.floor(rnd() * (hi - lo + 1));
-    const u = NU.filter((q) => r.wave >= q[1]);
+    const mn = 8 + Math.min(5, Math.floor(r.wave / 20)), u = NU.filter((q) => r.wave >= q[1] && q[0] >= mn);
     if (u.length && rnd() < 0.5) ti = u[Math.floor(rnd() * u.length)][0];
   }
-  const d = SL[ti], hm = 1 + r.t * 0.012;
+  const d = SL[ti], bo = d[7] === "boss" || ti === 7 || ti === 15, hm = SC.hp(r.t) * (bo ? SC.bh(r.t) : 1) * DF().hp, dmm = SC.dm(r.t) * (bo ? SC.bd(r.t) : 1) * DF().dm;
   if (king) {
     sfx("boss", ti);
     r.bb = { s: "⚠ BOSS · " + d[0].toUpperCase(), t: 3, c: d[1] };
@@ -40,7 +41,7 @@ function spawn(king) {
     r.ex.push({ x: W - 36, y: GY - 40, t: 0, sc: 2.4, col: "a", ring: d[1], rr: 70 });
   } else if (d[8]) sfx("flyer", ti);
   if (d[2] > SL[r.tier][2]) r.tier = ti;
-  const mo = { ti, k: d[7] || "", z: d[8] || 0, z0: d[8] || 0, dv: 0, ai: { bee: 0.7, bird: 0.8, dragon: 0.8 }[d[7]] || 1, x: W + 12, hp: d[2] * hm, mx: d[2] * hm, dm: d[3] * (1 + r.t * 4e-3), sp: d[5] * 2 * (1 + Math.min(0.5, r.t / 400)), gd: d[4] * (1 + r.t / 240), w: d[6], h: Math.round(d[6] * 0.7), cd: 0, fl: 0, ph: rnd() * 6, of: rnd() * 10 };
+  const mo = { ti, k: d[7] || "", z: d[8] || 0, z0: d[8] || 0, dv: 0, ai: { bee: 0.7, bird: 0.8, dragon: 0.8 }[d[7]] || 1, x: W + 12, hp: d[2] * hm, mx: d[2] * hm, dm: d[3] * dmm, sp: d[5] * 2 * SC.sp(r.t), gd: d[4] * SC.gd(r.t) * DF().gd, w: d[6], h: Math.round(d[6] * 0.7), cd: 0, fl: 0, ph: rnd() * 6, of: rnd() * 10, st: 0, si: 0, bp: 0, bn: 0, ba: 0, bt: 0, bf: 0, xc: 0, kv: 0 };
   if (d[7] === "boss") {
     // Boss: kích thước theo ảnh (có thể chỉnh trong Mod), vùng trúng đòn theo hình ảnh
     const b = BOSS[ti - BOSS0], im = BI[b.i], sz = bossPx(b.i), asp = ld(im) ? im.naturalHeight / im.naturalWidth : 0.92;
@@ -60,9 +61,10 @@ function hurt(m, s) {
   sfx("hurt");
   if (r.hp <= 0) {
     if (S.sk.revive && r.cr <= 0) {
-      r.hp = 1;
-      r.cr = 60;
-      r.inv = 1.5;
+      const rv = SKV.revive(S.sk.revive);
+      r.hp = Math.max(1, Math.round(s.maxHp * rv.hp));
+      r.cr = rv.cd;
+      r.inv = rv.inv;
       tx(DX, GY - 60, "HỒI SINH", "#ffd23a");
       R.ex.push({ x: DX, y: GY - 30, t: 0, sc: 2.2, col: "g", ring: "#ffd23a", rr: 60 });
       for (let i = 0; i < 26; i++) R.fx.push({ x: DX + (rnd() - 0.5) * 40, y: GY - rnd() * 40, vx: (rnd() - 0.5) * 40, vy: -50 - rnd() * 90, g: -30, l: 0.8, c: i % 2 ? "#ffd23a" : "#fff6b0", s: 2 });
@@ -98,17 +100,21 @@ function kill(m, s) {
   } else sfx("kill", m);
 }
 function hit(m, s) {
-  const cr = rnd() < CFG.crit, d = Math.round(s.dmg * (cr ? 2 : 1)), a = Math.min(d, m.hp);
+  const cr = rnd() < s.cr, d = Math.round(s.dmg * (cr ? s.cd : 1)), a = Math.min(d, m.hp);
   m.hp -= d;
   m.fl = 0.08;
   R.dmgT += a;
-  R.hp = Math.min(s.maxHp, R.hp + a * s.steal);
+  heal(a, s);
   tx(m.x, GY - (m.z || 0) - m.h - 6, (cr ? "CRIT -" : "-") + d, cr ? "#ffd23a" : "#fff");
+  if (cr) critFx(m);
   sfx(cr ? "crit" : "hit");
-  if (m.hp <= 0) kill(m, s);
+  if (m.hp <= 0) { kill(m, s); return; }
+  if (s.burn > 0) addBurn(m, d, s);
+  if (s.stunP > 0 && m.si <= 0 && rnd() < s.stunP * (m.k === "boss" ? 0.5 : 1)) stunMon(m, s);
+  if (S.sk.exec) execProc(m, s);
 }
 function splash(o, s) {
-  const d = Math.max(1, Math.round(s.dmg * 0.5));
+  const d = Math.max(1, Math.round(s.dmg * SKV.boom(S.sk.boom).sp));
   o.hp -= d;
   o.fl = 0.08;
   R.dmgT += d;
@@ -119,7 +125,7 @@ function fire(s, tg) {
   const r = R, kd = dk(), iw = (IM[0].width || 80) * kd, ox = DX + iw * 0.35, oy = GY - (IM[0].height || 70) * kd * 0.75, ts = r.mon.filter((m) => !m.dead && m.x > front() + 8 && m.x < W - 4).sort((p, q) => p.x - q.x);
   for (let i = 0; i < s.n; i++) {
     const t = ts[i % ts.length] || tg, a = Math.atan2(GY - (t.z || 0) - t.h / 2 - oy, t.x - ox) + (i - (s.n - 1) / 2) * 0.06;
-    r.lv.push({ x: ox, y: oy, vx: Math.cos(a) * CFG.leafSpd, vy: Math.sin(a) * CFG.leafSpd, a, tg: t, p: S.sk.pierce ? 3 : 1, hs: [], ag: 0, pc: S.sk.pierce ? 1 : 0, k: r.buf > 0 ? "a" : "" });
+    r.lv.push({ x: ox, y: oy, vx: Math.cos(a) * CFG.leafSpd, vy: Math.sin(a) * CFG.leafSpd, a, tg: t, p: S.sk.pierce ? SKV.pierce(S.sk.pierce).n : 1, hs: [], ag: 0, pc: S.sk.pierce ? 1 : 0, k: r.buf > 0 ? "a" : "" });
   }
   for (let i = 0; i < 6; i++) r.fx.push({ x: ox + 2, y: oy + (rnd() - 0.5) * 6, vx: 60 + rnd() * 110, vy: (rnd() - 0.5) * 70, g: -20, l: 0.25 + rnd() * 0.15, c: i % 2 ? "#ffd23a" : "#ff8a2a", s: 2 });
   r.atk = 0.15;
@@ -210,6 +216,10 @@ function upd(dt) {
   }
   chestUpd(dt / GS);
   r.hp = Math.min(s.maxHp, r.hp + s.regen * dt);
+  if ((r.sbT -= dt) <= 0) {
+    r.sbT = 1;
+    r.sbU = 0;
+  }
   r.buf -= dt;
   r.sh -= dt;
   if (r.buf > 0 && r.fx.length < 380 && (r.au = (r.au || 0) - dt) <= 0) {
@@ -218,32 +228,38 @@ function upd(dt) {
   }
   if (S.sk.revive) r.cr -= dt;
   if (S.sk.storm && (r.cs -= dt) <= 0) {
-    r.cs = 15;
+    const sg = SKV.storm(S.sk.storm);
+    r.cs = sg.cd;
     const kd = dk(), ox = DX + (IM[0].width || 80) * kd * 0.35, oy = GY - (IM[0].height || 70) * kd * 0.75;
-    for (let i = 0; i < 8; i++) {
-      const a = (i - 3.5) * 0.06 + 0.1;
-      r.lv.push({ x: ox, y: oy, vx: Math.cos(a) * CFG.leafSpd, vy: Math.sin(a) * CFG.leafSpd, a, p: S.sk.pierce ? 3 : 1, hs: [], ag: 0, pc: S.sk.pierce ? 1 : 0, k: "s" });
+    for (let i = 0; i < sg.n; i++) {
+      const a = (i - (sg.n - 1) / 2) * (sg.n > 10 ? 0.05 : 0.06) + 0.1;
+      r.lv.push({ x: ox, y: oy, vx: Math.cos(a) * CFG.leafSpd, vy: Math.sin(a) * CFG.leafSpd, a, p: S.sk.pierce ? SKV.pierce(S.sk.pierce).n : 1, hs: [], ag: 0, pc: S.sk.pierce ? 1 : 0, k: "s" });
     }
     r.ex.push({ x: ox + 4, y: oy, t: 0, sc: 0.9, col: "s", ring: "#ffe066", rr: 34 });
     tx(DX, GY - 60, "BÃO LỬA", "#ffb040");
     sfx("storm");
   }
   if (S.sk.ancient && (r.ca -= dt) <= 0) {
-    r.ca = 20;
-    r.buf = 6;
+    const an = SKV.ancient(S.sk.ancient);
+    r.ca = an.cd;
+    r.buf = an.dur;
+    r.bm = an.b;
     tx(DX, GY - 60, "CỔ ĐẠI", "#ff9a3a");
     sfx("ancient");
   }
   if (S.sk.wall && (r.cw -= dt) <= 0) {
-    r.cw = 20;
-    r.sh = 3;
+    const wl = SKV.wall(S.sk.wall);
+    r.cw = wl.cd;
+    r.sh = wl.dur;
     tx(DX, GY - 60, "TƯỜNG LỬA", "#8effd0");
     sfx("wall");
   }
+  galeUpd(dt, s);
+  if (r.gw && (r.gw.t += dt) >= r.gw.l) r.gw = null;
   r.sp -= dt;
   if (r.sp <= 0 && r.mon.length < CFG.maxMon) {
     spawn(0);
-    r.sp = Math.max(0.5, 2.4 - r.t * 8e-3) * (0.8 + rnd() * 0.4);
+    r.sp = SC.si(r.t) * DF().si * (0.8 + rnd() * 0.4);
   }
   if (r.t >= r.king && r.mon.length < CFG.maxMon) {
     spawn(1);
@@ -260,17 +276,34 @@ function upd(dt) {
   }
   const fx = front();
   for (const m of r.mon) {
+    if (m.dead) continue;
     m.fl -= dt;
     m.cd -= dt;
+    if (m.xc > 0) m.xc -= dt;
+    if (m.si > 0) m.si -= dt;
+    if (m.bp > 0) {
+      burnTick(m, dt, s);
+      if (m.hp <= 0) {
+        kill(m, s);
+        continue;
+      }
+    }
+    if (m.kv > 2) {
+      m.x = Math.min(W + 40, m.x + m.kv * dt);
+      m.kv *= Math.exp(-7 * dt);
+    } else m.kv = 0;
+    const sn = m.st > 0;
+    if (sn) m.st -= dt;
     if (m.z0) {
       m.dv -= dt;
       m.z = m.z0 + Math.sin(CT * (m.zs || (m.k === "bat" ? 7 : 3)) + m.ph) * (m.za || (m.k === "bat" ? 9 : 5)) - (m.dv > 0 ? m.z0 * 0.5 * Math.sin(Math.PI * (1 - m.dv / 0.4)) : 0);
     }
     let msp = m.sp;
     if (m.k === "boss") msp *= bossMove(m, dt);
+    if (sn) msp = 0;
     const lim = fx + m.w / 2 + m.of;
     if (m.x > lim) m.x = Math.max(lim, m.x - msp * dt);
-    else if (m.cd <= 0 && r.inv <= 0 && r.al) {
+    else if (m.cd <= 0 && r.inv <= 0 && r.al && !sn && !(m.kv > 30)) {
       m.cd = m.ai;
       if (m.z0) {
         m.dv = 0.4;
@@ -313,7 +346,7 @@ function upd(dt) {
         explode(l, m);
         if (S.sk.boom) {
           r.fx.push({ x: m.x, y: GY - m.h / 2, vx: 0, vy: 0, l: 0.2, c: "#ffb040", s: 10 });
-          for (const o of r.mon) if (o !== m && !o.dead && Math.abs(o.x - m.x) < 26) splash(o, s);
+          for (const o of r.mon) if (o !== m && !o.dead && Math.abs(o.x - m.x) < SKV.boom(S.sk.boom).r) splash(o, s);
         }
         break;
       }

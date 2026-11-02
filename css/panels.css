@@ -38,6 +38,11 @@ input[type=range]::-moz-range-thumb { width: 1.4em; height: 1.4em; border-radius
 .mn { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 700 }
 .mn svg { width: 1.1em; height: 1.1em; vertical-align: -.2em; color: #ffd23a }
 .mr .b { min-width: 6em; flex: none; padding: .4em .6em; min-height: 2.3em; font-size: .9em }
+.dft { margin: .4em 0 .2em; font-weight: 700; font-size: .9em; color: #cdd6f4 }
+.dfsel { display: flex; gap: .6em; justify-content: center; flex-wrap: wrap; margin: .3em 0 }
+.dfb { font: 800 .95em/1 Montserrat, sans-serif; padding: .6em 1.1em; min-width: 7em; color: #e8ecff; background: #141a33; border: .17em solid var(--c, #888); border-radius: .7em; cursor: pointer; opacity: .62; transition: transform .1s, opacity .15s, box-shadow .15s; -webkit-tap-highlight-color: transparent }
+.dfb.on { opacity: 1; background: color-mix(in srgb, var(--c) 28%, #141a33); box-shadow: 0 0 .9em color-mix(in srgb, var(--c) 70%, transparent); transform: translateY(-.1em) }
+.dfl { margin: .1em 0 .3em; font-weight: 800; font-size: .95em; color: var(--c, #7ee06a) }
 .mm { min-height: 1.4em; margin: .7em 0 0; text-align: center; font-weight: 700; font-size: .85em; color: #ffd78a }
 
 /* Tùy chỉnh hình ảnh */
