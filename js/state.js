@@ -59,8 +59,8 @@ const sv = () => {
   const L = S.lv, e = S.evo, bm = R && R.buf > 0 ? (R.bm || 1.5) : 1, mh = UP.hp.f(L.hp) + CFG.evoHp * e;
   return {
     maxHp: mh,
-    dmg: Math.round(UP.dmg.f(L.dmg) * (1 + CFG.evoDmg * e) * bm),
-    rate: Math.min(CFG.rateCap, UP.rate.f(L.rate) * bm),
+    dmg: Math.round(UP.dmg.f(L.dmg) * (1 + CFG.evoDmg * e) * bm * (R && R.dim > 0 ? 0.75 : 1)),
+    rate: Math.min(CFG.rateCap, UP.rate.f(L.rate) * bm) * (R && R.slw > 0 ? 0.6 : 1),
     n: UP.multi.f(L.multi),
     cr: Math.min(0.95, (UP.critR.f(L.critR) + CFG.evoCrit * e) / 100),
     cd: UP.critD.f(L.critD) / 100,

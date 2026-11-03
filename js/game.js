@@ -1,7 +1,7 @@
 /* ===== Logic ván chơi: startRun, sinh quái, sát thương, giết quái, bắn, cập nhật mỗi khung hình upd(). ===== */
 function startRun() {
   const s = sv();
-  R = { t: (S.rw - 1) * 20, hp: s.maxHp, kills: 0, gold: 0, dmgT: 0, tier: 0, mon: [], lv: [], fx: [], tx: [], cd: 0.3, sp: 1.2, inv: 0, al: 1, dT: 0, pz: 0, wave: S.rw, bn: 2, hitT: 0, atk: 0, king: 100 + 45 * Math.max(0, Math.ceil(((S.rw - 1) * 20 - 100) / 45)), dust: 0, ov: 0, cs: 8, ca: 10, cw: 12, cr: 0, buf: 0, sh: 0, bm: 1.5, sbT: 1, sbU: 0, gc: 4, gk: 0, gw: null };
+  R = { t: (S.rw - 1) * 20, hp: s.maxHp, kills: 0, gold: 0, dmgT: 0, tier: 0, mon: [], lv: [], fx: [], tx: [], cd: 0.3, sp: 1.2, inv: 0, al: 1, dT: 0, pz: 0, wave: S.rw, bn: 2, hitT: 0, atk: 0, king: 100 + 45 * Math.max(0, Math.ceil(((S.rw - 1) * 20 - 100) / 45)), dust: 0, ov: 0, cs: 8, ca: 10, cw: 12, cr: 0, buf: 0, sh: 0, bm: 1.5, sbT: 1, sbU: 0, gc: 4, gk: 0, gw: null, sil: 0, slw: 0, vul: 0, seal: 0, dim: 0, dimT: 0, ri: 0, dot: 0, dotp: 0, da: 0, dt2: 0, vf: [], bo: [] };
   R.ch = [];
   R.cq = [];
   R.ex = [];
@@ -17,7 +17,7 @@ function startRun() {
 function tx(X, Y, s, c) {
   if (S.set.dn && R.tx.length < 24) R.tx.push({ x: X, y: Y, s, c, l: 0.8 });
 }
-function spawn(king) {
+function spawn(king, tiO, xO) {
   const r = R;
   let ti = 7;
   if (king) {
@@ -32,6 +32,7 @@ function spawn(king) {
     const mn = 8 + Math.min(5, Math.floor(r.wave / 20)), u = NU.filter((q) => r.wave >= q[1] && q[0] >= mn);
     if (u.length && rnd() < 0.5) ti = u[Math.floor(rnd() * u.length)][0];
   }
+  if (tiO != null) ti = tiO;
   const d = SL[ti], bo = d[7] === "boss" || ti === 7 || ti === 15, hm = SC.hp(r.t) * (bo ? SC.bh(r.t) : 1) * DF().hp, dmm = SC.dm(r.t) * (bo ? SC.bd(r.t) : 1) * DF().dm;
   if (king) {
     sfx("boss", ti);
@@ -41,7 +42,7 @@ function spawn(king) {
     r.ex.push({ x: W - 36, y: GY - 40, t: 0, sc: 2.4, col: "a", ring: d[1], rr: 70 });
   } else if (d[8]) sfx("flyer", ti);
   if (d[2] > SL[r.tier][2]) r.tier = ti;
-  const mo = { ti, k: d[7] || "", z: d[8] || 0, z0: d[8] || 0, dv: 0, ai: { bee: 0.7, bird: 0.8, dragon: 0.8 }[d[7]] || 1, x: W + 12, hp: d[2] * hm, mx: d[2] * hm, dm: d[3] * dmm, sp: d[5] * 2 * SC.sp(r.t), gd: d[4] * SC.gd(r.t) * DF().gd, w: d[6], h: Math.round(d[6] * 0.7), cd: 0, fl: 0, ph: rnd() * 6, of: rnd() * 10, st: 0, si: 0, bp: 0, bn: 0, ba: 0, bt: 0, bf: 0, xc: 0, kv: 0 };
+  const mo = { ti, k: d[7] || "", z: d[8] || 0, z0: d[8] || 0, dv: 0, ai: { bee: 0.7, bird: 0.8, dragon: 0.8 }[d[7]] || 1, x: xO != null ? xO : W + 12, hp: d[2] * hm, mx: d[2] * hm, dm: d[3] * dmm, sp: d[5] * 2 * SC.sp(r.t), gd: d[4] * SC.gd(r.t) * DF().gd, w: d[6], h: Math.round(d[6] * 0.7), cd: 0, fl: 0, ph: rnd() * 6, of: rnd() * 10, st: 0, si: 0, bp: 0, bn: 0, ba: 0, bt: 0, bf: 0, xc: 0, kv: 0 };
   if (d[7] === "boss") {
     // Boss: kích thước theo ảnh (có thể chỉnh trong Mod), vùng trúng đòn theo hình ảnh
     const b = BOSS[ti - BOSS0], im = BI[b.i], sz = bossPx(b.i), asp = ld(im) ? im.naturalHeight / im.naturalWidth : 0.92;
@@ -53,18 +54,24 @@ function spawn(king) {
 const front = () => DX + (IM[0].width || 80) * dk() * 0.3;
 function hurt(m, s) {
   if (R.sh > 0) return;
-  const r = R, d = Math.max(1, Math.round(m.dm * (1 - s.def)));
+  const r = R, d = Math.max(1, Math.round(m.dm * (1 - s.def) * (r.vul > 0 ? 1.3 : 1)));
   r.hp -= d;
   r.inv = CFG.iframe;
   r.hitT = 0.25;
   tx(DX, GY - 50, "-" + d, "#ff6a6a");
   sfx("hurt");
+  plCheck(s);
+}
+/* Kiểm tra khủng long hết máu: Phượng Hoàng hồi sinh hoặc kết thúc lượt (dùng chung cho đòn đánh thường và chiêu Boss) */
+function plCheck(s) {
+  const r = R;
   if (r.hp <= 0) {
     if (S.sk.revive && r.cr <= 0) {
       const rv = SKV.revive(S.sk.revive);
       r.hp = Math.max(1, Math.round(s.maxHp * rv.hp));
       r.cr = rv.cd;
       r.inv = rv.inv;
+      r.ri = rv.inv;
       tx(DX, GY - 60, "HỒI SINH", "#ffd23a");
       R.ex.push({ x: DX, y: GY - 30, t: 0, sc: 2.2, col: "g", ring: "#ffd23a", rr: 60 });
       for (let i = 0; i < 26; i++) R.fx.push({ x: DX + (rnd() - 0.5) * 40, y: GY - rnd() * 40, vx: (rnd() - 0.5) * 40, vy: -50 - rnd() * 90, g: -30, l: 0.8, c: i % 2 ? "#ffd23a" : "#fff6b0", s: 2 });
@@ -100,7 +107,7 @@ function kill(m, s) {
   } else sfx("kill", m);
 }
 function hit(m, s) {
-  const cr = rnd() < s.cr, d = Math.round(s.dmg * (cr ? s.cd : 1)), a = Math.min(d, m.hp);
+  const cr = rnd() < s.cr, d = Math.round(s.dmg * (cr ? s.cd : 1) * mdm(m)), a = Math.min(d, m.hp);
   m.hp -= d;
   m.fl = 0.08;
   R.dmgT += a;
@@ -114,7 +121,7 @@ function hit(m, s) {
   if (S.sk.exec) execProc(m, s);
 }
 function splash(o, s) {
-  const d = Math.max(1, Math.round(s.dmg * SKV.boom(S.sk.boom).sp));
+  const d = Math.max(1, Math.round(s.dmg * SKV.boom(S.sk.boom).sp * mdm(o)));
   o.hp -= d;
   o.fl = 0.08;
   R.dmgT += d;
@@ -227,7 +234,7 @@ function upd(dt) {
     r.fx.push({ x: DX - 18 + rnd() * 44, y: GY - rnd() * 30, vx: (rnd() - 0.5) * 14, vy: -30 - rnd() * 40, g: -40, l: 0.5, c: rnd() < 0.5 ? "#ff3a1a" : "#ff9a2a", s: rnd() < 0.4 ? 3 : 2 });
   }
   if (S.sk.revive) r.cr -= dt;
-  if (S.sk.storm && (r.cs -= dt) <= 0) {
+  if (S.sk.storm && !(r.seal > 0) && (r.cs -= dt) <= 0) {
     const sg = SKV.storm(S.sk.storm);
     r.cs = sg.cd;
     const kd = dk(), ox = DX + (IM[0].width || 80) * kd * 0.35, oy = GY - (IM[0].height || 70) * kd * 0.75;
@@ -239,7 +246,7 @@ function upd(dt) {
     tx(DX, GY - 60, "BÃO LỬA", "#ffb040");
     sfx("storm");
   }
-  if (S.sk.ancient && (r.ca -= dt) <= 0) {
+  if (S.sk.ancient && !(r.seal > 0) && (r.ca -= dt) <= 0) {
     const an = SKV.ancient(S.sk.ancient);
     r.ca = an.cd;
     r.buf = an.dur;
@@ -247,7 +254,7 @@ function upd(dt) {
     tx(DX, GY - 60, "CỔ ĐẠI", "#ff9a3a");
     sfx("ancient");
   }
-  if (S.sk.wall && (r.cw -= dt) <= 0) {
+  if (S.sk.wall && !(r.seal > 0) && (r.cw -= dt) <= 0) {
     const wl = SKV.wall(S.sk.wall);
     r.cw = wl.cd;
     r.sh = wl.dur;
@@ -255,6 +262,7 @@ function upd(dt) {
     sfx("wall");
   }
   galeUpd(dt, s);
+  bossFxUpd(dt, s);
   if (r.gw && (r.gw.t += dt) >= r.gw.l) r.gw = null;
   r.sp -= dt;
   if (r.sp <= 0 && r.mon.length < CFG.maxMon) {
@@ -266,7 +274,7 @@ function upd(dt) {
     r.king += 45;
   }
   r.cd -= dt;
-  if (r.cd <= 0) {
+  if (r.cd <= 0 && !(r.sil > 0)) {
     let tg = null;
     for (const m of r.mon) if (m.x > front() + 8 && m.x < W - 4 && (!tg || m.x < tg.x)) tg = m;
     if (tg) {
@@ -301,6 +309,7 @@ function upd(dt) {
     let msp = m.sp;
     if (m.k === "boss") msp *= bossMove(m, dt);
     if (sn) msp = 0;
+    if (m.k === "boss") bossSkillUpd(m, dt, s, sn);
     const lim = fx + m.w / 2 + m.of;
     if (m.x > lim) m.x = Math.max(lim, m.x - msp * dt);
     else if (m.cd <= 0 && r.inv <= 0 && r.al && !sn && !(m.kv > 30)) {

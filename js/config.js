@@ -1,5 +1,5 @@
 /* ===== Cấu hình và số liệu cân bằng: phiên bản, hằng số khung chơi, bảng nâng cấp (UP), quái (SL), kỹ năng (SK), tiến hóa (EVO), rương (CHR). ===== */
-const VERSION = "2.1";
+const VERSION = "2.2";
 const $ = (i) => document.getElementById(i), rnd = Math.random;
 const W = 640, H = 360, GY = 280, DX = 96, K = "pds_save_v1";
 const CFG = { iframe: 0.5, maxMon: 34, crit: 0.05, leafSpd: 340, chestP: 0.3, chestW: 20, chestDec: 0.01, chestMin: 0.03, chestH: 20, chestSpd: 90,
@@ -57,9 +57,9 @@ const SKV = {
 /* Chế độ độ khó (chọn khi bắt đầu game mới, lưu trong S.df). hp/dm: nhân máu / sát thương quái và Boss; gd: nhân vàng rơi và rương
    (chế độ khó thưởng nhiều vàng hơn để vẫn max hết nâng cấp trong khoảng 2 giờ); si: nhân thời gian giữa 2 lần sinh quái (nhỏ hơn = đông hơn). */
 const DIFF = [
-  { n: "Thường", c: "#7ee06a", d: "Cân bằng. Phù hợp để làm quen.", hp: 1, dm: 1, gd: 1, si: 1 },
-  { n: "Khó", c: "#ffb23a", d: "Quái trâu và đau hơn, đông hơn; vàng rơi nhiều hơn.", hp: 1.8, dm: 1.5, gd: 1.2, si: 0.85 },
-  { n: "Địa ngục", c: "#ff4a4a", d: "Quái cực mạnh, dồn dập. Thưởng vàng lớn.", hp: 3.2, dm: 2.4, gd: 1.5, si: 0.7 }
+  { n: "Thường", c: "#7ee06a", d: "Cân bằng. Phù hợp để làm quen.", hp: 1, dm: 1, gd: 1.06, si: 1 },
+  { n: "Khó", c: "#ffb23a", d: "Quái trâu và đau hơn, đông hơn; vàng rơi nhiều hơn.", hp: 1.8, dm: 1.5, gd: 1.25, si: 0.85 },
+  { n: "Địa ngục", c: "#ff4a4a", d: "Quái cực mạnh, dồn dập. Thưởng vàng lớn.", hp: 3.2, dm: 2.4, gd: 1.6, si: 0.7 }
 ];
 const DF = () => DIFF[(S && S.df) | 0] || DIFF[0];
 /* Tiến hóa: [tên, vàng, số quái đã hạ, màu]. Mỗi bậc: +12% sát thương, +30 HP, +1% chí mạng, +5% vàng (xem CFG.evo*). */
@@ -67,19 +67,36 @@ const EVO = [["Cỏ Non", 0, 0, "#58c24a"], ["Thợ Săn", 800, 60, "#4ac2c9"], 
 /* ----- 12 Boss (v2.1: máu/sát thương/vàng gốc tăng ~2x, thêm SC.bh/SC.bd tăng theo thời gian) (ảnh assets1/boss/boss01..12.png), xếp từ yếu đến mạnh. Chỉ số trong SL = 16 + thứ tự.
    mv = kiểu chuyển động: hop nhảy · dash lao nhanh · sway lắc nặng · stomp giậm chân · swoop vỗ cánh · float lơ lửng · phase mờ ảo · void hư không.
    z > 0 là Boss bay (lơ lửng, có thể lao xuống đánh). w = kích thước hiển thị mặc định (px). ===== */
+/* ----- Chiêu Boss (v2.2). Mỗi chiêu: báo trước (tele, vòng tím dưới chân khủng long + tên chiêu) → hiệu ứng (fx, từ js/vfx) → hiệu lực lúc `tele + pre`.
+   cd = giây hồi chiêu (nhân thêm DF().si: chế độ khó dùng chiêu dồn dập hơn) · dm = hệ số × sát thương Boss (có giảm theo Phòng thủ, tối đa cap × HP khủng long) ·
+   sil/slw/vul/seal/dim/dot = hiệu ứng lên khủng long (giây) · hl = % máu tối đa Boss hồi · red = giảm sát thương Boss nhận · Choáng (stun) làm gián đoạn chiêu đang báo trước. ----- */
+const BSK = {
+  hands:   { n: "Vồ Lấy",           fx: "grasping-hands",  c: "#b07cff", cd: 11, tele: 0.8, pre: 0.35, tail: 2.4, dm: 1.6, cap: 0.3, sil: 1.2, d: "Tay bóng tối vồ khủng long: sát thương + không bắn được 1,2 giây" },
+  tendril: { n: "Xúc Tu Quất",      fx: "shadow-tendrils", c: "#9a5cff", cd: 12, tele: 0.8, pre: 0.35, tail: 2.6, dm: 1.2, cap: 0.25, slw: 4, d: "Xúc tu quất: sát thương + giảm 40% tốc độ bắn trong 4 giây" },
+  flame:   { n: "Lửa Bóng Tối",     fx: "shadow-flames",   c: "#8a4cff", cd: 13, tele: 0.7, pre: 0.2, tail: 4, dot: 4, dotp: 0.025, d: "Lửa tím thiêu 2,5% HP tối đa mỗi giây trong 4 giây" },
+  curse:   { n: "Lời Nguyền",       fx: "curse",           c: "#c77dff", cd: 15, tele: 0.4, pre: 0.6, tail: 3.2, vul: 6, d: "Nguyền: nhận thêm 30% sát thương trong 6 giây" },
+  sigil:   { n: "Ấn Phong Kỹ Năng", fx: "hex-sigil",       c: "#a259ff", cd: 17, tele: 0, pre: 2.6, tail: 3, seal: 5, d: "Ấn chú vẽ 2,6 giây rồi phong ấn kỹ năng chủ động 5 giây (Choáng Boss để ngắt)" },
+  orb:     { n: "Cầu Hư Không",     fx: "void-orb",        c: "#7b3fe4", cd: 14, tele: 0.6, pre: 0, fly: 1.4, dm: 2.4, cap: 0.35, d: "Cầu hư không bay tới khủng long, sát thương lớn" },
+  eclipse: { n: "Nhật Thực",        fx: "eclipse",         c: "#d8c8ff", cd: 19, tele: 0.4, pre: 0, tail: 5, dim: 5, d: "Che tối bầu trời: sát thương của bạn giảm 25% trong 5 giây" },
+  skulls:  { n: "Triệu Hồi Sọ Ma",  fx: "necro-skulls",    c: "#5affc8", cd: 18, tele: 0.3, pre: 1.3, tail: 3, cnt: 3, d: "Gọi 3 bóng ma yếu ra trận" },
+  drain:   { n: "Hút Linh Hồn",     fx: "soul-drain",      c: "#9ad0ff", cd: 17, tele: 0.3, pre: 0, tail: 2.6, hl: 0.07, hdur: 2.4, d: "Hút linh hồn hồi 7% máu tối đa cho Boss" },
+  steal:   { n: "Hút Máu",          fx: "life-steal",      c: "#ff4a5a", cd: 14, tele: 0.7, pre: 0.9, tail: 2.2, dm: 1.0, cap: 0.2, hl: 0.04, d: "Hút máu khủng long: sát thương + Boss hồi 4% máu tối đa" },
+  hole:    { n: "Hố Đen",           fx: "black-hole",      c: "#6a2fd0", cd: 19, tele: 0.5, pre: 0, tail: 4, red: 0.5, dur: 4, d: "Hố đen nuốt sát thương: Boss nhận ít hơn 50% trong 4 giây" },
+  nova:    { n: "Bùng Nổ Hư Vô",    fx: "dark-explosion",  c: "#e08aff", cd: 26, tele: 0, pre: 1.85, tail: 2, dm: 3.5, cap: 0.45, d: "Gom năng lượng 1,85 giây rồi nổ tung: sát thương rất lớn (tối đa 45% HP)" }
+};
 const BOSS = [
-  { n: "Hổ Lôi Hỏa",     c: "#ffa63a", hp: 2200, dm: 30, g: 600,  sp: 15, w: 54, mv: "hop",   z: 0,  ai: 1.3 },
-  { n: "Khối Cầu Vồng",  c: "#6ae86a", hp: 2700, dm: 33, g: 800,  sp: 14, w: 56, mv: "hop",   z: 0,  ai: 1.3 },
-  { n: "Sói Sét Tím",    c: "#b980ff", hp: 3400, dm: 36, g: 1050,  sp: 20, w: 58, mv: "dash",  z: 0,  ai: 1.2 },
-  { n: "Yêu Lông Trắng", c: "#ffd6d6", hp: 4200, dm: 39, g: 1400,  sp: 13, w: 60, mv: "sway",  z: 0,  ai: 1.3 },
-  { n: "Quỷ Nham Thạch", c: "#ff7a2a", hp: 5200, dm: 42, g: 1850, sp: 12, w: 62, mv: "stomp", z: 0,  ai: 1.4 },
-  { n: "Băng Vương",     c: "#9eeeff", hp: 6500, dm: 46, g: 2400, sp: 12, w: 64, mv: "sway",  z: 0,  ai: 1.4 },
-  { n: "Đại Bàng Tuyết", c: "#bfe6ff", hp: 8000, dm: 50, g: 3100, sp: 19, w: 66, mv: "swoop", z: 40, ai: 1.1 },
-  { n: "Khối Mây Điện",  c: "#58b4ff", hp: 9800, dm: 54, g: 4000, sp: 16, w: 66, mv: "float", z: 34, ai: 1.2 },
-  { n: "Hồ Ly Lửa",      c: "#ff6a4a", hp: 12000, dm: 58, g: 5200, sp: 17, w: 68, mv: "float", z: 38, ai: 1.1 },
-  { n: "Ma Hỏa Lam",     c: "#66d4ff", hp: 15000, dm: 63, g: 6800, sp: 15, w: 70, mv: "phase", z: 34, ai: 1.2 },
-  { n: "Tinh Vân",       c: "#c98aff", hp: 19000, dm: 68, g: 9000, sp: 14, w: 72, mv: "float", z: 40, ai: 1.2 },
-  { n: "Hư Không",       c: "#e08aff", hp: 24000, dm: 74, g: 12000, sp: 13, w: 78, mv: "void",  z: 44, ai: 1.3 }
+  { n: "Hổ Lôi Hỏa",     c: "#ffa63a", hp: 2200, dm: 30, g: 600,  sp: 15, w: 54, mv: "hop",   z: 0,  ai: 1.3, sk: ['flame'] },
+  { n: "Khối Cầu Vồng",  c: "#6ae86a", hp: 2700, dm: 33, g: 800,  sp: 14, w: 56, mv: "hop",   z: 0,  ai: 1.3, sk: ['curse'] },
+  { n: "Sói Sét Tím",    c: "#b980ff", hp: 3400, dm: 36, g: 1050,  sp: 20, w: 58, mv: "dash",  z: 0,  ai: 1.2, sk: ['hands'] },
+  { n: "Yêu Lông Trắng", c: "#ffd6d6", hp: 4200, dm: 39, g: 1400,  sp: 13, w: 60, mv: "sway",  z: 0,  ai: 1.3, sk: ['steal'] },
+  { n: "Quỷ Nham Thạch", c: "#ff7a2a", hp: 5200, dm: 42, g: 1850, sp: 12, w: 62, mv: "stomp", z: 0,  ai: 1.4, sk: ['tendril'] },
+  { n: "Băng Vương",     c: "#9eeeff", hp: 6500, dm: 46, g: 2400, sp: 12, w: 64, mv: "sway",  z: 0,  ai: 1.4, sk: ['sigil','hole'] },
+  { n: "Đại Bàng Tuyết", c: "#bfe6ff", hp: 8000, dm: 50, g: 3100, sp: 19, w: 66, mv: "swoop", z: 40, ai: 1.1, sk: ['orb'] },
+  { n: "Khối Mây Điện",  c: "#58b4ff", hp: 9800, dm: 54, g: 4000, sp: 16, w: 66, mv: "float", z: 34, ai: 1.2, sk: ['eclipse','hands'] },
+  { n: "Hồ Ly Lửa",      c: "#ff6a4a", hp: 12000, dm: 58, g: 5200, sp: 17, w: 68, mv: "float", z: 38, ai: 1.1, sk: ['flame','skulls'] },
+  { n: "Ma Hỏa Lam",     c: "#66d4ff", hp: 15000, dm: 63, g: 6800, sp: 15, w: 70, mv: "phase", z: 34, ai: 1.2, sk: ['skulls','drain'] },
+  { n: "Tinh Vân",       c: "#c98aff", hp: 19000, dm: 68, g: 9000, sp: 14, w: 72, mv: "float", z: 40, ai: 1.2, sk: ['hole','orb','curse'] },
+  { n: "Hư Không",       c: "#e08aff", hp: 24000, dm: 74, g: 12000, sp: 13, w: 78, mv: "void",  z: 44, ai: 1.3, sk: ['nova','sigil','eclipse'] }
 ];
 BOSS.forEach((b, i) => { b.i = i; b.src = "assets1/boss/boss" + String(i + 1).padStart(2, "0") + ".png"; SL.push([b.n, b.c, b.hp, b.dm, b.g, b.sp, b.w, "boss", b.z]) });
 const BOSS0 = 16, BOSSORD = [7, 15, ...BOSS.map((b) => BOSS0 + b.i)];

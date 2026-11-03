@@ -1,4 +1,4 @@
-# Pixel Dino Survivor (v2.1 - 3 chế độ, kỹ năng mới, cân bằng lại)
+# Pixel Dino Survivor (v2.2 - chiêu Boss bóng tối, 3 chế độ, kỹ năng mới)
 Game 2D pixel art, tự động chiến đấu, PWA chạy offline. Không cần build: HTML/CSS/JS thuần, đã tách thành nhiều file.
 
 ## Chạy thử
@@ -6,7 +6,7 @@ Game 2D pixel art, tự động chiến đấu, PWA chạy offline. Không cần
 
 ## Đưa lên GitHub và triển khai
 ```
-git init && git add . && git commit -m "Pixel Dino Survivor v2.1" && git branch -M main
+git init && git add . && git commit -m "Pixel Dino Survivor v2.2" && git branch -M main
 git remote add origin https://github.com/<tên-bạn>/pixel-dino-survivor.git && git push -u origin main
 ```
 Vào Settings > Pages, chọn nhánh main, thư mục root. Mở link HTTPS trên Android Chrome > Menu > Cài đặt ứng dụng.
@@ -24,6 +24,10 @@ js/    (nạp theo đúng thứ tự trong index.html)
   audio.js · fire.js · icons.js · render.js (có bossDraw) · chest.js · music.js · custom.js · settings.js
   mod.js              Bảng Mod ẩn (mật khẩu, bật/tắt, nhập vàng, cỡ khủng long, cỡ Boss, Nhập đợt)
   keypad.js           (v2.1) bàn phím số riêng cho mọi ô nhập số / mật khẩu (css/keypad.css)
+  bossskills.js       (v2.2) chiêu Boss: lập lịch, báo trước, hiệu lực, trạng thái xấu, vẽ hiệu ứng
+  vfx/vfx.js          (v2.2) ES module nạp vfx/core + 12 hiệu ứng bóng tối, đưa ra window.VFX
+  vfx/core/           bộ lõi vẽ điểm ảnh (hạt, ánh sáng, mô phỏng)
+  vfx/effects/shadow/ 12 hiệu ứng bóng tối (Sprite Fusion, MIT)
   skills.js           (v2.1) logic + hiệu ứng: chí mạng, hút máu có trần, Thiêu đốt, Choáng, Phá Huyết, Cuồng Phong
   cards.js · game.js (có bossMove) · ui.js (điều hướng, bảng quái monPanel) · main.js
 assets1/  (32 file) nhân vật, quái, môi trường, âm thanh
@@ -72,7 +76,7 @@ Dùng bộ nút trong `assets2/ui/` (từ Setting.png): loa / loa gạch cho Âm
 
 ## Cân bằng game (v2.1)
 Số liệu nằm ở `js/config.js`: `CFG`, `SC` (độ khó quái theo thời gian: máu `hp`, sát thương `dm`, vàng `gd`, tốc độ `sp`, nhịp sinh `si`, hệ số riêng cho Boss `bh`/`bd`), `DIFF` (3 chế độ), `UP` (giá = b × g^cấp), `SL`, `SK`/`SKV`, `EVO`, `BOSS`.
-- **3 chế độ** (`DIFF`, chọn ở màn *Trò chơi mới*, lưu trong `S.df`, cố định cho đến khi chơi mới): Thường (quái ×1), Khó (máu ×1,8, sát thương ×1,5, đông hơn, vàng ×1,2), Địa ngục (máu ×3,2, sát thương ×2,4, rất dồn dập, vàng ×1,5). Với bot mô phỏng (luôn chạm rương, mua thẻ cân bằng), cả ba chế độ **max toàn bộ nâng cấp sau khoảng 2 giờ chơi (đo được 106–120 phút ở các lần chạy thử)** (xem bên dưới); người chơi thật thường chậm hơn một chút.
+- **3 chế độ** (`DIFF`, chọn ở màn *Trò chơi mới*, lưu trong `S.df`, cố định cho đến khi chơi mới): Thường (quái ×1, vàng ×1,06), Khó (máu ×1,8, sát thương ×1,5, đông hơn, vàng ×1,25), Địa ngục (máu ×3,2, sát thương ×2,4, rất dồn dập, vàng ×1,6). Với bot mô phỏng (luôn chạm rương, mua thẻ cân bằng), cả ba chế độ **max toàn bộ nâng cấp sau khoảng 2 giờ chơi (đo được 115–128 phút ở các lần chạy thử, đã tính cả chiêu Boss)** (xem bên dưới); người chơi thật thường chậm hơn một chút.
 - Nâng cấp theo cấp: cấp tối đa cao hơn (Sinh lực/Sức mạnh 40, Tốc độ 30, Đa mục tiêu 6, Chí mạng 30...). Giá cấp đầu rẻ nhưng cấp cuối rất đắt (hệ số `g` lớn) nên đầu game mượt và hậu kỳ dài.
 - Tiến hóa 8 bậc (đến Long Vương), cần số quái đã hạ; mỗi bậc +12% sát thương, +30 HP, +1% chí mạng, +5% vàng.
 - Quái yếu biến mất dần khỏi đợt sinh ở đợt cao (đợt 14, 20, 26, 32+ ...), Boss mạnh gấp đôi bản cũ và tăng thêm theo thời gian. Nhân vật full cấp ở chế độ Thường bắt đầu thua ở khoảng đợt 110 và chạm trần quanh đợt 155–185.
@@ -95,12 +99,39 @@ Bảng Mod > Tùy chỉnh hình ảnh (chỉ khi bật Mod): tải ảnh Nền, 
 ## Âm thanh
 Tiếng bắn dùng `assets1/audio/fire_breath.mp3`, nhạc nền mặc định `assets1/audio/bgm.mp3` (thiếu file thì dùng âm tổng hợp bằng WebAudio). Có thể đổi nhạc nền trong Cài đặt > Đổi nhạc nền.
 
+## Chiêu Boss (v2.2)
+12 Boss mới mỗi Boss có 1–3 chiêu (Slime Vua và Rồng Con chưa có chiêu để đầu game dễ thở). Boss chọn một chiêu đang sẵn sàng → **báo trước** (tên chiêu hiện trên đầu, vòng tím quanh Boss và dưới chân khủng long) → hiệu ứng điểm ảnh → **hiệu lực**. Bảng `BSK` và gán chiêu `BOSS[i].sk` ở `js/config.js`; logic ở `js/bossskills.js`.
+
+| Boss | Chiêu | Hiệu ứng | Tác dụng |
+|---|---|---|---|
+| Hổ Lôi Hỏa | Lửa Bóng Tối | shadow-flames | thiêu 2,5% HP tối đa/giây trong 4 giây |
+| Khối Cầu Vồng | Lời Nguyền | curse | nhận thêm 30% sát thương trong 6 giây |
+| Sói Sét Tím | Vồ Lấy | grasping-hands | sát thương + không bắn được 1,2 giây |
+| Yêu Lông Trắng | Hút Máu | life-steal | sát thương, Boss hồi 4% máu tối đa |
+| Quỷ Nham Thạch | Xúc Tu Quất | shadow-tendrils | sát thương + giảm 40% tốc độ bắn 4 giây |
+| Băng Vương | Ấn Phong Kỹ Năng, Hố Đen | hex-sigil, black-hole | phong ấn kỹ năng chủ động 5 giây; Boss nhận ít hơn 50% sát thương 4 giây |
+| Đại Bàng Tuyết | Cầu Hư Không | void-orb | cầu bay tới, sát thương lớn |
+| Khối Mây Điện | Nhật Thực, Vồ Lấy | eclipse, grasping-hands | trời tối: sát thương của bạn giảm 25% trong 5 giây |
+| Hồ Ly Lửa | Lửa Bóng Tối, Triệu Hồi Sọ Ma | shadow-flames, necro-skulls | gọi 3 bóng ma yếu |
+| Ma Hỏa Lam | Triệu Hồi Sọ Ma, Hút Linh Hồn | necro-skulls, soul-drain | Boss hồi 7% máu tối đa |
+| Tinh Vân | Hố Đen, Cầu Hư Không, Lời Nguyền | black-hole, void-orb, curse | |
+| Hư Không | Bùng Nổ Hư Vô, Ấn Phong Kỹ Năng, Nhật Thực | dark-explosion, hex-sigil, eclipse | Bùng Nổ: gom 1,85 giây rồi nổ, sát thương rất lớn |
+
+- **Cách đối phó:** thẻ **Choáng** làm Boss gián đoạn chiêu đang báo trước ("BỊ NGẮT!"); **Tường Lửa** (bất tử) chặn cả sát thương lẫn hiệu ứng xấu; hạ Boss nhanh để chiêu không kịp dùng. Mỗi chiêu gây sát thương bị chặn trần theo % HP tối đa của khủng long (20–45%), nên không thể bị hạ trong một chiêu. Phượng Hoàng vẫn hồi sinh được sau chiêu.
+- Chế độ Khó / Địa ngục dùng chiêu dồn dập hơn (hồi chiêu nhân `DIFF[].si`); sát thương chiêu tính từ sát thương Boss nên cũng tăng theo chế độ và theo thời gian.
+- Trạng thái xấu hiện thành nhãn nhỏ dưới thanh máu (TRÓI, CHẬM, NGUYỀN, PHONG ẤN, THIÊU, TỐI) kèm thời gian còn lại.
+- **Hiệu ứng điểm ảnh** (`js/vfx/`): chạy bằng ES module (`<script type="module">`) nên cần mở game qua http/https (GitHub Pages ổn); mở thẳng `file://` thì chiêu vẫn hoạt động nhưng không có hình. Mỗi hiệu ứng vẽ lại tối đa 30 lần/giây, tối đa 6 hiệu ứng cùng lúc, tự bỏ qua nếu chưa nạp xong. Lời Nguyền và Hút Máu tô màu lên đúng hình khủng long / Boss nhờ mặt nạ dựng từ sprite (`VFX.actorOf`).
+- Ghi công: `js/vfx/` dùng bộ hiệu ứng điểm ảnh có phần mượn từ Sprite Fusion (https://www.spritefusion.com/pixel-art-vfx), giấy phép MIT, Copyright (c) 2026 Hugo Duprez; các dòng ghi công được giữ nguyên trong từng file.
+
 ## Bàn phím số riêng (v2.1)
 - Mọi ô `input[type=number]` và `input[type=password]` (mật khẩu Mod và mật khẩu mới, số vàng, cỡ khủng long / 12 Boss / cây / lá / cỏ, nhập đợt) dùng bàn phím này thay cho bàn phím hệ thống, nên **bàn phím điện thoại không bao giờ bật lên che game**.
 - Bố cục 2 hàng × 6 phím: `1 2 3 4 5 ⌫` / `6 7 8 9 0 OK`, kèm một dòng hiển thị (tên ô, giá trị; mật khẩu hiện dấu •) và nút ✕ xóa hết. Cố định giữa mép dưới khung game, rộng tối đa 27em; màn hình nội dung tự chừa chỗ phía dưới khi bàn phím mở.
 - Tự hiện khi chạm vào ô số (hoặc khi hộp thoại tự đặt con trỏ vào ô, như Nhập đợt / Mật khẩu), tự ẩn khi bấm OK, bấm ra ngoài hoặc đổi màn hình. Chạm số đầu tiên sẽ thay giá trị có sẵn. OK phát phím Enter nên các bộ xử lý cũ (`mod.js`, `custom.js`) không cần sửa; giá trị đổi được lưu qua sự kiện `change` như khi gõ thật.
 - Máy tính: gõ phím số, Backspace, Enter (OK), Esc (đóng) cũng hoạt động. Các ô được đặt `readonly` + `inputmode="none"` để trình duyệt di động không mở bàn phím hệ thống.
 - Thêm ô số mới: chỉ cần dùng `<input type="number">` (hoặc `password`) có `inputmode="none" readonly`, `aria-label` (hiện làm tên ô) và `min`/`max` (quyết định số chữ số tối đa).
+
+## Nhật ký v2.2
+- Chiêu Boss: 12 chiêu từ bộ hiệu ứng bóng tối (Vồ Lấy, Xúc Tu Quất, Lửa Bóng Tối, Lời Nguyền, Ấn Phong Kỹ Năng, Cầu Hư Không, Nhật Thực, Triệu Hồi Sọ Ma, Hút Linh Hồn, Hút Máu, Hố Đen, Bùng Nổ Hư Vô); trạng thái xấu trên khủng long; Choáng ngắt chiêu. `VERSION` = 2.2, cache `pds-v23`.
 
 ## Nhật ký v2.1
 - Bàn phím số riêng (0–9, ⌫, OK) cho mọi ô nhập số; cache `pds-v22`.

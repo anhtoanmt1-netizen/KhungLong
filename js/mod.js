@@ -55,7 +55,7 @@ function jumpWave(n) {
   r.bn = 2;
   r.king = 100 + 45 * Math.max(0, Math.ceil((r.t - 100) / 45));
   r.mon = []; r.lv = []; r.ch = []; r.cq = []; r.ex = []; r.fx = []; r.tx = []; r.rg = [];
-  r.bb = null; r.gw = null; r.sp = 1.2; r.tier = 0;
+  r.bb = null; r.gw = null; r.vf = []; r.bo = []; r.sp = 1.2; r.tier = 0;
   chestRoll();
   sfx('wave');
 }

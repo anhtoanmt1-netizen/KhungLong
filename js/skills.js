@@ -4,6 +4,8 @@
 
 const fxOk = () => R.fx.length < 380;
 const monY = (m) => GY - (m.z || 0);
+/* Boss đang có "Hố Đen" chỉ nhận một nửa sát thương */
+const mdm = (m) => (m.shd > 0 ? 1 - BSK.hole.red : 1);
 
 /* Hút máu: heal = sát thương × %, nhưng mỗi giây chỉ hồi tối đa s.stealCap (tránh bất tử khi sát thương rất lớn) */
 function heal(a, s) {
@@ -33,7 +35,7 @@ function addBurn(m, d, s) {
 function burnTick(m, dt, s) {
   if (!(m.bp > 0.5)) { m.bp = 0; return; }
   if ((m.bn -= dt) <= 0) { m.bp = 0; m.ba = 0; return; }
-  const dd = m.bp * Math.min(1, dt / CFG.burnTau);
+  const dd = m.bp * Math.min(1, dt / CFG.burnTau) * mdm(m);
   m.bp -= dd;
   m.hp -= dd;
   m.ba += dd;
@@ -66,7 +68,7 @@ function execProc(m, s) {
   const e = SKV.exec(S.sk.exec);
   if (rnd() >= e.p) return;
   m.xc = CFG.execIcd;
-  const d = Math.max(1, Math.round(m.mx * (m.k === "boss" ? e.pb : e.pn))), a = Math.min(d, m.hp);
+  const d = Math.max(1, Math.round(m.mx * (m.k === "boss" ? e.pb : e.pn) * mdm(m))), a = Math.min(d, m.hp);
   m.hp -= d;
   m.fl = 0.08;
   R.dmgT += a;
@@ -85,6 +87,7 @@ function galeUpd(dt, s) {
   if (!k) return;
   r.gc -= dt;
   r.gk -= dt;
+  if (r.seal > 0) return;
   if (r.gc > 0 || r.gk > 0) return;
   r.gk = 0.2;
   const g = SKV.gale(k), fx = front();
@@ -101,7 +104,7 @@ function galeCast(g, s) {
     const b = m.k === "boss";
     m.kv += g.kb * (b ? 0.4 : 1);
     if (!b) m.st = Math.max(m.st, g.dz);
-    const d = Math.max(1, Math.round(s.dmg * g.dm));
+    const d = Math.max(1, Math.round(s.dmg * g.dm * mdm(m)));
     m.hp -= d;
     m.fl = 0.1;
     r.dmgT += d;
