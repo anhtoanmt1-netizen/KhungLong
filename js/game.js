@@ -1,7 +1,7 @@
 /* ===== Logic ván chơi: startRun, sinh quái, sát thương, giết quái, bắn, cập nhật mỗi khung hình upd(). ===== */
 function startRun() {
   const s = sv();
-  R = { t: (S.rw - 1) * 20, hp: s.maxHp, kills: 0, gold: 0, dmgT: 0, tier: 0, mon: [], lv: [], fx: [], tx: [], cd: 0.3, sp: 1.2, inv: 0, al: 1, dT: 0, pz: 0, wave: S.rw, bn: 2, hitT: 0, atk: 0, king: 100 + 45 * Math.max(0, Math.ceil(((S.rw - 1) * 20 - 100) / 45)), dust: 0, ov: 0, cs: 8, ca: 10, cw: 12, cr: 0, buf: 0, sh: 0, bm: 1.5, sbT: 1, sbU: 0, gc: 4, gk: 0, gw: null, sil: 0, slw: 0, vul: 0, seal: 0, dim: 0, dimT: 0, ri: 0, dot: 0, dotp: 0, da: 0, dt2: 0, vf: [], bo: [] };
+  R = { t: (S.rw - 1) * 20, hp: s.maxHp, kills: 0, gold: 0, dmgT: 0, tier: 0, mon: [], lv: [], fx: [], tx: [], cd: 0.3, sp: 1.2, inv: 0, al: 1, dT: 0, pz: 0, wave: S.rw, bn: 2, hitT: 0, atk: 0, king: 100 + 45 * Math.max(0, Math.ceil(((S.rw - 1) * 20 - 100) / 45)), dust: 0, ov: 0, cs: 8, ca: 10, cw: 12, cr: 0, buf: 0, sh: 0, bm: 1.5, hq: {}, sbT: 1, sbU: 0, gc: 4, gk: 0, gw: null, sil: 0, slw: 0, vul: 0, seal: 0, dim: 0, dimT: 0, ri: 0, dot: 0, dotp: 0, da: 0, dt2: 0, vf: [], bo: [] };
   R.ch = [];
   R.cq = [];
   R.ex = [];
@@ -72,6 +72,7 @@ function plCheck(s) {
       r.cr = rv.cd;
       r.inv = rv.inv;
       r.ri = rv.inv;
+      healPop(DX, GY - 70, r.hp, HEALC.revive);
       tx(DX, GY - 60, "HỒI SINH", "#ffd23a");
       R.ex.push({ x: DX, y: GY - 30, t: 0, sc: 2.2, col: "g", ring: "#ffd23a", rr: 60 });
       for (let i = 0; i < 26; i++) R.fx.push({ x: DX + (rnd() - 0.5) * 40, y: GY - rnd() * 40, vx: (rnd() - 0.5) * 40, vy: -50 - rnd() * 90, g: -30, l: 0.8, c: i % 2 ? "#ffd23a" : "#fff6b0", s: 2 });
@@ -112,7 +113,7 @@ function hit(m, s) {
   m.fl = 0.08;
   R.dmgT += a;
   heal(a, s);
-  tx(m.x, GY - (m.z || 0) - m.h - 6, (cr ? "CRIT -" : "-") + d, cr ? "#ffd23a" : "#fff");
+  tx(m.x, GY - (m.z || 0) - m.h - 6, (cr ? "CRIT -" : "-") + fmtN(d), cr ? "#ffd23a" : "#fff");
   if (cr) critFx(m);
   sfx(cr ? "crit" : "hit");
   if (m.hp <= 0) { kill(m, s); return; }
@@ -222,7 +223,10 @@ function upd(dt) {
     chestRoll();
   }
   chestUpd(dt / GS);
+  const hp0 = r.hp;
   r.hp = Math.min(s.maxHp, r.hp + s.regen * dt);
+  healAdd("regen", r.hp - hp0);
+  healTick(dt);
   if ((r.sbT -= dt) <= 0) {
     r.sbT = 1;
     r.sbU = 0;

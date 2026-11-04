@@ -13,7 +13,33 @@ function heal(a, s) {
   const r = R, h = Math.min(a * s.steal, Math.max(0, s.stealCap - r.sbU));
   if (h <= 0) return;
   r.sbU += h;
+  const h0 = r.hp;
   r.hp = Math.min(s.maxHp, r.hp + h);
+  healAdd("steal", r.hp - h0);
+}
+
+/* Số hồi máu "+N" màu xanh lá (cùng phông chữ với các số sát thương). Hồi phục và Hút máu cộng dồn trong 0,7 giây rồi hiện một lần để không dày đặc;
+   tôn trọng tùy chọn "hiện số sát thương" trong Cài đặt. regen (xanh lá sáng) hiện bên trái đầu khủng long, steal (xanh lá đậm) bên phải. */
+const HEALC = { regen: "#7dff8a", steal: "#4fe86a", revive: "#b6ffc4", boss: "#7dff8a" };
+const HEALP = { regen: [-26, -64], steal: [26, -64] };
+function healAdd(src, a) {
+  if (!(a > 0.001) || !S.set.dn) return;
+  const q = R.hq[src] || (R.hq[src] = { a: 0, t: 0.35 });
+  q.a += a;
+}
+function healTick(dt) {
+  const r = R;
+  for (const src in r.hq) {
+    const q = r.hq[src];
+    if (q.a <= 0) continue;
+    if ((q.t -= dt) > 0) continue;
+    q.t = 0.7;
+    if (q.a >= 1) { healPop(DX + HEALP[src][0], GY + HEALP[src][1], q.a, HEALC[src]); q.a = 0; }
+  }
+}
+function healPop(X, Y, a, c) {
+  if (!S.set.dn || R.tx.length >= 24 || !(a >= 1)) return;
+  R.tx.push({ x: X, y: Y, s: "+" + fmtN(Math.round(a)), c: c || HEALC.regen, l: 1, z: 11 });
 }
 
 /* Chí mạng: tia sáng vàng + vòng sáng nhỏ quanh quái */

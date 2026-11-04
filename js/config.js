@@ -1,13 +1,13 @@
 /* ===== Cấu hình và số liệu cân bằng: phiên bản, hằng số khung chơi, bảng nâng cấp (UP), quái (SL), kỹ năng (SK), tiến hóa (EVO), rương (CHR). ===== */
-const VERSION = "2.2";
+const VERSION = "2.3";
 const $ = (i) => document.getElementById(i), rnd = Math.random;
 const W = 640, H = 360, GY = 280, DX = 96, K = "pds_save_v1";
 const CFG = { iframe: 0.5, maxMon: 34, crit: 0.05, leafSpd: 340, chestP: 0.3, chestW: 20, chestDec: 0.01, chestMin: 0.03, chestH: 20, chestSpd: 90,
   rateCap: 6, defCap: 0.6, burnTau: 1.1, burnT: 3.2, stunImm: 1.4, bossStunK: 0.35, bossImm: 5, execIcd: 0.35, evoHp: 30, evoDmg: 0.12, evoCrit: 1, evoGold: 5 };
 /* ----- Độ khó theo thời gian t (giây). w = t/20 = số đợt. Quái, Boss và vàng tăng theo các hàm này (v2.1: tăng nhanh hơn bản cũ, có "bức tường" ở hậu kỳ). ----- */
 const SC = {
-  hp: (t) => { const w = t / 20; return (1 + 0.25 * w + 0.012 * w * w) * Math.pow(1.004, w) },
-  dm: (t) => { const w = t / 20; return 1 + 0.035 * w + 0.00015 * w * w },
+  hp: (t) => { const w = t / 20; return (1 + 0.25 * w + 0.012 * w * w) * Math.pow(1.004, w) * Math.pow(1.03, Math.max(0, w - 150)) },
+  dm: (t) => { const w = t / 20; return (1 + 0.035 * w + 0.00015 * w * w) * Math.pow(1.035, Math.max(0, w - 120)) },
   gd: (t) => { const w = t / 20; return 2 + 0.14 * w + 0.0006 * w * w },
   sp: (t) => 1 + Math.min(0.6, t / 500),
   bh: (t) => 1 + t / 1500,
@@ -16,33 +16,49 @@ const SC = {
 };
 /* Rương thưởng: g = bội số của "đơn vị vàng" (= 5 × SC.gd(t), tức vàng của một quái nhỏ ở thời điểm đó); x = nhân đôi vàng hiện có nhưng tối đa 100 đơn vị */
 const CHR = [{ g: 5 }, { g: 10 }, { g: 20 }, { g: 40 }, { g: 80 }, { g: 160 }, { x: 2 }], CUK = ["bg", "tree", "leaf", "grass"];
+/* Giá trị các cấp mở rộng (v2.3). Cấp ≤ cấp cũ giữ nguyên công thức cũ; các cấp mới:
+   · Sinh lực 41–80: mỗi cấp tăng gấp 1,2 lần mức tăng của cấp trước (bắt đầu từ +20), làm tròn lên bội số của 5 → mọi giá trị HP đều tận cùng 0 hoặc 5.
+   · Sức mạnh 41–80: mức tăng 3 nhân thêm 6% mỗi cấp · Hồi phục 21–50: mức tăng 1,5 nhân thêm 10% mỗi cấp. */
+const XV = (() => {
+  const hp = [80], dm = [6], rg = [0];
+  let inc = 20;
+  for (let l = 1; l <= 80; l++) {
+    if (l > 40) inc = Math.ceil(inc * 1.2 / 5) * 5;
+    hp[l] = hp[l - 1] + inc;
+    dm[l] = l <= 40 ? 6 + 3 * l : dm[l - 1] + Math.round(3 * Math.pow(1.06, l - 40));
+  }
+  for (let l = 1; l <= 50; l++) rg[l] = l <= 20 ? 1.5 * l : rg[l - 1] + 1.5 * Math.pow(1.1, l - 20);
+  return { hp, dm, rg };
+})();
 /* Nâng cấp theo cấp: giá = b × g^cấp, m = cấp tối đa, f(cấp) = giá trị hiển thị. */
 const UP = {
-  hp: { n: "Sinh lực", b: 18, g: 1.391, m: 40, f: (l) => 80 + 20 * l, u: " HP" },
-  dmg: { n: "Sức mạnh", b: 22, g: 1.391, m: 40, f: (l) => 6 + 3 * l, u: " sát thương" },
+  hp: { n: "Sinh lực", b: 18, g: 1.391, m: 80, l1: 40, g2: 1.005, dc: [20, 0.8], f: (l) => XV.hp[l], u: " HP" },
+  dmg: { n: "Sức mạnh", b: 22, g: 1.391, m: 80, l1: 40, g2: 1.005, dc: [20, 0.8], f: (l) => XV.dm[l], u: " sát thương" },
   rate: { n: "Tốc độ bắn", b: 30, g: 1.437, m: 30, f: (l) => +(1 + 0.1 * l).toFixed(1), u: " đạn/giây" },
-  multi: { n: "Đa mục tiêu", b: 150, g: 2.84, m: 6, f: (l) => 1 + l, u: " đạn/lần" },
+  multi: { n: "Đa mục tiêu", b: 150, g: 2.84, m: 11, l1: 6, g2: 1.6, f: (l) => 1 + l, u: " đạn/lần" },
   critR: { n: "Tỷ lệ chí mạng", b: 55, g: 1.414, m: 30, f: (l) => +(5 + 1.5 * l).toFixed(1), u: "% chí mạng" },
-  critD: { n: "Sát thương chí mạng", b: 70, g: 1.414, m: 30, f: (l) => 200 + 8 * l, u: "% sát thương" },
-  regen: { n: "Hồi phục", b: 40, g: 1.518, m: 20, f: (l) => +(1.5 * l).toFixed(1), u: " HP/giây" },
+  critD: { n: "Sát thương chí mạng", b: 70, g: 1.414, m: 100, l1: 30, g2: 1.0, f: (l) => l <= 30 ? 200 + 8 * l : 440 + 5 * (l - 30), u: "% sát thương" },
+  regen: { n: "Hồi phục", b: 40, g: 1.518, m: 50, l1: 20, g2: 1.03, f: (l) => +XV.rg[l].toFixed(1), u: " HP/giây" },
   def: { n: "Phòng thủ", b: 60, g: 1.518, m: 20, f: (l) => 3 * l, u: "% giảm sát thương" },
-  steal: { n: "Hút máu", b: 90, g: 1.575, m: 15, f: (l) => 2 * l, u: "% sát thương" },
+  steal: { n: "Hút máu", b: 90, g: 1.575, m: 20, l1: 15, g2: 1.3, f: (l) => 2 * l, u: "% sát thương" },
   gold: { n: "Kinh tế", b: 70, g: 1.483, m: 20, f: (l) => 100 + 10 * l, u: "% vàng" },
-  burn: { n: "Thiêu đốt", b: 120, g: 1.483, m: 20, f: (l) => 10 + 4 * l, u: "% sát thương lửa" },
+  burn: { n: "Thiêu đốt", b: 120, g: 1.483, m: 50, l1: 20, g2: 1.03, f: (l) => l <= 20 ? 10 + 4 * l : 90 + 2 * (l - 20), u: "% sát thương lửa" },
   stun: { n: "Choáng", b: 150, g: 1.575, m: 15, f: (l) => +(3 + 1.8 * l).toFixed(1), u: "% choáng" }
 };
 const SL = [["Slime Cỏ", "#6fcf4f", 10, 2, 2, 22, 14], ["Slime Lam", "#4a8cff", 20, 3, 4, 24, 15], ["Slime Tím", "#b08cff", 36, 4, 7, 26, 16], ["Slime Đá", "#8aa0a8", 70, 6, 12, 20, 18], ["Slime Lửa", "#ff7a3a", 120, 8, 20, 28, 18], ["Slime Độc", "#2f9a3a", 200, 10, 35, 26, 20], ["Slime Pha Lê", "#4fe8f0", 330, 14, 60, 30, 20], ["Slime Vua", "#e8c040", 520, 14, 200, 18, 34], ["Dơi Tím", "#8a4fd0", 32, 4, 6, 40, 20, "bat", 48], ["Ong Vàng", "#ffcc20", 22, 5, 8, 46, 16, "bee", 58], ["Nấm Độc", "#e0403a", 110, 7, 14, 14, 28, "shroom", 0], ["Nhím Gai", "#9a6a40", 90, 9, 18, 40, 24, "hog", 0], ["Bóng Ma", "#e8f0ff", 150, 11, 26, 22, 26, "ghost", 54], ["Bọ Giáp", "#2a8fa0", 330, 14, 40, 12, 34, "beetle", 0], ["Chim Lửa", "#ff8a3a", 260, 16, 50, 36, 30, "bird", 66], ["Rồng Con", "#d03a5a", 1100, 20, 500, 16, 48, "dragon", 70]], NU = [[8, 3], [9, 4], [10, 5], [11, 6], [12, 8], [13, 10], [14, 12]];
 /* ----- Kỹ năng (SK) có 5 cấp. c = giá cấp 1, g = hệ số tăng giá mỗi cấp, e = bậc tiến hóa cần có để mở cấp 1, f(cấp) = chữ hiển thị trên thẻ.
    SKV = thông số chiến đấu theo cấp (dùng trong game.js / skills.js). ----- */
+/* Phá Huyết: cơ hội theo cấp (cấp 6–10 là phần mở rộng, kèm tăng dần % máu: 2% → 3%) */
+const XC = [0, 5, 10, 20, 30, 40, 45, 50, 55, 60, 65];
 const SK = {
-  pierce: { n: "Lửa Xanh Xuyên Phá", c: 800, g: 3.6, m: 5, e: 1, f: (l) => (l + 2) + " quái" },
+  pierce: { n: "Lửa Xanh Xuyên Phá", c: 800, g: 3.6, m: 10, l1: 5, g2: 1.3, e: 1, f: (l) => (l + 2) + " quái" },
   boom: { n: "Lửa Bùng Nổ", c: 2000, g: 3.6, m: 5, e: 2, f: (l) => Math.round(40 + 10 * l) + "% lan" },
   storm: { n: "Bão Lửa", c: 5000, g: 3.6, m: 5, e: 3, f: (l) => (6 + 2 * l) + " đạn · " + +(16.5 - 1.5 * l).toFixed(1) + "s" },
   revive: { n: "Phượng Hoàng Lửa", c: 1800, g: 3.6, m: 5, e: 1, f: (l) => "hồi chiêu " + (67 - 7 * l) + "s" },
   ancient: { n: "Hỏa Ngục Cổ Đại", c: 8000, g: 3.6, m: 5, e: 4, f: (l) => "+" + Math.round(40 + 10 * l) + "% · " + +(5.5 + 0.5 * l) + "s" },
   wall: { n: "Tường Lửa", c: 3000, g: 3.6, m: 5, e: 2, f: (l) => +(2.6 + 0.4 * l).toFixed(1) + "s bất tử" },
   gale: { n: "Cuồng Phong Hộ Thân", c: 4000, g: 3.6, m: 5, e: 3, f: (l) => "hồi chiêu " + +(15.4 - 1.4 * l).toFixed(1) + "s" },
-  exec: { n: "Phá Huyết", c: 6000, g: 3.6, m: 5, e: 4, f: (l) => [0, 5, 10, 20, 30, 40][l] + "% cơ hội" }
+  exec: { n: "Phá Huyết", c: 6000, g: 3.6, m: 10, l1: 5, g2: 1.3, e: 4, f: (l) => XC[l] + "% cơ hội" + (l > 5 ? " · " + +(2 + 0.2 * (l - 5)).toFixed(1) + "% máu" : "") }
 };
 const SKV = {
   pierce: (l) => ({ n: l + 2 }),
@@ -52,7 +68,7 @@ const SKV = {
   ancient: (l) => ({ cd: 21.5 - 1.5 * l, dur: 5.5 + 0.5 * l, b: 1.4 + 0.1 * l }),
   wall: (l) => ({ cd: 21.5 - 1.5 * l, dur: 2.6 + 0.4 * l }),
   gale: (l) => ({ cd: 15.4 - 1.4 * l, need: l >= 4 ? 2 : 3, zone: 56, r: 110 + 12 * l, kb: 520 + 60 * l, dm: 0.6 + 0.4 * l, dz: 0.4 + 0.1 * l }),
-  exec: (l) => ({ p: [0, 0.05, 0.1, 0.2, 0.3, 0.4][l], pn: 0.02, pb: 0.005 })
+  exec: (l) => ({ p: XC[l] / 100, pn: 0.02 + 0.002 * Math.max(0, l - 5), pb: 0.005 + 0.0005 * Math.max(0, l - 5) })
 };
 /* Chế độ độ khó (chọn khi bắt đầu game mới, lưu trong S.df). hp/dm: nhân máu / sát thương quái và Boss; gd: nhân vàng rơi và rương
    (chế độ khó thưởng nhiều vàng hơn để vẫn max hết nâng cấp trong khoảng 2 giờ); si: nhân thời gian giữa 2 lần sinh quái (nhỏ hơn = đông hơn). */

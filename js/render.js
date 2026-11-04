@@ -115,7 +115,7 @@ function hudc() {
       x.restore();
     }
   }
-  tw("HP " + Math.ceil(r.hp) + "/" + mx, BX + 2, BY + BH + 9, "#fff", 8);
+  tw("HP " + (mx >= 1e5 ? fmtN(Math.ceil(r.hp)) + "/" + fmtN(mx) : Math.ceil(r.hp) + "/" + mx), BX + 2, BY + BH + 9, "#fff", 8);
   tw("⏱ " + fmt(r.t), BX + BW - 2, BY + BH + 9, "#fff", 8, "right");
 }
 function bg() {

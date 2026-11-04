@@ -38,6 +38,8 @@ const CARDS = {
 };
 let upTab = 'atk', hintT = 0;
 const cardKeys = t => Object.keys(CARDS).filter(k => CARDS[k].tab === t);
+/* Số lớn trên thẻ (HP cấp cao...): ngăn cách hàng nghìn bằng dấu chấm */
+const fv = v => typeof v === 'number' && v >= 1000 ? fmtP(Math.round(v)) : v;
 const fmtP = n => n >= 1e6 ? fmtN(n) : String(n).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
 
 /* Trạng thái thẻ: st = ok (mua được) | poor (thiếu vàng) | max (đã đủ) | lock (cần tiến hóa) */
@@ -63,9 +65,9 @@ function cardInfo(k) {
     return { lv: l, st: S.gold >= c ? 'ok' : 'poor', price: c, need: 'Chưa đủ vàng', d2: (l ? o.f(l) : 'Chưa mở') + ' → ' + o.f(l + 1) };
   }
   const u = UP[k], l = S.lv[k], pc = u.u[0] === '%' ? '%' : '', tail = u.u.replace(/^%/, '');
-  if (l >= u.m) return { lv: l, st: 'max', pr: 'MAX', d2: u.f(l) + pc + tail + ' (tối đa)' };
+  if (l >= u.m) return { lv: l, st: 'max', pr: 'MAX', d2: fv(u.f(l)) + pc + tail + ' (tối đa)' };
   const c = cost(k, l);
-  return { lv: l, st: S.gold >= c ? 'ok' : 'poor', price: c, need: 'Chưa đủ vàng', d2: u.f(l) + pc + ' → ' + u.f(l + 1) + pc + tail };
+  return { lv: l, st: S.gold >= c ? 'ok' : 'poor', price: c, need: 'Chưa đủ vàng', d2: fv(u.f(l)) + pc + ' → ' + fv(u.f(l + 1)) + pc + tail };
 }
 
 function cardHTML(k) {
@@ -137,7 +139,6 @@ function cardNav() {
   const cs = $('cards'), w = $('cwrap'), mx = cs.scrollWidth - cs.clientWidth, ov = mx > 4;
   w.classList.toggle('al', ov && cs.scrollLeft > 4);
   w.classList.toggle('ar', ov && cs.scrollLeft < mx - 4);
-  $('swh').classList.toggle('on', ov);
 }
 let csAnim = 0;
 function cardScroll(d) {
@@ -178,6 +179,50 @@ function cardScroll(d) {
     e.preventDefault();
   }, { passive: false });
   document.addEventListener('keydown', e => {
-    if (scr === 'up' && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) { cardScroll(e.key === 'ArrowLeft' ? -1 : 1); e.preventDefault() }
+    if (scr === 'up' && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) {
+      const d = e.key === 'ArrowLeft' ? -1 : 1, ed = cardEdge();
+      if (d < 0 ? !ed.l : !ed.r) cardScroll(d); else tabStep(d);
+      e.preventDefault();
+    }
   });
+})();
+
+/* ----- Vuốt ngang để đổi nhánh (Công ↔ Thủ ↔ Phụ trợ ↔ Hiệu ứng ↔ Kỹ năng...) -----
+   Nếu hàng thẻ còn cuộn được thì vuốt sẽ cuộn thẻ; khi đã ở mép (hoặc không cần cuộn) vuốt tiếp sẽ sang nhánh kế bên. */
+function cardEdge(t) {
+  if (t && t.closest && !t.closest('#cards')) return { l: true, r: true };   // vuốt ngoài hàng thẻ: đổi nhánh ngay
+  const cs = $('cards'), mx = cs.scrollWidth - cs.clientWidth, ov = mx > 4;
+  return { l: !ov || cs.scrollLeft <= 4, r: !ov || cs.scrollLeft >= mx - 4 };   // l/r: đang ở mép trái/phải (hoặc không có gì để cuộn)
+}
+function setTab(id, d) {
+  if (id === upTab) return;
+  upTab = id;
+  renderUp();
+  const cs = $('cards');
+  cs.classList.remove('sl-n', 'sl-p');
+  if (!S.set.rm) { void cs.offsetWidth; cs.classList.add(d > 0 ? 'sl-n' : 'sl-p'); }
+  sfx('ui');
+}
+function tabStep(d) {
+  const i = TABS.findIndex(t => t.id === upTab) + d;
+  if (i < 0 || i >= TABS.length) return false;
+  setTab(TABS[i].id, d);
+  return true;
+}
+(() => {
+  const up = $('up');
+  let g = null;
+  const fin = (x, y, dt) => {
+    if (!g) return;
+    const dx = x - g.x, dy = y - g.y;
+    const e = g; g = null;
+    if (Math.abs(dx) < 56 || Math.abs(dx) < Math.abs(dy) * 1.5 || dt > 1200) return;
+    if (dx < 0 ? e.r : e.l) tabStep(dx < 0 ? 1 : -1);   // vuốt sang trái = nhánh kế tiếp
+  };
+  up.addEventListener('touchstart', e => { g = e.touches.length === 1 ? { x: e.touches[0].clientX, y: e.touches[0].clientY, t: performance.now(), ...cardEdge(e.target) } : null }, { passive: true });
+  up.addEventListener('touchend', e => { const t = e.changedTouches[0]; if (t) fin(t.clientX, t.clientY, performance.now() - g?.t) }, { passive: true });
+  up.addEventListener('touchcancel', () => { g = null }, { passive: true });
+  // Chuột: kéo ngang đủ dài ở mép hàng thẻ cũng đổi nhánh
+  up.addEventListener('pointerdown', e => { if (e.pointerType === 'mouse' && e.button === 0) g = { x: e.clientX, y: e.clientY, t: performance.now(), ...cardEdge(e.target) } });
+  addEventListener('pointerup', e => { if (e.pointerType === 'mouse' && g) fin(e.clientX, e.clientY, performance.now() - g.t) });
 })();

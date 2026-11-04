@@ -33,7 +33,7 @@ function act(a, k, i) {
       else if (prev === 'hud' && R && R.al) { R.pz = 0; show(null) }
       else show(prev === 'pause' && R && R.al ? 'pause' : 'menu');
       break;
-    case 'tab': upTab = k; renderUp(); break;
+    case 'tab': setTab(k, TABS.findIndex(t => t.id === k) - TABS.findIndex(t => t.id === upTab)); break;
     case 'card': buyCard(k); break;
     case 'cprev': cardScroll(-1); break;
     case 'cnext': cardScroll(1); break;

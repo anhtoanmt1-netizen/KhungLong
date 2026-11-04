@@ -30,7 +30,12 @@ function bossSkillUpd(m, dt, s, sn) {
   if (m.shd > 0) m.shd -= dt;
   if (m.hl > 0) {
     m.hl -= dt;
-    if (!m.dead) m.hp = Math.min(m.mx, m.hp + m.hr * dt);
+    if (!m.dead) {
+      const h0 = m.hp;
+      m.hp = Math.min(m.mx, m.hp + m.hr * dt);
+      m.hq = (m.hq || 0) + (m.hp - h0);
+      if ((m.ht = (m.ht || 0.7) - dt) <= 0) { m.ht = 0.7; healPop(m.x, GY - (m.z || 0) - m.h - 10, m.hq, HEALC.boss); m.hq = 0; }
+    }
   }
   if (!r.al) { cancelCast(m); return; }
   const c = bs.c;
@@ -137,12 +142,14 @@ function applySk(k, m, s, d) {
     case "drain":
       m.hl = d.hdur;
       m.hr = m.mx * d.hl / d.hdur;
-      tx(m.x, GY - (m.z || 0) - m.h - 10, "HÚT HỒN", "#9ad0ff");
+      m.hq = 0;
+      tx(m.x, GY - (m.z || 0) - m.h - 22, "HÚT HỒN", "#9ad0ff");
       break;
     case "steal":
       if (pdmg(raw * d.dm, { cap: d.cap, c: "#ff6a7a" }, s)) {
+        const h0 = m.hp;
         m.hp = Math.min(m.mx, m.hp + m.mx * d.hl);
-        tx(m.x, GY - (m.z || 0) - m.h - 10, "HỒI MÁU", "#ff7a8a");
+        healPop(m.x, GY - (m.z || 0) - m.h - 10, m.hp - h0, HEALC.boss);
       }
       break;
     case "hole":

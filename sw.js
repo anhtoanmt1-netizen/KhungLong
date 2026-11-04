@@ -1,6 +1,6 @@
 /* Service Worker: ưu tiên mạng (chờ tối đa 4 giây), rơi về bộ nhớ đệm khi offline.
    Đổi số phiên bản CACHE mỗi khi phát hành để máy người chơi tải bản mới. */
-const CACHE = 'pds-v23';
+const CACHE = 'pds-v24';
 const ASSETS = [
   "./",
   "index.html",

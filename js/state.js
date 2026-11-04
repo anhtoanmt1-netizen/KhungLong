@@ -51,8 +51,16 @@ const save = () => {
   } catch (e) {
   }
 };
-const cost = (k, l) => Math.min(1e12, Math.round(UP[k].b * Math.pow(UP[k].g, l)));
-const skCost = (k, l) => Math.min(1e12, Math.round(SK[k].c * Math.pow(SK[k].g, l)));
+/* Giá: b × g^cấp (tới cấp l1), các cấp mở rộng nhân thêm g2 mỗi cấp; dc = [từ cấp, hệ số] giảm giá (Sức mạnh/Sinh lực giảm 20% từ cấp 20) */
+const curve = (o, l, base) => {
+  const l1 = o.l1 == null ? Infinity : o.l1;
+  let p = base * Math.pow(o.g, Math.min(l, l1));
+  if (l > l1) p *= Math.pow(o.g2, l - l1);
+  if (o.dc && l >= o.dc[0]) p *= o.dc[1];
+  return Math.min(1e12, Math.round(p));
+};
+const cost = (k, l) => curve(UP[k], l, UP[k].b);
+const skCost = (k, l) => curve(SK[k], l, SK[k].c);
 const skl = (k) => S.sk[k] > 0 ? SKV[k](S.sk[k]) : null;
 /* Chỉ số tổng hợp từ nâng cấp + tiến hóa + kỹ năng (Cổ Đại làm tăng sát thương/tốc độ bắn tạm thời) */
 const sv = () => {

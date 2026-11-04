@@ -1,4 +1,4 @@
-# Pixel Dino Survivor (v2.2 - chiêu Boss bóng tối, 3 chế độ, kỹ năng mới)
+# Pixel Dino Survivor (v2.3 - cấp mở rộng, vuốt đổi nhánh, số hồi máu)
 Game 2D pixel art, tự động chiến đấu, PWA chạy offline. Không cần build: HTML/CSS/JS thuần, đã tách thành nhiều file.
 
 ## Chạy thử
@@ -6,7 +6,7 @@ Game 2D pixel art, tự động chiến đấu, PWA chạy offline. Không cần
 
 ## Đưa lên GitHub và triển khai
 ```
-git init && git add . && git commit -m "Pixel Dino Survivor v2.2" && git branch -M main
+git init && git add . && git commit -m "Pixel Dino Survivor v2.3" && git branch -M main
 git remote add origin https://github.com/<tên-bạn>/pixel-dino-survivor.git && git push -u origin main
 ```
 Vào Settings > Pages, chọn nhánh main, thư mục root. Mở link HTTPS trên Android Chrome > Menu > Cài đặt ứng dụng.
@@ -59,6 +59,7 @@ Góc trên phải, dưới dãy nút cài đặt: nền trong suốt, chữ màu
 
 ## Thẻ nâng cấp (v2.1)
 - 6 nhóm (tab), tổng 21 thẻ: **Công** (Sức mạnh, Tốc độ bắn, Đa mục tiêu, Tỷ lệ chí mạng, Sát thương chí mạng) · **Thủ** (Sinh lực, Hồi phục, Phòng thủ) · **Phụ trợ** (Tiến hóa, Kinh tế, Hút máu) · **Hiệu ứng** (Thiêu đốt, Choáng, Phá Huyết) · **Kỹ năng công** (Lửa Xuyên Phá, Lửa Bùng Nổ, Bão Lửa, Hỏa Ngục Cổ Đại) · **Kỹ năng thủ** (Phượng Hoàng Lửa, Tường Lửa, Cuồng Phong Hộ Thân). Chấm xanh trên tab = có thẻ đủ vàng để nâng.
+- **Vuốt đổi nhánh (v2.3):** vuốt ngang trên bảng để chuyển Công ↔ Thủ ↔ Phụ trợ ↔ Hiệu ứng ↔ Kỹ năng. Vuốt ở vùng ngoài hàng thẻ (tiêu đề, thanh nhánh) đổi nhánh ngay; vuốt trên hàng thẻ thì cuộn thẻ trước, khi đã tới mép vuốt tiếp mới sang nhánh kế bên (chuột: kéo ngang đủ dài ở mép; phím ←/→ cũng vậy). Nhánh mới trượt vào theo chiều vuốt (`setTab`, `tabStep`, `cardEdge` trong `js/cards.js`).
 - **Vuốt ngang** để xem hết thẻ trong một tab: cuộn cảm ứng, kéo chuột, lăn chuột, mũi tên hai bên, phím ←/→. Mua thẻ không làm mất vị trí cuộn (`cardNav`, `cardScroll` trong `js/cards.js`; `.cards` trong `css/cards.css`).
 - Mỗi thẻ: nhãn **Lv.**, **giá**, **tên**, **mô tả** và dòng xanh giá trị trước → sau. Kỹ năng có 5 cấp (cấp 1 cần đủ bậc tiến hóa `e`, các cấp sau không cần). **Bấm vào thẻ là nâng cấp.**
 - Thêm/đổi thẻ: sửa `CARDS` trong `js/cards.js`; ảnh giữa thẻ là `assets2/cards/art_<khóa>.png`. Khung: fire · silver · shadow · blood · lotus · steel · jade · bronze.
@@ -123,12 +124,31 @@ Tiếng bắn dùng `assets1/audio/fire_breath.mp3`, nhạc nền mặc định 
 - **Hiệu ứng điểm ảnh** (`js/vfx/`): chạy bằng ES module (`<script type="module">`) nên cần mở game qua http/https (GitHub Pages ổn); mở thẳng `file://` thì chiêu vẫn hoạt động nhưng không có hình. Mỗi hiệu ứng vẽ lại tối đa 30 lần/giây, tối đa 6 hiệu ứng cùng lúc, tự bỏ qua nếu chưa nạp xong. Lời Nguyền và Hút Máu tô màu lên đúng hình khủng long / Boss nhờ mặt nạ dựng từ sprite (`VFX.actorOf`).
 - Ghi công: `js/vfx/` dùng bộ hiệu ứng điểm ảnh có phần mượn từ Sprite Fusion (https://www.spritefusion.com/pixel-art-vfx), giấy phép MIT, Copyright (c) 2026 Hugo Duprez; các dòng ghi công được giữ nguyên trong từng file.
 
+## Cấp mở rộng và hồi máu (v2.3)
+| Nâng cấp | Cấp tối đa | Giá trị ở cấp mở rộng |
+|---|---|---|
+| Sức mạnh | 40 → **80** | mức tăng +3 nhân thêm 6% mỗi cấp (cấp 80 = 617) |
+| Sinh lực | 40 → **80** | từ cấp 41, mỗi cấp tăng gấp **1,2 lần mức tăng của cấp trước** (bắt đầu +20), làm tròn lên bội số của 5 (cấp 80 = 247.495 HP) |
+| Hồi phục | 20 → **50** | mức tăng 1,5 nhân thêm 10% mỗi cấp (cấp 50 ≈ 301 HP/giây) |
+| Đa mục tiêu | 6 → **11** | tối đa **12** đạn mỗi lần |
+| Sát thương chí mạng | 30 → **100** | +5%/cấp sau cấp 30 (cấp 100 = 790%) |
+| Hút máu | 15 → **20** | +2%/cấp (cấp 20 = 40%) |
+| Thiêu đốt | 20 → **50** | +2%/cấp sau cấp 20 (cấp 50 = 150%) |
+| Phá Huyết (kỹ năng) | 5 → **10** | cơ hội 45/50/55/60/65% ở cấp 6–10, % máu gây thêm tăng dần từ 2% lên 3% (Boss 0,5% → 0,75%) |
+| Lửa Xuyên Phá (kỹ năng) | 5 → **10** | xuyên tối đa **12** quái |
+- **Giá:** `cost()` / `skCost()` trong `js/state.js` dùng `b × g^cấp` tới cấp cũ (`l1`), các cấp mở rộng nhân thêm `g2` mỗi cấp. **Sức mạnh và Sinh lực giảm 20% giá từ cấp 20** (`dc: [20, 0.8]`: áp dụng cho giá nâng từ cấp 20 trở lên). Các giá trị cấp mở rộng nằm trong bảng `XV` (`js/config.js`).
+- Toàn bộ phần mở rộng tốn khoảng 986 triệu vàng (nội dung cũ khoảng 74 triệu); hậu kỳ tăng độ khó mạnh hơn (`SC.hp`, `SC.dm` có thêm hệ số mũ từ đợt 150 / 120) nên nhân vật đã tối đa hết mọi cấp mở rộng bắt đầu thua ở khoảng đợt 245.
+- **Số hồi máu:** mọi hiệu ứng hồi HP hiện thành số **"+N" màu xanh lá** cùng phông chữ với các số sát thương: Hồi phục (xanh sáng, bên trái đầu khủng long), Hút máu và Phá Huyết (xanh đậm, bên phải), Phượng Hoàng hồi sinh, và Boss tự hồi (Hút Máu, Hút Linh Hồn). Hồi phục / Hút máu cộng dồn 0,7 giây rồi hiện một lần cho đỡ dày. Tắt "hiện số sát thương" trong Cài đặt thì các số này cũng ẩn (`healAdd`, `healTick`, `healPop` trong `js/skills.js`).
+
 ## Bàn phím số riêng (v2.1)
 - Mọi ô `input[type=number]` và `input[type=password]` (mật khẩu Mod và mật khẩu mới, số vàng, cỡ khủng long / 12 Boss / cây / lá / cỏ, nhập đợt) dùng bàn phím này thay cho bàn phím hệ thống, nên **bàn phím điện thoại không bao giờ bật lên che game**.
 - Bố cục 2 hàng × 6 phím: `1 2 3 4 5 ⌫` / `6 7 8 9 0 OK`, kèm một dòng hiển thị (tên ô, giá trị; mật khẩu hiện dấu •) và nút ✕ xóa hết. Cố định giữa mép dưới khung game, rộng tối đa 27em; màn hình nội dung tự chừa chỗ phía dưới khi bàn phím mở.
 - Tự hiện khi chạm vào ô số (hoặc khi hộp thoại tự đặt con trỏ vào ô, như Nhập đợt / Mật khẩu), tự ẩn khi bấm OK, bấm ra ngoài hoặc đổi màn hình. Chạm số đầu tiên sẽ thay giá trị có sẵn. OK phát phím Enter nên các bộ xử lý cũ (`mod.js`, `custom.js`) không cần sửa; giá trị đổi được lưu qua sự kiện `change` như khi gõ thật.
 - Máy tính: gõ phím số, Backspace, Enter (OK), Esc (đóng) cũng hoạt động. Các ô được đặt `readonly` + `inputmode="none"` để trình duyệt di động không mở bàn phím hệ thống.
 - Thêm ô số mới: chỉ cần dùng `<input type="number">` (hoặc `password`) có `inputmode="none" readonly`, `aria-label` (hiện làm tên ô) và `min`/`max` (quyết định số chữ số tối đa).
+
+## Nhật ký v2.3
+- Vuốt ngang để đổi nhánh trong bảng nâng cấp; số hồi máu xanh lá; giảm 20% giá Sức mạnh/Sinh lực từ cấp 20; mở rộng cấp độ (Sức mạnh/Sinh lực 80, Hồi phục 50, Đa mục tiêu 12 đạn, Chí mạng 100, Hút máu 20, Thiêu đốt 50, Phá Huyết 10, Lửa Xuyên Phá 12 quái); Sinh lực cấp 41+ tăng theo 1,2 lần mức tăng cấp trước; HUD và số sát thương gọn lại khi số rất lớn. `VERSION` = 2.3, cache `pds-v24`.
 
 ## Nhật ký v2.2
 - Chiêu Boss: 12 chiêu từ bộ hiệu ứng bóng tối (Vồ Lấy, Xúc Tu Quất, Lửa Bóng Tối, Lời Nguyền, Ấn Phong Kỹ Năng, Cầu Hư Không, Nhật Thực, Triệu Hồi Sọ Ma, Hút Linh Hồn, Hút Máu, Hố Đen, Bùng Nổ Hư Vô); trạng thái xấu trên khủng long; Choáng ngắt chiêu. `VERSION` = 2.2, cache `pds-v23`.
