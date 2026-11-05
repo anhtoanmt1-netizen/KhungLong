@@ -1,0 +1,70 @@
+/* ===== Hồ sơ: Thành tựu · Nhiệm vụ · Sách Quái (js/hub.js) ===== */
+.b { position: relative }
+.b .hd { display: none; position: absolute; right: -.35em; top: -.35em; width: .9em; height: .9em; border-radius: 50%; background: #59e04a; border: .15em solid #0b1020; box-shadow: 0 0 .5em #59e04a }
+.b .hd.on { display: block }
+.hubrow { flex-wrap: wrap; justify-content: center }
+.hub-panel { width: min(72.5em, 98%) }
+.hbody { max-height: 27em; overflow-y: auto; padding: .1em .4em .4em; scrollbar-width: thin; scrollbar-color: #3a4676 transparent; -webkit-overflow-scrolling: touch }
+.hsum { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: .5em .9em; margin: .1em 0 .7em; font: 700 .85em Montserrat, sans-serif; color: #cdd6f4 }
+.hsum b { color: #ffe08a }
+.hsum .b { font-size: .85em; padding: .45em .9em }
+.hwarn { margin: 0 0 .6em; padding: .4em .7em; border-radius: .5em; background: #4a1a1a; color: #ffb0a0; font: 700 .8em Montserrat, sans-serif }
+.hnote { margin: .7em 0 0; font: 600 .74em/1.4 Montserrat, sans-serif; color: #8f9cc4 }
+.hsum .hnote { margin: 0 }
+.hlist { display: grid; gap: .55em }
+.hrow { display: flex; align-items: center; gap: .9em; padding: .6em .8em; background: linear-gradient(#141c38, #0c1226); border: .14em solid #2a3358; border-radius: .7em }
+.hrow.done { border-color: #b8923e; box-shadow: inset 0 0 1.4em #ffd23a14 }
+.hrow .hico { flex: 0 0 2.7em; height: 2.7em; display: grid; place-items: center; border-radius: 50%; background: radial-gradient(#3a4a7c, #1a2342); border: .15em solid #5a6aa0; color: #ffe08a; font: 900 1.15em Montserrat, sans-serif }
+.hrow.done .hico { background: radial-gradient(#ffe38a, #c48a22); color: #5a2a05; border-color: #7a4a14 }
+.hrow.hid .hico { filter: grayscale(1) opacity(.55) }
+.hrow.hid .hmid b { color: #7480a8 }
+.hrow .hmid { flex: 1; min-width: 0 }
+.hrow .hmid b { display: block; font: 800 .95em Montserrat, sans-serif; color: #f1f4ff }
+.hrow .hmid small { display: block; margin: .15em 0 .4em; font: 600 .74em/1.35 Montserrat, sans-serif; color: #9aa6cf }
+.hbar { height: .55em; background: #070b18; border-radius: .3em; overflow: hidden; box-shadow: inset 0 0 .3em #000 }
+.hbar u { display: block; height: 100%; border-radius: .3em; background: linear-gradient(#ffe38a, #f0a034) }
+.hrow .hrt { flex: 0 0 auto; min-width: 7.5em; display: flex; flex-direction: column; align-items: flex-end; gap: .4em }
+.hpv { font: 700 .75em Montserrat, sans-serif; color: #cdd6f4 }
+.hmds { display: flex; gap: .3em }
+.hmd { width: .95em; height: .95em; border-radius: 50%; background: #1b2240; border: .12em solid #3a4466 }
+.hmd.on.m1 { background: #d89a5a; border-color: #7a4a14 }
+.hmd.on.m2 { background: #d8dde8; border-color: #7b8397 }
+.hmd.on.m3 { background: #ffd23a; border-color: #a8741a; box-shadow: 0 0 .5em #ffd23a88 }
+.hrow .hok { color: #8dff9a; font: 800 .8em Montserrat, sans-serif }
+.hrow .b { font-size: .8em; padding: .5em 1.1em }
+.hrow .b.sm { font-size: .72em; padding: .35em .8em }
+.hrow.q.t1 .hico { border-color: #5ea84a }
+.hrow.q.t2 .hico { border-color: #4a8ad8 }
+.hrow.q.t3 .hico { border-color: #d8584a }
+.hrow.bonus { border-style: dashed }
+/* Sách Quái */
+.cxw { display: flex; gap: 1em; align-items: flex-start }
+.cxgrid { flex: 1; display: flex; flex-wrap: wrap; gap: .5em; align-content: flex-start }
+.cxh { flex: 0 0 100%; margin: .4em 0 .05em; font: 800 .72em Montserrat, sans-serif; letter-spacing: .14em; color: #c9b88a }
+.cxc { width: 5.3em; height: 5.3em; padding: 0; border-radius: .6em; cursor: pointer; border: .14em solid #3a4466; background: radial-gradient(#26365f, #0c1226); -webkit-tap-highlight-color: transparent }
+.cxc.on { border-color: #ffd23a; box-shadow: 0 0 .8em #ffd23a77 }
+.cxc.ms { border-color: #c9a24a }
+.cxi { display: block; width: 100%; height: 100%; image-rendering: pixelated }
+.cxdet { flex: 0 0 21em; padding: .7em .8em; border-radius: .7em; background: linear-gradient(#141c38, #0c1226); border: .14em solid #2a3358; font: 600 .82em/1.45 Montserrat, sans-serif; color: #cdd6f4 }
+#cxbig { display: block; width: 100%; height: auto; border-radius: .6em; border: .14em solid #3a4466; background: radial-gradient(#26365f, #0c1226); image-rendering: pixelated }
+.cxdet h3 { margin: .5em 0 0; font: 900 1.15em Montserrat, sans-serif; color: #ffe08a; letter-spacing: .04em }
+.cxdet p { margin: .3em 0 }
+.cxy { color: #8f9cc4; font-weight: 700; font-size: .85em }
+.cxs { color: #ffd23a; letter-spacing: .2em }
+.cxu, .cxn { color: #8f9cc4; font-size: .85em }
+.cxg { display: grid; grid-template-columns: 1fr 1fr; gap: .35em; margin: .4em 0 }
+.cxg span { display: flex; justify-content: space-between; padding: .25em .5em; border-radius: .4em; background: #070b18; font-size: .85em; color: #9aa6cf }
+.cxg b { color: #ffe08a }
+.cxb { font-size: .9em }
+.cxb i { font-style: normal; font-weight: 800 }
+/* Thông báo nhanh */
+#toast { position: absolute; left: 50%; top: 9%; z-index: 70; min-width: 16em; max-width: 90%; padding: .55em 1.2em; box-sizing: border-box; text-align: center; border-radius: .8em; background: radial-gradient(ellipse at 50% 0, #26365f, #0b1022); box-shadow: 0 0 0 .12em #000, 0 0 0 .28em #d9a640, 0 .6em 1.4em #000a; opacity: 0; pointer-events: none; transform: translate(-50%, -160%); transition: transform .28s cubic-bezier(.2, .9, .3, 1), opacity .2s; font-family: Montserrat, sans-serif }
+#toast.on { opacity: 1; transform: translate(-50%, 0) }
+#toast b { display: block; font-weight: 900; font-size: 1em; letter-spacing: .03em; text-shadow: 0 .08em 0 #000a }
+#toast small { display: block; margin-top: .15em; font-weight: 700; font-size: .72em; color: #cdd6f4 }
+@media (max-width: 760px) { .cxw { flex-direction: column } .cxdet { flex-basis: auto; width: 100% } }
+.hub-panel p { max-width: none }
+.hub-panel .hnote { font-size: .74em }
+.hub-panel .cxh { flex: 0 0 100%; width: 100% }
+#w:has(#hub.on) #toast { top: auto; bottom: 3.5%; transform: translate(-50%, 160%) }
+#w:has(#hub.on) #toast.on { transform: translate(-50%, 0) }

@@ -1,4 +1,4 @@
-# Pixel Dino Survivor (v2.3 - cấp mở rộng, vuốt đổi nhánh, số hồi máu)
+# Pixel Dino Survivor (v2.4 - Hồ sơ: thành tựu, nhiệm vụ hằng ngày, Sách Quái)
 Game 2D pixel art, tự động chiến đấu, PWA chạy offline. Không cần build: HTML/CSS/JS thuần, đã tách thành nhiều file.
 
 ## Chạy thử
@@ -6,7 +6,7 @@ Game 2D pixel art, tự động chiến đấu, PWA chạy offline. Không cần
 
 ## Đưa lên GitHub và triển khai
 ```
-git init && git add . && git commit -m "Pixel Dino Survivor v2.3" && git branch -M main
+git init && git add . && git commit -m "Pixel Dino Survivor v2.4" && git branch -M main
 git remote add origin https://github.com/<tên-bạn>/pixel-dino-survivor.git && git push -u origin main
 ```
 Vào Settings > Pages, chọn nhánh main, thư mục root. Mở link HTTPS trên Android Chrome > Menu > Cài đặt ứng dụng.
@@ -24,6 +24,7 @@ js/    (nạp theo đúng thứ tự trong index.html)
   audio.js · fire.js · icons.js · render.js (có bossDraw) · chest.js · music.js · custom.js · settings.js
   mod.js              Bảng Mod ẩn (mật khẩu, bật/tắt, nhập vàng, cỡ khủng long, cỡ Boss, Nhập đợt)
   keypad.js           (v2.1) bàn phím số riêng cho mọi ô nhập số / mật khẩu (css/keypad.css)
+  hub.js              (v2.4) Hồ sơ: thành tựu, nhiệm vụ hằng ngày, Sách Quái, thông báo nhanh (css/hub.css)
   bossskills.js       (v2.2) chiêu Boss: lập lịch, báo trước, hiệu lực, trạng thái xấu, vẽ hiệu ứng
   vfx/vfx.js          (v2.2) ES module nạp vfx/core + 12 hiệu ứng bóng tối, đưa ra window.VFX
   vfx/core/           bộ lõi vẽ điểm ảnh (hạt, ánh sáng, mô phỏng)
@@ -124,6 +125,13 @@ Tiếng bắn dùng `assets1/audio/fire_breath.mp3`, nhạc nền mặc định 
 - **Hiệu ứng điểm ảnh** (`js/vfx/`): chạy bằng ES module (`<script type="module">`) nên cần mở game qua http/https (GitHub Pages ổn); mở thẳng `file://` thì chiêu vẫn hoạt động nhưng không có hình. Mỗi hiệu ứng vẽ lại tối đa 30 lần/giây, tối đa 6 hiệu ứng cùng lúc, tự bỏ qua nếu chưa nạp xong. Lời Nguyền và Hút Máu tô màu lên đúng hình khủng long / Boss nhờ mặt nạ dựng từ sprite (`VFX.actorOf`).
 - Ghi công: `js/vfx/` dùng bộ hiệu ứng điểm ảnh có phần mượn từ Sprite Fusion (https://www.spritefusion.com/pixel-art-vfx), giấy phép MIT, Copyright (c) 2026 Hugo Duprez; các dòng ghi công được giữ nguyên trong từng file.
 
+## Hồ sơ: Thành tựu · Nhiệm vụ hằng ngày · Sách Quái (v2.4)
+Vào từ menu (3 nút mới), từ màn Tạm dừng và Game Over. Dữ liệu nằm trong save (`S.pr`, `S.cx`, `S.ach`, `S.dq`, `S.tt`, `S.ax`) và **được giữ lại khi chơi mới**. Khi **Bảng Mod đang BẬT**, mọi tiến trình đều không được tính (vì Mod sửa được vàng, nhảy đợt). Logic và giao diện: `js/hub.js`, `css/hub.css`; sự kiện được game gọi qua `ev(...)` (kill, crit, chest, intr, gale, rv, buy, wave, heal, tap, run, dead), `cxSeen(ti)` và `qEv(...)`.
+- **Thành tựu (`ACH`)**: 23 mục: 20 mục 3 bậc Đồng/Bạc/Vàng hoặc 1 bậc, và 3 mục **ẩn** (hiện "???" tới khi mở khóa). Gồm hạ quái / Boss, đạt đợt, Boss không mất máu, ngắt chiêu Boss, vàng, rương, chí mạng, đòn mạnh nhất, hồi máu, hồi sinh, Cuồng Phong, thời gian chơi, nâng cấp, tiến hóa, kỹ năng/thẻ tối đa, Sách Quái, đạt đợt 50 ở chế độ Khó / Địa ngục. Điểm thành tựu (bậc 1/2/3 = 1/2/3 điểm, mục 1 bậc = 3) quyết định hạng (Tân Binh → Long Thần). Đạt bậc cao nhất mở **danh hiệu**, chọn trong tab Thành tựu và hiển thị thay chữ "DINO" trên HUD. Phần thưởng chỉ là danh hiệu, điểm và hạng nên không đổi cân bằng.
+- **Nhiệm vụ hằng ngày (`QD`)**: mỗi ngày 3 nhiệm vụ (dễ / vừa / khó) chọn theo ngày và theo đợt cao nhất của bạn (mục tiêu tự tăng theo tiến độ; nhiệm vụ cần Choáng / Cuồng Phong chỉ xuất hiện nếu bạn đã có). **Đổi 1 nhiệm vụ chưa làm mỗi ngày.** Hoàn thành cả 3 thì nhận **Rương Ngày** và tăng **chuỗi ngày** (+10% thưởng mỗi ngày, tối đa +50%; lỡ một ngày thì mất chuỗi). Thưởng là vàng tính theo "đơn vị vàng" của đợt cao nhất của bạn (`unit()`), rất nhỏ so với thu nhập nên không ảnh hưởng mục tiêu ~2 giờ. Đổi ngày lúc 0 giờ theo giờ máy.
+- **Sách Quái**: 28 trang (14 quái, Slime Vua, Rồng Con và 12 Boss). **Gặp lần đầu** thì mở trang (thông báo "Trang mới"); hạ đủ số con mở thêm thông tin: quái thường 20 con → chỉ số gốc, 100 con → mẹo; Boss 1 con → chỉ số, 3 con → danh sách chiêu thức. Trang chưa gặp hiện bóng đen và dấu "?". Quái thường được vẽ bằng chính hàm `slime()` của game (`cxDraw` tạm hoán đổi ngữ cảnh canvas `x`), Boss dùng ảnh.
+- Thêm thành tựu / nhiệm vụ: thêm một dòng vào `ACH` (cần `v()` đọc giá trị) hoặc `QD` (cần sự kiện `ev`). Dùng `trk()` để bỏ qua khi Mod bật.
+
 ## Cấp mở rộng và hồi máu (v2.3)
 | Nâng cấp | Cấp tối đa | Giá trị ở cấp mở rộng |
 |---|---|---|
@@ -146,6 +154,9 @@ Tiếng bắn dùng `assets1/audio/fire_breath.mp3`, nhạc nền mặc định 
 - Tự hiện khi chạm vào ô số (hoặc khi hộp thoại tự đặt con trỏ vào ô, như Nhập đợt / Mật khẩu), tự ẩn khi bấm OK, bấm ra ngoài hoặc đổi màn hình. Chạm số đầu tiên sẽ thay giá trị có sẵn. OK phát phím Enter nên các bộ xử lý cũ (`mod.js`, `custom.js`) không cần sửa; giá trị đổi được lưu qua sự kiện `change` như khi gõ thật.
 - Máy tính: gõ phím số, Backspace, Enter (OK), Esc (đóng) cũng hoạt động. Các ô được đặt `readonly` + `inputmode="none"` để trình duyệt di động không mở bàn phím hệ thống.
 - Thêm ô số mới: chỉ cần dùng `<input type="number">` (hoặc `password`) có `inputmode="none" readonly`, `aria-label` (hiện làm tên ô) và `min`/`max` (quyết định số chữ số tối đa).
+
+## Nhật ký v2.4
+- Hồ sơ: 23 thành tựu (3 ẩn) + danh hiệu trên HUD, 3 nhiệm vụ hằng ngày + Rương Ngày + chuỗi ngày, Sách Quái 28 trang; thông báo nhanh; chạm khủng long có phản ứng. Cache `pds-v25`.
 
 ## Nhật ký v2.3
 - Vuốt ngang để đổi nhánh trong bảng nâng cấp; số hồi máu xanh lá; giảm 20% giá Sức mạnh/Sinh lực từ cấp 20; mở rộng cấp độ (Sức mạnh/Sinh lực 80, Hồi phục 50, Đa mục tiêu 12 đạn, Chí mạng 100, Hút máu 20, Thiêu đốt 50, Phá Huyết 10, Lửa Xuyên Phá 12 quái); Sinh lực cấp 41+ tăng theo 1,2 lần mức tăng cấp trước; HUD và số sát thương gọn lại khi số rất lớn. `VERSION` = 2.3, cache `pds-v24`.

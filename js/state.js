@@ -1,5 +1,11 @@
 /* ===== Trạng thái lưu (localStorage): mặc định, nạp/lưu, giá nâng cấp cost(), chỉ số tổng hợp sv(). ===== */
-const defS = () => ({ v: 1, df: 0, gold: 0, rw: 1, lv: Object.fromEntries(Object.keys(UP).map((k) => [k, 0])), st: { kills: 0, best: 0, deaths: 0 }, sk: Object.fromEntries(Object.keys(SK).map((k) => [k, 0])), evo: 0, set: { snd: 1, mus: 1, dn: 1, rm: 0, sv: 0.5 }, mod: { on: 0, pw: hpw(MODPW), dino: null, bs: {}, wj: 0 }, cu: { bg: { sel: null }, tree: { sel: null, px: null }, leaf: { sel: null, px: null }, grass: { sel: null, px: null } } });
+/* Hồ sơ người chơi (v2.4) — tồn tại qua các lần "Trò chơi mới":
+   pr = bộ đếm trọn đời (gold: tổng vàng kiếm, bk: Boss đã hạ, ch: rương, cr: đòn chí mạng, it: chiêu Boss bị ngắt, hl: HP đã hồi, pt: giây chơi, up: lần nâng cấp, mh: đòn mạnh nhất,
+        gl: lần Cuồng Phong, rv: lần hồi sinh, nh: Boss hạ không mất máu, tp: lần chạm khủng long, bw: đợt cao nhất, nl: chơi ban đêm, fd: chết ở đợt 1, runs: số lượt, bwd: đợt cao nhất theo chế độ)
+   cx = Sách Quái { mã quái: số con đã hạ } (có khóa = đã gặp) · ach = { mã thành tựu: bậc đã đạt } · dq = nhiệm vụ ngày · tt = danh hiệu đang dùng · ax = số bậc thành tựu đã xem */
+const PRK = ["gold", "bk", "ch", "cr", "it", "hl", "pt", "up", "mh", "gl", "rv", "nh", "tp", "bw", "nl", "fd", "runs"];
+const defPr = () => ({ ...Object.fromEntries(PRK.map((k) => [k, 0])), bwd: [0, 0, 0] });
+const defS = () => ({ v: 1, pr: defPr(), cx: {}, ach: {}, dq: null, tt: "dino", ax: 0, df: 0, gold: 0, rw: 1, lv: Object.fromEntries(Object.keys(UP).map((k) => [k, 0])), st: { kills: 0, best: 0, deaths: 0 }, sk: Object.fromEntries(Object.keys(SK).map((k) => [k, 0])), evo: 0, set: { snd: 1, mus: 1, dn: 1, rm: 0, sv: 0.5 }, mod: { on: 0, pw: hpw(MODPW), dino: null, bs: {}, wj: 0 }, cu: { bg: { sel: null }, tree: { sel: null, px: null }, leaf: { sel: null, px: null }, grass: { sel: null, px: null } } });
 let GS = 1, warn = 0;
 function load() {
   try {
@@ -7,6 +13,14 @@ function load() {
     if (!j || j.v !== 1) throw 0;
     const d = defS();
     d.gold = Math.max(0, Math.floor(+j.gold) || 0);
+    const jp = j.pr || {};
+    for (const k of PRK) d.pr[k] = Math.max(0, +jp[k] || 0);
+    for (let i = 0; i < 3; i++) d.pr.bwd[i] = Math.max(0, Math.floor(+(jp.bwd || [])[i]) || 0);
+    for (const k in j.cx || {}) if (/^\d+$/.test(k) && +k < 40) d.cx[k] = Math.max(0, Math.floor(+j.cx[k]) || 0);
+    for (const k in j.ach || {}) if (/^[a-z0-9_]+$/.test(k)) d.ach[k] = Math.min(3, Math.max(0, Math.floor(+j.ach[k]) || 0));
+    d.dq = j.dq && typeof j.dq === "object" ? j.dq : null;   // được kiểm tra lại trong hub.js (dqEnsure)
+    d.tt = typeof j.tt === "string" && /^[a-z0-9_]+$/.test(j.tt) ? j.tt : "dino";
+    d.ax = Math.max(0, Math.floor(+j.ax) || 0);
     d.df = Math.min(DIFF.length - 1, Math.max(0, Math.floor(+j.df) || 0));
     d.rw = Math.min(9999, Math.max(1, Math.floor(+j.rw) || 1));
     for (const k in UP) d.lv[k] = Math.min(UP[k].m, Math.max(0, Math.floor(+(j.lv || {})[k]) || 0));

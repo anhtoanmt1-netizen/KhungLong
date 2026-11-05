@@ -42,6 +42,7 @@ function chestPop(c) {
   const r = R, o = CHR[Math.floor(rnd() * CHR.length)], u = 5 * SC.gd(r.t) * DF().gd, g = o.g ? Math.round(o.g * u) : Math.min(Math.round(S.gold * (o.x - 1)), Math.round(100 * u));
   S.gold = Math.min(1e12, S.gold + g);
   r.gold += g;
+  ev("chest", g);
   dirty = 1;
   const bx = c.x, by = GY + 5 - c.z - c.h / 2, n = S.set.rm ? 8 : 24;
   for (let i = 0; i < n; i++) r.fx.push({ x: bx, y: by, vx: (rnd() - 0.5) * 150, vy: -rnd() * 110 - 20, l: 0.9, c: i % 3 ? "#ffd23a" : "#fff6b0", s: i % 4 ? 2 : 3 });

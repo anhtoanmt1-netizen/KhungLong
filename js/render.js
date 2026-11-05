@@ -1,5 +1,6 @@
 /* ===== Vẽ canvas: nền, quái, khủng long, hiệu ứng và HUD pixel (máu, vàng, số đợt). ===== */
-const cv = $("c"), x = cv.getContext("2d");
+const cv = $("c");
+let x = cv.getContext("2d");
 x.imageSmoothingEnabled = false;
 const rc = (c, a, b, w, h) => {
   x.fillStyle = c;
@@ -71,7 +72,7 @@ function hudc() {
   x.imageSmoothingEnabled = true;
   x.drawImage(IM[0], 46, 0, 32, 24, X0 + 4, Y0 + 4, 24, 18);
   x.imageSmoothingEnabled = false;
-  tw("DINO", X0 + 32, Y0 + 13, "#ff4a4a", 9);
+  { const tn = titleText().toUpperCase(); tw(tn, X0 + 32, Y0 + 13, "#ff4a4a", Math.max(6, Math.min(9, Math.floor(46 / (tn.length * 0.64))))); }   // danh hiệu (Hồ sơ → Thành tựu)
   tw("☠ " + String(r.kills).padStart(5, "0"), X0 + 32, Y0 + 23, "#fff", 8);
   let cx = X0 + 86;
   ic(HC.coin, cx, Y0 + 5.5);

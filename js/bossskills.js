@@ -14,6 +14,7 @@ function pdmg(raw, o, s) {
   let d = raw * (o.nodef ? 1 : 1 - s.def) * (r.vul > 0 && !o.nov ? 1.3 : 1);
   d = Math.max(1, Math.round(Math.min(d, s.maxHp * (o.cap || 1))));
   r.hp -= d;
+  r.lost += d;
   r.hitT = 0.25;
   tx(DX, GY - 50 - (o.dy || 0), "-" + d, o.c || "#c77dff");
   sfx("hurt");
@@ -48,6 +49,7 @@ function bossSkillUpd(m, dt, s, sn) {
   }
   const d = BSK[c.k], F = d.tele + d.pre;
   if (sn && !c.fired) { // Choáng gián đoạn chiêu chưa phát động
+    ev("intr");
     tx(m.x, GY - (m.z || 0) - m.h - 22, "BỊ NGẮT!", "#9ad8ff");
     cancelCast(m);
     return;

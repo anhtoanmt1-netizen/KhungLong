@@ -21,6 +21,7 @@ function renderDf() {
 }
 
 function act(a, k, i) {
+  if (hubAct(a, k)) return;   // Hồ sơ (js/hub.js)
   switch (a) {
     case 'play': startRun(); break;
     case 'play1': S.rw = 1; save(); startRun(); break;
@@ -46,7 +47,8 @@ function act(a, k, i) {
     case 'dfpick': newDf = +k; renderDf(); break;
     case 'donew': {
       const st = S.set, cu = S.cu, md = S.mod;
-      S = defS(); S.set = st; S.cu = cu; S.mod = md; S.df = newDf;   // giữ cài đặt, ảnh tùy chỉnh và Mod
+      const pf = { pr: S.pr, cx: S.cx, ach: S.ach, dq: S.dq, tt: S.tt, ax: S.ax };   // hồ sơ (thành tựu, Sách Quái, nhiệm vụ) được giữ lại
+      S = defS(); S.set = st; S.cu = cu; S.mod = md; S.df = newDf; Object.assign(S, pf);   // giữ cài đặt, ảnh tùy chỉnh và Mod
       save(); R = null; $('mg').textContent = 0; show('menu');
       break;
     }
@@ -104,6 +106,7 @@ document.addEventListener('keydown', e => {
   else if (scr === 'cust') act('custback');
   else if (scr === 'mod' || scr === 'modpw') act('modclose');
   else if (scr === 'wj') act('wjclose');
+  else if (scr === 'hub') act('hubclose');
 });
 document.addEventListener('visibilitychange', () => {
   if (document.hidden) { save(); if (R && R.al && scr === null) act('pause') }
@@ -166,6 +169,13 @@ cv.addEventListener('pointerdown', e => {
     const cy = GY + 5 - c.h / 2, d = Math.hypot(px - c.x, py - cy);
     if (Math.abs(px - c.x) < c.w / 2 + 18 && Math.abs(py - cy) < c.h / 2 + 22 && d < bd) { bd = d; bc = c }
   }
-  if (bc) { bc.st = 1; bc.vz = 150; bc.vx = 0; sfx('tap') }
+  if (bc) { bc.st = 1; bc.vz = 150; bc.vx = 0; sfx('tap'); return }
+  // Chạm vào khủng long: một chút tương tác vui (và là điều kiện của một thành tựu ẩn)
+  if (px > 40 && px < 170 && py > 170 && py < 292) {
+    ev('tap');
+    sfx('ui');
+    for (let i = 0; i < 4; i++) R.fx.push({ x: DX + (Math.random() - 0.5) * 40, y: GY - 60 - Math.random() * 20, vx: (Math.random() - 0.5) * 30, vy: -40 - Math.random() * 30, g: -10, l: 0.7, c: '#ff7a9a', s: 3 });
+    tx(DX, GY - 78, '♥', '#ff7a9a');
+  }
 });
 dfLabel();

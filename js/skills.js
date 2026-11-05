@@ -23,6 +23,7 @@ function heal(a, s) {
 const HEALC = { regen: "#7dff8a", steal: "#4fe86a", revive: "#b6ffc4", boss: "#7dff8a" };
 const HEALP = { regen: [-26, -64], steal: [26, -64] };
 function healAdd(src, a) {
+  if (a > 0.001) ev("heal", a);
   if (!(a > 0.001) || !S.set.dn) return;
   const q = R.hq[src] || (R.hq[src] = { a: 0, t: 0.35 });
   q.a += a;
@@ -143,6 +144,7 @@ function galeCast(g, s) {
   }
   r.rg.push({ x: DX, y: GY + 1, t: 0, l: 0.6, c: "#8adfff", r: g.r }, { x: DX, y: GY + 1, t: -0.1, l: 0.6, c: "#fff", r: g.r * 0.7 });
   r.tx.push({ x: DX, y: GY - 70, s: "CUỒNG PHONG", c: "#9ae8ff", l: 1, z: 12 });
+  ev("gale");
   sfx("gale");
 }
 

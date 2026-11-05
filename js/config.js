@@ -1,5 +1,5 @@
 /* ===== Cấu hình và số liệu cân bằng: phiên bản, hằng số khung chơi, bảng nâng cấp (UP), quái (SL), kỹ năng (SK), tiến hóa (EVO), rương (CHR). ===== */
-const VERSION = "2.3";
+const VERSION = "2.4";
 const $ = (i) => document.getElementById(i), rnd = Math.random;
 const W = 640, H = 360, GY = 280, DX = 96, K = "pds_save_v1";
 const CFG = { iframe: 0.5, maxMon: 34, crit: 0.05, leafSpd: 340, chestP: 0.3, chestW: 20, chestDec: 0.01, chestMin: 0.03, chestH: 20, chestSpd: 90,

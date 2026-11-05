@@ -90,3 +90,11 @@
 .up-panel .hint { max-width: none; margin: .8em 0 0; min-height: 1.4em; text-align: center; font: 700 .8em Montserrat, sans-serif; color: #b8c4e8; transition: color .2s }
 .up-panel .hint.warn { color: #ff9a8a }
 @media (prefers-reduced-motion: reduce) { .st-ok .c-frame { animation: none } .fx-buy, .fx-no, .fx-buy .c-lv { animation: none } }
+
+/* Hiệu ứng trượt khi đổi nhánh bằng cách vuốt */
+@keyframes slN { from { transform: translateX(46px); opacity: .1 } to { transform: none; opacity: 1 } }
+@keyframes slP { from { transform: translateX(-46px); opacity: .1 } to { transform: none; opacity: 1 } }
+.cards.sl-n { animation: slN .22s ease-out }
+.cards.sl-p { animation: slP .22s ease-out }
+
+.up-panel .swh { max-width: none; width: 100%; margin: .15em 0 0; text-align: center }

@@ -129,6 +129,7 @@ function buyCard(k) {
     if (k === 'hp' && R && R.al) R.hp += sv().maxHp - old;
     sfx('buy');
   }
+  ev('buy');
   save();
   upHint();
   renderUp(k, 'ok');

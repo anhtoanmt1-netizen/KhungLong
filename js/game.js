@@ -11,6 +11,11 @@ function startRun() {
   R.shk = 0;     // thời gian rung màn hình
   R.th = R.dr = R.ph = R.hp;
   R.tl = 0;
+  R.t0 = R.t;     // mốc bắt đầu lượt (nhiệm vụ "sống sót X phút")
+  R.lost = 0;     // tổng HP đã mất trong lượt (thành tựu "không xây xước")
+  R.ac = 2;
+  ev("run");
+  dqEnsure();
   chestRoll();
   show(null);
 }
@@ -42,7 +47,8 @@ function spawn(king, tiO, xO) {
     r.ex.push({ x: W - 36, y: GY - 40, t: 0, sc: 2.4, col: "a", ring: d[1], rr: 70 });
   } else if (d[8]) sfx("flyer", ti);
   if (d[2] > SL[r.tier][2]) r.tier = ti;
-  const mo = { ti, k: d[7] || "", z: d[8] || 0, z0: d[8] || 0, dv: 0, ai: { bee: 0.7, bird: 0.8, dragon: 0.8 }[d[7]] || 1, x: xO != null ? xO : W + 12, hp: d[2] * hm, mx: d[2] * hm, dm: d[3] * dmm, sp: d[5] * 2 * SC.sp(r.t), gd: d[4] * SC.gd(r.t) * DF().gd, w: d[6], h: Math.round(d[6] * 0.7), cd: 0, fl: 0, ph: rnd() * 6, of: rnd() * 10, st: 0, si: 0, bp: 0, bn: 0, ba: 0, bt: 0, bf: 0, xc: 0, kv: 0 };
+  cxSeen(ti);   // Sách Quái: gặp lần đầu thì mở trang
+  const mo = { ti, k: d[7] || "", z: d[8] || 0, z0: d[8] || 0, dv: 0, ai: { bee: 0.7, bird: 0.8, dragon: 0.8 }[d[7]] || 1, x: xO != null ? xO : W + 12, hp: d[2] * hm, mx: d[2] * hm, dm: d[3] * dmm, sp: d[5] * 2 * SC.sp(r.t), gd: d[4] * SC.gd(r.t) * DF().gd, w: d[6], h: Math.round(d[6] * 0.7), cd: 0, fl: 0, ph: rnd() * 6, of: rnd() * 10, st: 0, si: 0, bp: 0, bn: 0, ba: 0, bt: 0, bf: 0, xc: 0, kv: 0, l0: r.lost };
   if (d[7] === "boss") {
     // Boss: kích thước theo ảnh (có thể chỉnh trong Mod), vùng trúng đòn theo hình ảnh
     const b = BOSS[ti - BOSS0], im = BI[b.i], sz = bossPx(b.i), asp = ld(im) ? im.naturalHeight / im.naturalWidth : 0.92;
@@ -56,6 +62,7 @@ function hurt(m, s) {
   if (R.sh > 0) return;
   const r = R, d = Math.max(1, Math.round(m.dm * (1 - s.def) * (r.vul > 0 ? 1.3 : 1)));
   r.hp -= d;
+  r.lost += d;
   r.inv = CFG.iframe;
   r.hitT = 0.25;
   tx(DX, GY - 50, "-" + d, "#ff6a6a");
@@ -72,6 +79,7 @@ function plCheck(s) {
       r.cr = rv.cd;
       r.inv = rv.inv;
       r.ri = rv.inv;
+      ev("rv");
       healPop(DX, GY - 70, r.hp, HEALC.revive);
       tx(DX, GY - 60, "HỒI SINH", "#ffd23a");
       R.ex.push({ x: DX, y: GY - 30, t: 0, sc: 2.2, col: "g", ring: "#ffd23a", rr: 60 });
@@ -92,6 +100,7 @@ function kill(m, s) {
   R.gold += g;
   R.kills++;
   S.st.kills++;
+  ev("kill", g, m);
   dirty = 1;
   tx(m.x, GY - (m.z || 0) - m.h - 14, "+" + g, "#ffd23a");
   const n = S.set.rm ? 3 : 10;
@@ -115,6 +124,7 @@ function hit(m, s) {
   heal(a, s);
   tx(m.x, GY - (m.z || 0) - m.h - 6, (cr ? "CRIT -" : "-") + fmtN(d), cr ? "#ffd23a" : "#fff");
   if (cr) critFx(m);
+  ev(cr ? "crit" : "hit", d);
   sfx(cr ? "crit" : "hit");
   if (m.hp <= 0) { kill(m, s); return; }
   if (s.burn > 0) addBurn(m, d, s);
@@ -203,6 +213,8 @@ function upd(dt) {
       r.ov = 1;
       S.rw = Math.max(1, r.wave - 3);
       S.st.deaths++;
+      ev("dead", r.wave);
+      achCheck();
       S.st.best = Math.max(S.st.best, Math.floor(r.t));
       save();
       $("ovt").innerHTML = `<p>Sống sót: ${fmt(r.t)} · Quái hạ: ${r.kills}</p><p>Vàng lượt: ${r.gold} · Vàng hiện có: ${S.gold}</p><p>Tổng sát thương: ${Math.round(r.dmgT)} · Số lần chết: ${S.st.deaths}</p><p>Quái cao nhất: ${SL[r.tier][0]} · Kỷ lục: ${fmt(S.st.best)}</p><p>Lượt sau hồi lại từ đợt ${S.rw} (lùi 3 đợt)</p>`;
@@ -211,6 +223,10 @@ function upd(dt) {
     return;
   }
   r.t += dt;
+  if (trk()) {
+    S.pr.pt += dt / GS;
+    if ((r.ac -= dt) <= 0) { r.ac = 2; achCheck(); ev("surv", Math.floor((r.t - r.t0) / 60)); }
+  }
   r.inv -= dt;
   r.hitT -= dt;
   r.atk -= dt;
@@ -218,6 +234,7 @@ function upd(dt) {
   const wv = 1 + Math.floor(r.t / 20);
   if (wv > r.wave) {
     r.wave = wv;
+    ev("wave", wv);
     r.bn = 2;
     sfx("wave");
     chestRoll();

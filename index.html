@@ -14,6 +14,7 @@
 <link rel="stylesheet" href="css/panels.css">
 <link rel="stylesheet" href="css/cards.css">
 <link rel="stylesheet" href="css/keypad.css">
+<link rel="stylesheet" href="css/hub.css">
 </head>
 <body>
 <div id="w">
@@ -44,6 +45,9 @@
     <button class="ibtn" data-a="pause" aria-label="Tạm dừng"><img src="assets2/ui/btn_pause.png" alt=""></button>
   </div>
 
+  <!-- Thông báo nhanh: thành tựu / nhiệm vụ / Sách Quái -->
+  <div id="toast" role="status" aria-live="polite"></div>
+
   <!-- Menu chính -->
   <div class="sc on" id="menu">
     <h1>PIXEL DINO<br>SURVIVOR</h1>
@@ -54,6 +58,11 @@
     <button class="b" id="bp" data-a="play">▶ CHƠI</button>
     <button class="b a" id="bf" data-a="play1" style="display:none">↺ Từ đầu (đợt 1)</button>
     <button class="b s" data-a="up">★ NÂNG CẤP</button>
+    <div class="row hubrow">
+      <button class="b" data-a="hub" data-k="a">🏆 Thành tựu<i class="hd" data-hd="a"></i></button>
+      <button class="b" data-a="hub" data-k="q">📜 Nhiệm vụ<i class="hd" data-hd="q"></i></button>
+      <button class="b" data-a="hub" data-k="c">📖 Sách Quái</button>
+    </div>
     <button class="b r" data-a="newg">NEW GAME – TRÒ CHƠI MỚI</button>
     <div class="row">
       <button class="b" data-a="set"><i data-ic="gear"></i> Cài đặt</button>
@@ -128,6 +137,7 @@
     <h2>Tạm dừng</h2>
     <button class="b" data-a="resume">▶ Tiếp tục</button>
     <button class="b s" data-a="up">★ Nâng cấp</button>
+    <button class="b" data-a="hub" data-k="q">📜 Hồ sơ: nhiệm vụ · thành tựu · Sách Quái</button>
     <button class="b" data-a="menu">Về menu</button>
   </div>
 
@@ -138,6 +148,7 @@
       <button class="b" id="bo" data-a="play">↻ Chơi lại</button>
       <button class="b a" id="bf2" data-a="play1" style="display:none">↺ Từ đầu</button>
       <button class="b s" data-a="up">★ Nâng cấp</button>
+      <button class="b" data-a="hub" data-k="q">📜 Hồ sơ</button>
       <button class="b" data-a="menu">Menu</button>
     </div>
   </div>
@@ -151,6 +162,18 @@
     <div class="row">
       <button class="b" data-a="menu">Hủy</button>
       <button class="b r" data-a="donew">Xác nhận trò chơi mới</button>
+    </div>
+  </div>
+
+  <!-- Hồ sơ: Thành tựu · Nhiệm vụ hằng ngày · Sách Quái -->
+  <div class="sc" id="hub">
+    <div class="panel hub-panel">
+      <header class="ph">
+        <h2 class="ptitle">HỒ SƠ</h2>
+        <button class="ibtn" data-a="hubclose" aria-label="Đóng"><img src="assets2/ui/btn_close.png" alt=""></button>
+      </header>
+      <nav class="tabs" id="htabs"></nav>
+      <div class="hbody" id="hbody"></div>
     </div>
   </div>
 
@@ -238,6 +261,7 @@
 <script src="js/mod.js"></script>
 <script src="js/skills.js"></script>
 <script src="js/bossskills.js"></script>
+<script src="js/hub.js"></script>
 <script src="js/cards.js"></script>
 <script src="js/game.js"></script>
 <script src="js/ui.js"></script>
