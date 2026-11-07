@@ -130,7 +130,7 @@ const AU = (() => {
     s2.start(t, Math.random() * 0.4);
     s2.stop(t + d + 0.03);
   }
-  const arp = (a, ty, v, g = 0.07, d = 0.14) => a.forEach((f, i) => T(f, d, ty, v, { at: i * g })), CD = { stun: 0.12, exec: 0.1, gale: 0.5, boomf: 0.1, shoot: 0.05, hit: 0.035, kill: 0.04, flyer: 0.45, hurt: 0.1, ui: 0.05, dive: 0.2 };
+  const arp = (a, ty, v, g = 0.07, d = 0.14) => a.forEach((f, i) => T(f, d, ty, v, { at: i * g })), CD = { bolt: 0.07, stun: 0.12, exec: 0.1, gale: 0.5, boomf: 0.1, shoot: 0.05, hit: 0.035, kill: 0.04, flyer: 0.45, hurt: 0.1, ui: 0.05, dive: 0.2 };
   const PE = [0, 2, 4, 7, 9], R_ = {
     shoot(a) {
       const iv = a && a.iv || 1, pc = a && a.pc;
@@ -270,6 +270,15 @@ const AU = (() => {
     evo() {
       arp([262, 330, 392, 523, 659, 784, 1047], "triangle", 0.07, 0.08, 0.25);
       N(0.7, "highpass", 1e3, 8e3, 0.05);
+    },
+    rage() {
+      T(90, 0.9, "sawtooth", 0.06, { to: 45 });
+      N(0.9, "lowpass", 2200, 200, 0.12);
+      T(180, 0.5, "square", 0.03, { to: 70 });
+    },
+    bolt() {
+      N(0.12, "highpass", 2500, 9000, 0.07);
+      T(1200, 0.06, "sawtooth", 0.025, { to: 200 });
     },
     bcast() {
       T(120, 0.5, "sawtooth", 0.04, { to: 55 });

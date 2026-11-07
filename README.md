@@ -1,4 +1,4 @@
-# Pixel Dino Survivor (v2.4 - Hồ sơ: thành tựu, nhiệm vụ hằng ngày, Sách Quái)
+# Pixel Dino Survivor (v2.5 - Long Nộ bấm tay, chọn phần thưởng mỗi 10 đợt)
 Game 2D pixel art, tự động chiến đấu, PWA chạy offline. Không cần build: HTML/CSS/JS thuần, đã tách thành nhiều file.
 
 ## Chạy thử
@@ -6,7 +6,7 @@ Game 2D pixel art, tự động chiến đấu, PWA chạy offline. Không cần
 
 ## Đưa lên GitHub và triển khai
 ```
-git init && git add . && git commit -m "Pixel Dino Survivor v2.4" && git branch -M main
+git init && git add . && git commit -m "Pixel Dino Survivor v2.5" && git branch -M main
 git remote add origin https://github.com/<tên-bạn>/pixel-dino-survivor.git && git push -u origin main
 ```
 Vào Settings > Pages, chọn nhánh main, thư mục root. Mở link HTTPS trên Android Chrome > Menu > Cài đặt ứng dụng.
@@ -24,6 +24,8 @@ js/    (nạp theo đúng thứ tự trong index.html)
   audio.js · fire.js · icons.js · render.js (có bossDraw) · chest.js · music.js · custom.js · settings.js
   mod.js              Bảng Mod ẩn (mật khẩu, bật/tắt, nhập vàng, cỡ khủng long, cỡ Boss, Nhập đợt)
   keypad.js           (v2.1) bàn phím số riêng cho mọi ô nhập số / mật khẩu (css/keypad.css)
+  rage.js             (v2.5) Long Nộ: thanh nộ, 3 kiểu xả, hiệu ứng, nút bấm
+  picks.js            (v2.5) chọn 1 trong 3 phần thưởng mỗi 10 đợt (css/picks.css)
   hub.js              (v2.4) Hồ sơ: thành tựu, nhiệm vụ hằng ngày, Sách Quái, thông báo nhanh (css/hub.css)
   bossskills.js       (v2.2) chiêu Boss: lập lịch, báo trước, hiệu lực, trạng thái xấu, vẽ hiệu ứng
   vfx/vfx.js          (v2.2) ES module nạp vfx/core + 12 hiệu ứng bóng tối, đưa ra window.VFX
@@ -125,6 +127,20 @@ Tiếng bắn dùng `assets1/audio/fire_breath.mp3`, nhạc nền mặc định 
 - **Hiệu ứng điểm ảnh** (`js/vfx/`): chạy bằng ES module (`<script type="module">`) nên cần mở game qua http/https (GitHub Pages ổn); mở thẳng `file://` thì chiêu vẫn hoạt động nhưng không có hình. Mỗi hiệu ứng vẽ lại tối đa 30 lần/giây, tối đa 6 hiệu ứng cùng lúc, tự bỏ qua nếu chưa nạp xong. Lời Nguyền và Hút Máu tô màu lên đúng hình khủng long / Boss nhờ mặt nạ dựng từ sprite (`VFX.actorOf`).
 - Ghi công: `js/vfx/` dùng bộ hiệu ứng điểm ảnh có phần mượn từ Sprite Fusion (https://www.spritefusion.com/pixel-art-vfx), giấy phép MIT, Copyright (c) 2026 Hugo Duprez; các dòng ghi công được giữ nguyên trong từng file.
 
+## Long Nộ và phần thưởng mỗi 10 đợt (v2.5)
+### Long Nộ (`js/rage.js`, nhánh thẻ "LONG NỘ")
+- Thẻ **Long Nộ** (cấp 1–10, cần tiến hóa Chiến Binh) mở thanh nộ và nút **LONG NỘ** tròn ở góc phải màn hình (hoặc phím **R / Space**). Mỗi cấp tăng sức mạnh +25% (x1 → x3,25) và tốc độ nạp +6%.
+- Thanh nộ nạp +0,8/giây, +0,8 mỗi quái hạ, +6 mỗi Boss (cộng thêm theo cấp và phần thưởng "Nộ Khí"): thường mất khoảng 30–80 giây. Đầy thì bấm để xả một trong 3 kiểu bạn đã mở (mỗi kiểu là một thẻ mua 1 lần; chọn kiểu đang dùng bằng các nút ngay dưới hàng thẻ):
+  - **Hơi Thở Lửa** (cần Chiến Binh): quét lửa khắp màn, sát thương lớn, đẩy lùi, choáng nhẹ.
+  - **Sao Băng** (cần Cổ Đại): mưa 10+cấp thiên thạch, 60% rơi xuống Boss nếu có, mạnh nhất khi đánh Boss.
+  - **Bão Sét** (cần Huyền Thoại): choáng toàn bộ quái (và ngắt chiêu Boss đang báo trước) rồi sét đánh liên hồi.
+- Sát thương = max(sát thương × hệ số, % máu tối đa) với quái thường, và chủ yếu là % máu tối đa với Boss, nên có ích ở mọi giai đoạn nhưng không "giết Boss trong một phát" (khoảng 5–25% máu Boss mỗi lần xả, tùy kiểu và cấp). Thiêu đốt cộng thêm vào sát thương của Long Nộ.
+### Chọn 1 trong 3 mỗi 10 đợt (`js/picks.js`)
+- Đạt đợt 10, 20, 30... game tạm dừng và đưa ra 3 phần thưởng ngẫu nhiên (đổi lựa chọn 1 lần). Có 18 phần thưởng, 3 độ hiếm (THƯỜNG/HIẾM/SỬ THI), nhiều cái có **đánh đổi** (ví dụ Cuồng Nộ: +35% sát thương nhưng -15% HP; Hào Khí: +30% sát thương nhưng quái trâu hơn 20%).
+- Cộng dồn tối đa 5 lần mỗi loại, mỗi lần sau yếu đi 15%. Lưu trong `S.bf` (mỗi mục `{w: đợt, id}`); khi hết máu game lùi 3 đợt thì các phần thưởng chọn ở những đợt bị lùi qua sẽ mất (phải chọn lại khi vượt qua), các phần thưởng cũ được giữ. "Trò chơi mới" xóa hết. Hiệu lực cộng vào `BF` (`state.js`) và `sv()` đọc.
+- Thêm phần thưởng: thêm một mục vào `BFP` trong `js/picks.js` (`e` là các khóa trong `BFK`, ảnh/khung lấy từ thẻ nâng cấp sẵn có).
+- Thành tựu và nhiệm vụ mới: "Cơn Thịnh Nộ" (xả Long Nộ), "Nhà Chiến Thuật" (chọn phần thưởng), nhiệm vụ ngày "Xả Long Nộ N lần".
+
 ## Hồ sơ: Thành tựu · Nhiệm vụ hằng ngày · Sách Quái (v2.4)
 Vào từ menu (3 nút mới), từ màn Tạm dừng và Game Over. Dữ liệu nằm trong save (`S.pr`, `S.cx`, `S.ach`, `S.dq`, `S.tt`, `S.ax`) và **được giữ lại khi chơi mới**. Khi **Bảng Mod đang BẬT**, mọi tiến trình đều không được tính (vì Mod sửa được vàng, nhảy đợt). Logic và giao diện: `js/hub.js`, `css/hub.css`; sự kiện được game gọi qua `ev(...)` (kill, crit, chest, intr, gale, rv, buy, wave, heal, tap, run, dead), `cxSeen(ti)` và `qEv(...)`.
 - **Thành tựu (`ACH`)**: 23 mục: 20 mục 3 bậc Đồng/Bạc/Vàng hoặc 1 bậc, và 3 mục **ẩn** (hiện "???" tới khi mở khóa). Gồm hạ quái / Boss, đạt đợt, Boss không mất máu, ngắt chiêu Boss, vàng, rương, chí mạng, đòn mạnh nhất, hồi máu, hồi sinh, Cuồng Phong, thời gian chơi, nâng cấp, tiến hóa, kỹ năng/thẻ tối đa, Sách Quái, đạt đợt 50 ở chế độ Khó / Địa ngục. Điểm thành tựu (bậc 1/2/3 = 1/2/3 điểm, mục 1 bậc = 3) quyết định hạng (Tân Binh → Long Thần). Đạt bậc cao nhất mở **danh hiệu**, chọn trong tab Thành tựu và hiển thị thay chữ "DINO" trên HUD. Phần thưởng chỉ là danh hiệu, điểm và hạng nên không đổi cân bằng.
@@ -154,6 +170,9 @@ Vào từ menu (3 nút mới), từ màn Tạm dừng và Game Over. Dữ liệu
 - Tự hiện khi chạm vào ô số (hoặc khi hộp thoại tự đặt con trỏ vào ô, như Nhập đợt / Mật khẩu), tự ẩn khi bấm OK, bấm ra ngoài hoặc đổi màn hình. Chạm số đầu tiên sẽ thay giá trị có sẵn. OK phát phím Enter nên các bộ xử lý cũ (`mod.js`, `custom.js`) không cần sửa; giá trị đổi được lưu qua sự kiện `change` như khi gõ thật.
 - Máy tính: gõ phím số, Backspace, Enter (OK), Esc (đóng) cũng hoạt động. Các ô được đặt `readonly` + `inputmode="none"` để trình duyệt di động không mở bàn phím hệ thống.
 - Thêm ô số mới: chỉ cần dùng `<input type="number">` (hoặc `password`) có `inputmode="none" readonly`, `aria-label` (hiện làm tên ô) và `min`/`max` (quyết định số chữ số tối đa).
+
+## Nhật ký v2.5
+- Long Nộ: thanh nộ + nút bấm + 3 kiểu xả (Hơi Thở Lửa, Sao Băng, Bão Sét) + nhánh thẻ mới; chọn 1 trong 3 phần thưởng mỗi 10 đợt (18 phần thưởng, đánh đổi, cộng dồn có giảm). Cache `pds-v26`.
 
 ## Nhật ký v2.4
 - Hồ sơ: 23 thành tựu (3 ẩn) + danh hiệu trên HUD, 3 nhiệm vụ hằng ngày + Rương Ngày + chuỗi ngày, Sách Quái 28 trang; thông báo nhanh; chạm khủng long có phản ứng. Cache `pds-v25`.

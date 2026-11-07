@@ -8,6 +8,7 @@ function loop(ts) {
   if (!R || (!R.pz && R.al)) BT += dt * GS;
   if (R && !R.pz) for (let i = 0; i < GS; i++) upd(dt);
   draw();
+  rageHud();
   hT -= dt;
   if (hT <= 0) { hT = .1; hud() }
   if (dirty) { sT -= dt; if (sT <= 0) { save(); dirty = 0; sT = 1 } }

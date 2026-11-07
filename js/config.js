@@ -1,5 +1,5 @@
 /* ===== Cấu hình và số liệu cân bằng: phiên bản, hằng số khung chơi, bảng nâng cấp (UP), quái (SL), kỹ năng (SK), tiến hóa (EVO), rương (CHR). ===== */
-const VERSION = "2.4";
+const VERSION = "2.5";
 const $ = (i) => document.getElementById(i), rnd = Math.random;
 const W = 640, H = 360, GY = 280, DX = 96, K = "pds_save_v1";
 const CFG = { iframe: 0.5, maxMon: 34, crit: 0.05, leafSpd: 340, chestP: 0.3, chestW: 20, chestDec: 0.01, chestMin: 0.03, chestH: 20, chestSpd: 90,
@@ -58,6 +58,11 @@ const SK = {
   ancient: { n: "Hỏa Ngục Cổ Đại", c: 8000, g: 3.6, m: 5, e: 4, f: (l) => "+" + Math.round(40 + 10 * l) + "% · " + +(5.5 + 0.5 * l) + "s" },
   wall: { n: "Tường Lửa", c: 3000, g: 3.6, m: 5, e: 2, f: (l) => +(2.6 + 0.4 * l).toFixed(1) + "s bất tử" },
   gale: { n: "Cuồng Phong Hộ Thân", c: 4000, g: 3.6, m: 5, e: 3, f: (l) => "hồi chiêu " + +(15.4 - 1.4 * l).toFixed(1) + "s" },
+  // Long Nộ (v2.5): tuyệt chiêu bấm tay. rage = nền (cấp 1–10: mạnh hơn và nạp nhanh hơn); 3 kỹ năng bên dưới là kiểu xả (mở 1 lần, chọn kiểu đang dùng trong thẻ Long Nộ)
+  rage: { n: "Long Nộ", c: 2000, g: 1.8, m: 10, e: 2, f: (l) => "x" + (1 + 0.25 * (l - 1)).toFixed(2) + " sức mạnh" },
+  rgFire: { n: "Hơi Thở Lửa", c: 1500, g: 1, m: 1, e: 2, rq: "rage", f: () => "Đã mở" },
+  rgMeteor: { n: "Sao Băng", c: 6000, g: 1, m: 1, e: 3, rq: "rage", f: () => "Đã mở" },
+  rgStorm: { n: "Bão Sét", c: 15000, g: 1, m: 1, e: 4, rq: "rage", f: () => "Đã mở" },
   exec: { n: "Phá Huyết", c: 6000, g: 3.6, m: 10, l1: 5, g2: 1.3, e: 4, f: (l) => XC[l] + "% cơ hội" + (l > 5 ? " · " + +(2 + 0.2 * (l - 5)).toFixed(1) + "% máu" : "") }
 };
 const SKV = {
@@ -73,13 +78,13 @@ const SKV = {
 /* Chế độ độ khó (chọn khi bắt đầu game mới, lưu trong S.df). hp/dm: nhân máu / sát thương quái và Boss; gd: nhân vàng rơi và rương
    (chế độ khó thưởng nhiều vàng hơn để vẫn max hết nâng cấp trong khoảng 2 giờ); si: nhân thời gian giữa 2 lần sinh quái (nhỏ hơn = đông hơn). */
 const DIFF = [
-  { n: "Thường", c: "#7ee06a", d: "Cân bằng. Phù hợp để làm quen.", hp: 1, dm: 1, gd: 1.06, si: 1 },
-  { n: "Khó", c: "#ffb23a", d: "Quái trâu và đau hơn, đông hơn; vàng rơi nhiều hơn.", hp: 1.8, dm: 1.5, gd: 1.25, si: 0.85 },
-  { n: "Địa ngục", c: "#ff4a4a", d: "Quái cực mạnh, dồn dập. Thưởng vàng lớn.", hp: 3.2, dm: 2.4, gd: 1.6, si: 0.7 }
+  { n: "Thường", c: "#7ee06a", d: "Cân bằng. Phù hợp để làm quen.", hp: 1, dm: 1, gd: 0.8, si: 1 },
+  { n: "Khó", c: "#ffb23a", d: "Quái trâu và đau hơn, đông hơn; vàng rơi nhiều hơn.", hp: 1.8, dm: 1.5, gd: 0.95, si: 0.85 },
+  { n: "Địa ngục", c: "#ff4a4a", d: "Quái cực mạnh, dồn dập. Thưởng vàng lớn.", hp: 3.2, dm: 2.4, gd: 1.2, si: 0.7 }
 ];
 const DF = () => DIFF[(S && S.df) | 0] || DIFF[0];
 /* Tiến hóa: [tên, vàng, số quái đã hạ, màu]. Mỗi bậc: +12% sát thương, +30 HP, +1% chí mạng, +5% vàng (xem CFG.evo*). */
-const EVO = [["Cỏ Non", 0, 0, "#58c24a"], ["Thợ Săn", 800, 60, "#4ac2c9"], ["Chiến Binh", 4000, 200, "#ffd23a"], ["Cổ Đại", 18000, 600, "#ff7a3a"], ["Huyền Thoại", 80000, 1500, "#c06aff"], ["Tối Cao", 360000, 3500, "#ffffff"], ["Thần Thú", 1400000, 7e3, "#ff4a8a"], ["Long Vương", 5000000, 12e3, "#3affc8"]];
+const EVO = [["Cỏ Non", 0, 0, "#58c24a"], ["Thợ Săn", 800, 60, "#4ac2c9"], ["Chiến Binh", 4000, 200, "#ffd23a"], ["Cổ Đại", 18000, 700, "#ff7a3a"], ["Huyền Thoại", 80000, 2000, "#c06aff"], ["Tối Cao", 360000, 5000, "#ffffff"], ["Thần Thú", 1400000, 11e3, "#ff4a8a"], ["Long Vương", 5000000, 19e3, "#3affc8"]];
 /* ----- 12 Boss (v2.1: máu/sát thương/vàng gốc tăng ~2x, thêm SC.bh/SC.bd tăng theo thời gian) (ảnh assets1/boss/boss01..12.png), xếp từ yếu đến mạnh. Chỉ số trong SL = 16 + thứ tự.
    mv = kiểu chuyển động: hop nhảy · dash lao nhanh · sway lắc nặng · stomp giậm chân · swoop vỗ cánh · float lơ lửng · phase mờ ảo · void hư không.
    z > 0 là Boss bay (lơ lửng, có thể lao xuống đánh). w = kích thước hiển thị mặc định (px). ===== */

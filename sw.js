@@ -1,6 +1,6 @@
 /* Service Worker: ưu tiên mạng (chờ tối đa 4 giây), rơi về bộ nhớ đệm khi offline.
    Đổi số phiên bản CACHE mỗi khi phát hành để máy người chơi tải bản mới. */
-const CACHE = 'pds-v25';
+const CACHE = 'pds-v26';
 const ASSETS = [
   "./",
   "index.html",
@@ -45,6 +45,10 @@ const ASSETS = [
   "assets2/cards/art_stun.png",
   "assets2/cards/art_exec.png",
   "assets2/cards/art_gale.png",
+  "assets2/cards/art_rage.png",
+  "assets2/cards/art_rgFire.png",
+  "assets2/cards/art_rgMeteor.png",
+  "assets2/cards/art_rgStorm.png",
   "assets2/cards/art_ancient.png",
   "assets2/cards/art_boom.png",
   "assets2/cards/art_def.png",
@@ -89,6 +93,7 @@ const ASSETS = [
   "css/cards.css",
   "css/keypad.css",
   "css/hub.css",
+  "css/picks.css",
   "css/panels.css",
   "js/assets.js",
   "js/audio.js",
@@ -105,6 +110,8 @@ const ASSETS = [
   "js/keypad.js",
   "js/bossskills.js",
   "js/hub.js",
+  "js/picks.js",
+  "js/rage.js",
   "js/vfx/core/act.js",
   "js/vfx/core/actor.js",
   "js/vfx/core/chain.js",

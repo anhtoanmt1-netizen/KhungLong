@@ -452,6 +452,7 @@ function draw() {
   dino();
   drawGale();
   drawBossFx();
+  drawRage();
   if (R) {
     for (const l of R.lv) {
       if (CB() && LF[S.evo]) {

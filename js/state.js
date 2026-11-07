@@ -3,9 +3,9 @@
    pr = bộ đếm trọn đời (gold: tổng vàng kiếm, bk: Boss đã hạ, ch: rương, cr: đòn chí mạng, it: chiêu Boss bị ngắt, hl: HP đã hồi, pt: giây chơi, up: lần nâng cấp, mh: đòn mạnh nhất,
         gl: lần Cuồng Phong, rv: lần hồi sinh, nh: Boss hạ không mất máu, tp: lần chạm khủng long, bw: đợt cao nhất, nl: chơi ban đêm, fd: chết ở đợt 1, runs: số lượt, bwd: đợt cao nhất theo chế độ)
    cx = Sách Quái { mã quái: số con đã hạ } (có khóa = đã gặp) · ach = { mã thành tựu: bậc đã đạt } · dq = nhiệm vụ ngày · tt = danh hiệu đang dùng · ax = số bậc thành tựu đã xem */
-const PRK = ["gold", "bk", "ch", "cr", "it", "hl", "pt", "up", "mh", "gl", "rv", "nh", "tp", "bw", "nl", "fd", "runs"];
+const PRK = ["gold", "bk", "ch", "cr", "it", "hl", "pt", "up", "mh", "gl", "rv", "nh", "tp", "bw", "nl", "fd", "runs", "rg", "pk"];
 const defPr = () => ({ ...Object.fromEntries(PRK.map((k) => [k, 0])), bwd: [0, 0, 0] });
-const defS = () => ({ v: 1, pr: defPr(), cx: {}, ach: {}, dq: null, tt: "dino", ax: 0, df: 0, gold: 0, rw: 1, lv: Object.fromEntries(Object.keys(UP).map((k) => [k, 0])), st: { kills: 0, best: 0, deaths: 0 }, sk: Object.fromEntries(Object.keys(SK).map((k) => [k, 0])), evo: 0, set: { snd: 1, mus: 1, dn: 1, rm: 0, sv: 0.5 }, mod: { on: 0, pw: hpw(MODPW), dino: null, bs: {}, wj: 0 }, cu: { bg: { sel: null }, tree: { sel: null, px: null }, leaf: { sel: null, px: null }, grass: { sel: null, px: null } } });
+const defS = () => ({ v: 1, pr: defPr(), cx: {}, ach: {}, dq: null, tt: "dino", ax: 0, bf: [], rg: "fire", df: 0, gold: 0, rw: 1, lv: Object.fromEntries(Object.keys(UP).map((k) => [k, 0])), st: { kills: 0, best: 0, deaths: 0 }, sk: Object.fromEntries(Object.keys(SK).map((k) => [k, 0])), evo: 0, set: { snd: 1, mus: 1, dn: 1, rm: 0, sv: 0.5 }, mod: { on: 0, pw: hpw(MODPW), dino: null, bs: {}, wj: 0 }, cu: { bg: { sel: null }, tree: { sel: null, px: null }, leaf: { sel: null, px: null }, grass: { sel: null, px: null } } });
 let GS = 1, warn = 0;
 function load() {
   try {
@@ -21,6 +21,8 @@ function load() {
     d.dq = j.dq && typeof j.dq === "object" ? j.dq : null;   // được kiểm tra lại trong hub.js (dqEnsure)
     d.tt = typeof j.tt === "string" && /^[a-z0-9_]+$/.test(j.tt) ? j.tt : "dino";
     d.ax = Math.max(0, Math.floor(+j.ax) || 0);
+    d.bf = (Array.isArray(j.bf) ? j.bf : []).filter((b) => b && /^[a-z0-9_]+$/.test(b.id) && b.w >= 10 && b.w <= 9999).slice(0, 200).map((b) => ({ w: Math.floor(b.w), id: String(b.id) }));
+    d.rg = ["fire", "meteor", "storm"].includes(j.rg) ? j.rg : "fire";
     d.df = Math.min(DIFF.length - 1, Math.max(0, Math.floor(+j.df) || 0));
     d.rw = Math.min(9999, Math.max(1, Math.floor(+j.rw) || 1));
     for (const k in UP) d.lv[k] = Math.min(UP[k].m, Math.max(0, Math.floor(+(j.lv || {})[k]) || 0));
@@ -77,22 +79,25 @@ const cost = (k, l) => curve(UP[k], l, UP[k].b);
 const skCost = (k, l) => curve(SK[k], l, SK[k].c);
 const skl = (k) => S.sk[k] > 0 ? SKV[k](S.sk[k]) : null;
 /* Chỉ số tổng hợp từ nâng cấp + tiến hóa + kỹ năng (Cổ Đại làm tăng sát thương/tốc độ bắn tạm thời) */
+/* Phần thưởng chọn mỗi 10 đợt (js/picks.js) cộng dồn vào đây; picks.js tính lại khi chọn / nạp */
+const BFK = ["dmgM", "hpM", "rateM", "critP", "critDM", "goldM", "regenP", "stealP", "burn", "stunP", "stunT", "multiN", "defP", "pierceN", "rageM", "wall", "hpMon", "spdM", "chestM", "chestG"];
+const BF = Object.fromEntries(BFK.map((k) => [k, 0]));
 const sv = () => {
-  const L = S.lv, e = S.evo, bm = R && R.buf > 0 ? (R.bm || 1.5) : 1, mh = UP.hp.f(L.hp) + CFG.evoHp * e;
+  const L = S.lv, e = S.evo, bm = R && R.buf > 0 ? (R.bm || 1.5) : 1, mh = (UP.hp.f(L.hp) + CFG.evoHp * e) * Math.max(0.3, 1 + BF.hpM);
   return {
     maxHp: mh,
-    dmg: Math.round(UP.dmg.f(L.dmg) * (1 + CFG.evoDmg * e) * bm * (R && R.dim > 0 ? 0.75 : 1)),
-    rate: Math.min(CFG.rateCap, UP.rate.f(L.rate) * bm) * (R && R.slw > 0 ? 0.6 : 1),
-    n: UP.multi.f(L.multi),
-    cr: Math.min(0.95, (UP.critR.f(L.critR) + CFG.evoCrit * e) / 100),
-    cd: UP.critD.f(L.critD) / 100,
-    regen: UP.regen.f(L.regen),
-    steal: UP.steal.f(L.steal) / 100,
-    stealCap: (0.005 + 0.004 * L.steal) * mh,
-    gm: (UP.gold.f(L.gold) + CFG.evoGold * e) / 100,
-    def: Math.min(CFG.defCap, UP.def.f(L.def) / 100),
-    burn: L.burn ? UP.burn.f(L.burn) / 100 : 0,
-    stunP: L.stun ? UP.stun.f(L.stun) / 100 : 0,
-    stunT: 0.5 + 0.06 * L.stun
+    dmg: Math.round(UP.dmg.f(L.dmg) * (1 + CFG.evoDmg * e) * bm * (R && R.dim > 0 ? 0.75 : 1) * Math.max(0.3, 1 + BF.dmgM)),
+    rate: Math.min(CFG.rateCap, UP.rate.f(L.rate) * bm * Math.max(0.4, 1 + BF.rateM)) * (R && R.slw > 0 ? 0.6 : 1),
+    n: UP.multi.f(L.multi) + BF.multiN,
+    cr: Math.min(0.95, (UP.critR.f(L.critR) + CFG.evoCrit * e) / 100 + BF.critP),
+    cd: UP.critD.f(L.critD) / 100 + BF.critDM,
+    regen: UP.regen.f(L.regen) + mh * BF.regenP,
+    steal: UP.steal.f(L.steal) / 100 + BF.stealP,
+    stealCap: (0.005 + 0.004 * L.steal + BF.stealP * 0.5) * mh,
+    gm: (UP.gold.f(L.gold) + CFG.evoGold * e) / 100 * (1 + BF.goldM),
+    def: Math.min(CFG.defCap, UP.def.f(L.def) / 100 + BF.defP),
+    burn: (L.burn ? UP.burn.f(L.burn) / 100 : 0) + BF.burn,
+    stunP: (L.stun ? UP.stun.f(L.stun) / 100 : 0) + BF.stunP,
+    stunT: 0.5 + 0.06 * L.stun + BF.stunT
   };
 };

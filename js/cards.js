@@ -8,7 +8,8 @@ const TABS = [
   { id: 'sup', n: 'PHỤ TRỢ' },
   { id: 'fx', n: 'HIỆU ỨNG' },
   { id: 'sk1', n: 'KỸ NĂNG CÔNG' },
-  { id: 'sk2', n: 'KỸ NĂNG THỦ' }
+  { id: 'sk2', n: 'KỸ NĂNG THỦ' },
+  { id: 'rage', n: 'LONG NỘ' }
 ];
 /* Thẻ mới v2.1: critR=bronze · critD=fire · burn=blood · stun=lotus · exec=shadow · gale=steel (ảnh lấy từ skill_library).
    frame: dmg=fire(đỏ cam) · rate/pierce=silver(bạc) · multi/storm=shadow(tím tối) · hp/steal/boom=blood(đỏ thẫm)
@@ -34,7 +35,11 @@ const CARDS = {
   ancient: { tab: 'sk1', frame: 'fire',   n: 'Hỏa Ngục Cổ Đại',   d: 'Định kỳ tăng sát thương và tốc độ bắn.' },
   revive:  { tab: 'sk2', frame: 'lotus',  n: 'Phượng Hoàng Lửa',  d: 'Chí mạng vẫn sống, hồi sinh bằng lửa.' },
   wall:    { tab: 'sk2', frame: 'steel',  n: 'Tường Lửa',         d: 'Định kỳ bất tử trong vài giây.' },
-  gale:    { tab: 'sk2', frame: 'steel',  n: 'Cuồng Phong Hộ Thân', d: 'Bị bao vây: lốc xoáy đẩy lùi quái.' }
+  gale:    { tab: 'sk2', frame: 'steel',  n: 'Cuồng Phong Hộ Thân', d: 'Bị bao vây: lốc xoáy đẩy lùi quái.' },
+  rage:    { tab: 'rage', frame: 'fire',   n: 'Long Nộ',           d: 'Nạp nộ khi chiến đấu; đầy thì bấm nút LONG NỘ để xả tuyệt chiêu.' },
+  rgFire:  { tab: 'rage', frame: 'blood',  n: 'Hơi Thở Lửa',      d: 'Quét lửa khắp màn: sát thương lớn, đẩy lùi, choáng nhẹ.' },
+  rgMeteor:{ tab: 'rage', frame: 'bronze', n: 'Sao Băng',          d: 'Mưa thiên thạch, rơi nhiều nhất xuống Boss.' },
+  rgStorm: { tab: 'rage', frame: 'steel',  n: 'Bão Sét',           d: 'Choáng cả màn, sét liên hồi, ngắt chiêu Boss.' }
 };
 let upTab = 'atk', hintT = 0;
 const cardKeys = t => Object.keys(CARDS).filter(k => CARDS[k].tab === t);
@@ -57,8 +62,8 @@ function cardInfo(k) {
   if (SK[k]) {
     const o = SK[k], l = S.sk[k];
     if (l >= o.m) return { lv: l, st: 'max', pr: 'MAX', d2: o.f(l) + ' (tối đa)' };
-    if (!l && S.evo < o.e) {
-      const t = 'Cần tiến hóa: ' + EVO[o.e][0];
+    if (!l && (S.evo < o.e || (o.rq && !S.sk[o.rq]))) {
+      const t = S.evo < o.e ? 'Cần tiến hóa: ' + EVO[o.e][0] : 'Cần mở Long Nộ trước';
       return { lv: 0, st: 'lock', price: skCost(k, 0), d2: t, need: t, warn: true };
     }
     const c = skCost(k, l);
@@ -105,6 +110,7 @@ function renderUp(fk, ft) {
   cs._tab = upTab;
   cs.scrollLeft = keep;
   requestAnimationFrame(cardNav);
+  rgSel();
   if (fk) {
     const el = document.querySelector('.card[data-k="' + fk + '"]');
     if (el) el.classList.add(ft === 'ok' ? 'fx-buy' : 'fx-no');
@@ -227,3 +233,16 @@ function tabStep(d) {
   up.addEventListener('pointerdown', e => { if (e.pointerType === 'mouse' && e.button === 0) g = { x: e.clientX, y: e.clientY, t: performance.now(), ...cardEdge(e.target) } });
   addEventListener('pointerup', e => { if (e.pointerType === 'mouse' && g) fin(e.clientX, e.clientY, performance.now() - g.t) });
 })();
+
+/* Chọn kiểu Long Nộ đang dùng (chỉ hiện ở nhánh LONG NỘ) */
+function rgSel() {
+  const e = $('rgsel');
+  if (!e) return;
+  e.style.display = upTab === 'rage' ? '' : 'none';
+  if (upTab !== 'rage') return;
+  const cur = rgKind();
+  e.innerHTML = '<span>Tuyệt chiêu đang dùng:</span>' + Object.keys(RGK).map(k => {
+    const own = S.sk[RGK[k].sk] > 0;
+    return `<button type="button" class="rgc${k === cur ? ' on' : ''}${own ? '' : ' lk'}" data-a="rgpick" data-k="${k}" style="--c:${RGK[k].c}">${RGK[k].n}${own ? '' : ' 🔒'}</button>`;
+  }).join('');
+}

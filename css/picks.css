@@ -1,0 +1,22 @@
+/* ===== Long Nộ (nút bấm, chọn kiểu) và chọn phần thưởng mỗi 10 đợt ===== */
+#rgb { position: absolute; right: 2.4%; bottom: 14%; z-index: 25; width: 5.2em; height: 5.2em; padding: 0; border: 0; border-radius: 50%; display: grid; place-items: center; cursor: pointer; font-family: Montserrat, sans-serif; -webkit-tap-highlight-color: transparent;
+  background: conic-gradient(#ffb23a calc(var(--p, 0) * 1%), #1b2240 0); box-shadow: 0 0 0 .18em #000, 0 0 0 .34em #d9a640, 0 .5em 1em #000a; transition: transform .08s }
+#rgb::before { content: ""; position: absolute; inset: .5em; border-radius: 50%; background: var(--img) center / cover, #0b1022; filter: brightness(.45) saturate(.7) }
+#rgb.ready::before { filter: none }
+#rgb b, #rgb small { position: relative; z-index: 1; color: #fff; text-shadow: 0 .1em .3em #000, 0 0 .4em #000 }
+#rgb b { font-weight: 900; font-size: 1.1em }
+#rgb small { position: absolute; bottom: -1.9em; left: 50%; transform: translateX(-50%); z-index: 1; white-space: nowrap; font-weight: 800; font-size: .62em; letter-spacing: .08em; color: #ffe08a; text-shadow: 0 .1em .2em #000 }
+#rgb:active { transform: scale(.93) }
+#rgb.ready { animation: rgp .9s ease-in-out infinite }
+#rgb.busy { opacity: .75 }
+@keyframes rgp { 0%, 100% { box-shadow: 0 0 0 .18em #000, 0 0 0 .34em #ffd23a, 0 0 .8em #ffd23a99, 0 .5em 1em #000a } 50% { box-shadow: 0 0 0 .18em #000, 0 0 0 .34em #fff2a0, 0 0 2.2em #ffd23a, 0 .5em 1em #000a } }
+.rgsel { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: .6em; margin: .2em 0 0; font: 700 .8em Montserrat, sans-serif; color: #cdd6f4 }
+.rgc { padding: .4em 1em; border-radius: .7em; cursor: pointer; font: 800 1em Montserrat, sans-serif; color: #e8ecff; background: #141a33; border: .15em solid var(--c, #888); opacity: .65 }
+.rgc.on { opacity: 1; background: color-mix(in srgb, var(--c) 30%, #141a33); box-shadow: 0 0 .8em color-mix(in srgb, var(--c) 70%, transparent) }
+.rgc.lk { filter: grayscale(.8); opacity: .45 }
+#pick .pkt { margin: 0; font-size: 1.5em; letter-spacing: .06em; color: #ffe08a; text-shadow: 0 .1em 0 #5a2a05, 0 0 .6em #ffd23a66 }
+.pkc { display: flex; justify-content: center; gap: 1.5em; margin: 1.1em 0 .7em }
+.pkc .card.pk { flex: 0 0 auto }
+.pkc .card.pk.r2 { filter: drop-shadow(0 0 .7em #7ab8ff88) }
+.pkc .card.pk.r3 { filter: drop-shadow(0 0 .9em #d79aff) }
+.pkb { max-width: 56em; margin: .8em 0 0; text-align: center; font: 600 .78em/1.5 Montserrat, sans-serif; color: #9aa6cf }

@@ -27,10 +27,12 @@ const ACH = [
   { id: "heal", n: "Sinh Lực Dồi Dào", ic: "♥", d: "Hồi tổng cộng {n} HP", t: [1e3, 1e5, 1e7], v: () => S.pr.hl, tt: "Bất Diệt" },
   { id: "rv", n: "Bất Tử", ic: "☥", d: "Hồi sinh {n} lần nhờ Phượng Hoàng Lửa", t: [1, 10, 50], v: () => S.pr.rv, tt: "Phượng Hoàng" },
   { id: "gale", n: "Lốc Xoáy", ic: "◎", d: "Kích hoạt Cuồng Phong Hộ Thân {n} lần", t: [20, 200, 1e3], v: () => S.pr.gl, tt: "Lốc Xoáy" },
+  { id: "rage", n: "Cơn Thịnh Nộ", ic: "♨", d: "Xả Long Nộ {n} lần", t: [10, 100, 500], v: () => S.pr.rg, tt: "Thịnh Nộ" },
+  { id: "pick", n: "Nhà Chiến Thuật", ic: "◈", d: "Chọn {n} phần thưởng (mỗi 10 đợt)", t: [10, 100, 500], v: () => S.pr.pk, tt: "Chiến Thuật" },
   { id: "time", n: "Bền Bỉ", ic: "⏱", d: "Chơi tổng cộng {n} giờ", t: [1, 10, 50], v: () => S.pr.pt / 3600, tt: "Bền Bỉ" },
   { id: "up", n: "Nhà Nâng Cấp", ic: "▲", d: "Nâng cấp thẻ {n} lần", t: [100, 1e3, 5e3], v: () => S.pr.up, tt: "Nâng Cấp" },
   { id: "evo", n: "Tiến Hóa", ic: "❖", d: "Đạt bậc tiến hóa {n}", t: [2, 4, 7], v: () => S.evo, tt: "Long Vương" },
-  { id: "skm", n: "Bậc Thầy Kỹ Năng", ic: "★", d: "Đưa {n} kỹ năng lên cấp tối đa", t: [1, 4, 8], v: () => cntMax(SK, (k) => S.sk[k]), tt: "Thầy Kỹ Năng" },
+  { id: "skm", n: "Bậc Thầy Kỹ Năng", ic: "★", d: "Đưa {n} kỹ năng lên cấp tối đa", t: [1, 6, 12], v: () => cntMax(SK, (k) => S.sk[k]), tt: "Thầy Kỹ Năng" },
   { id: "cdm", n: "Đại Cao Thủ", ic: "▤", d: "Đưa {n} thẻ nâng cấp lên cấp tối đa", t: [3, 8, 12], v: () => cntMax(UP, (k) => S.lv[k]), tt: "Cao Thủ" },
   { id: "cxs", n: "Nhà Sưu Tầm", ic: "❏", d: "Gặp {n} trang trong Sách Quái", t: [7, 14, 28], v: () => cxFound(), tt: "Sưu Tầm" },
   { id: "cxm", n: "Học Giả", ic: "✎", d: "Thông thạo {n} trang Sách Quái", t: [3, 10, 28], v: () => cxMastered(), tt: "Học Giả" },
@@ -203,6 +205,8 @@ const QD = {
   kill3: { tier: 3, ev: "kill", t: (n) => `Hạ ${n} quái`, g: () => rd(800 * pwf(), 50) },
   gale3: { tier: 3, ev: "gale", t: (n) => `Kích hoạt Cuồng Phong ${n} lần`, g: () => 6, req: () => S.sk.gale > 0 },
   intr3: { tier: 3, ev: "intr", t: (n) => `Ngắt ${n} chiêu Boss bằng Choáng`, g: () => 6, req: () => S.lv.stun > 0 && S.pr.bw >= 12 },
+  rage2: { tier: 2, ev: "rage", t: (n) => `Xả Long Nộ ${n} lần`, g: () => 2, req: () => S.sk.rage > 0 },
+  rage3: { tier: 3, ev: "rage", t: (n) => `Xả Long Nộ ${n} lần`, g: () => 4, req: () => S.sk.rage > 0 },
   crit3: { tier: 3, ev: "crit", t: (n) => `Tung ${n} đòn chí mạng`, g: () => rd(1500 * pwf(), 100) }
 };
 const QR = [30, 50, 90], QBONUS = 120;   // thưởng theo "đơn vị vàng"
@@ -305,6 +309,8 @@ function ev(t, n, m) {
       qEv("wave", n);
       break;
     case "surv": qEv("surv", n); break;
+    case "rage": P.rg++; qEv("rage", 1); break;
+    case "pick": P.pk++; break;
     case "tap": P.tp++; break;
     case "run": P.runs++; if (new Date().getHours() < 4) P.nl = 1; break;
     case "dead": if (n <= 1) P.fd = 1; break;

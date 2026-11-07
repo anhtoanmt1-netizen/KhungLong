@@ -1,7 +1,7 @@
 /* ===== Rương kho báu: xuất hiện, chạy tới, chạm để mở, thưởng vàng. ===== */
 function chestRoll() {
   const w = R.wave, p = w <= CFG.chestW ? CFG.chestP : Math.max(CFG.chestMin, CFG.chestP - (w - CFG.chestW) * CFG.chestDec);
-  if (rnd() < p) R.cq.push(1 + rnd() * 9);
+  if (rnd() < p * (1 + BF.chestM)) R.cq.push(1 + rnd() * 9);
 }
 function chestUpd(dt) {
   const r = R;
@@ -39,7 +39,7 @@ function chestUpd(dt) {
   r.ch = r.ch.filter((c) => !c.dead);
 }
 function chestPop(c) {
-  const r = R, o = CHR[Math.floor(rnd() * CHR.length)], u = 5 * SC.gd(r.t) * DF().gd, g = o.g ? Math.round(o.g * u) : Math.min(Math.round(S.gold * (o.x - 1)), Math.round(100 * u));
+  const r = R, o = CHR[Math.floor(rnd() * CHR.length)], u = 5 * SC.gd(r.t) * DF().gd * (1 + BF.chestG), g = o.g ? Math.round(o.g * u) : Math.min(Math.round(S.gold * (o.x - 1)), Math.round(100 * u));
   S.gold = Math.min(1e12, S.gold + g);
   r.gold += g;
   ev("chest", g);

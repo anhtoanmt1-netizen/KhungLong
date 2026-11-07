@@ -21,7 +21,7 @@ function renderDf() {
 }
 
 function act(a, k, i) {
-  if (hubAct(a, k)) return;   // Hồ sơ (js/hub.js)
+  if (hubAct(a, k) || pickAct(a, k)) return;   // Hồ sơ (js/hub.js), chọn phần thưởng (js/picks.js)
   switch (a) {
     case 'play': startRun(); break;
     case 'play1': S.rw = 1; save(); startRun(); break;
@@ -36,6 +36,8 @@ function act(a, k, i) {
       break;
     case 'tab': setTab(k, TABS.findIndex(t => t.id === k) - TABS.findIndex(t => t.id === upTab)); break;
     case 'card': buyCard(k); break;
+    case 'rage': castRage(); break;
+    case 'rgpick': S.rg = k; save(); sfx('ui'); rgSel(); break;
     case 'cprev': cardScroll(-1); break;
     case 'cnext': cardScroll(1); break;
 
@@ -98,6 +100,8 @@ document.addEventListener('click', e => {
   if (a && !a.disabled) act(a.dataset.a, a.dataset.k, a.dataset.i);
 });
 document.addEventListener('keydown', e => {
+  // Phím tắt Long Nộ: R hoặc Space khi đang chơi
+  if ((e.key === 'r' || e.key === 'R' || e.code === 'Space') && scr === null && R && R.al && !(e.target && /INPUT|TEXTAREA/.test(e.target.tagName))) { if (castRage()) e.preventDefault(); }
   if (e.key !== 'Escape') return;
   if (R && R.al && scr === null) act('pause');
   else if (scr === 'crop') act('cancrop');

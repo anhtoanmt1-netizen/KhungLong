@@ -11,6 +11,8 @@ function startRun() {
   R.shk = 0;     // thời gian rung màn hình
   R.th = R.dr = R.ph = R.hp;
   R.tl = 0;
+  bfTrim(S.rw);   // phần thưởng chọn ở đợt sau đợt bắt đầu bị mất
+  R.rgM = 0; R.rgA = null; R.bw = 25;   // Long Nộ, Tấm Khiên
   R.t0 = R.t;     // mốc bắt đầu lượt (nhiệm vụ "sống sót X phút")
   R.lost = 0;     // tổng HP đã mất trong lượt (thành tựu "không xây xước")
   R.ac = 2;
@@ -38,7 +40,7 @@ function spawn(king, tiO, xO) {
     if (u.length && rnd() < 0.5) ti = u[Math.floor(rnd() * u.length)][0];
   }
   if (tiO != null) ti = tiO;
-  const d = SL[ti], bo = d[7] === "boss" || ti === 7 || ti === 15, hm = SC.hp(r.t) * (bo ? SC.bh(r.t) : 1) * DF().hp, dmm = SC.dm(r.t) * (bo ? SC.bd(r.t) : 1) * DF().dm;
+  const d = SL[ti], bo = d[7] === "boss" || ti === 7 || ti === 15, hm = SC.hp(r.t) * (bo ? SC.bh(r.t) : 1) * DF().hp * (1 + BF.hpMon), dmm = SC.dm(r.t) * (bo ? SC.bd(r.t) : 1) * DF().dm;
   if (king) {
     sfx("boss", ti);
     r.bb = { s: "⚠ BOSS · " + d[0].toUpperCase(), t: 3, c: d[1] };
@@ -48,7 +50,7 @@ function spawn(king, tiO, xO) {
   } else if (d[8]) sfx("flyer", ti);
   if (d[2] > SL[r.tier][2]) r.tier = ti;
   cxSeen(ti);   // Sách Quái: gặp lần đầu thì mở trang
-  const mo = { ti, k: d[7] || "", z: d[8] || 0, z0: d[8] || 0, dv: 0, ai: { bee: 0.7, bird: 0.8, dragon: 0.8 }[d[7]] || 1, x: xO != null ? xO : W + 12, hp: d[2] * hm, mx: d[2] * hm, dm: d[3] * dmm, sp: d[5] * 2 * SC.sp(r.t), gd: d[4] * SC.gd(r.t) * DF().gd, w: d[6], h: Math.round(d[6] * 0.7), cd: 0, fl: 0, ph: rnd() * 6, of: rnd() * 10, st: 0, si: 0, bp: 0, bn: 0, ba: 0, bt: 0, bf: 0, xc: 0, kv: 0, l0: r.lost };
+  const mo = { ti, k: d[7] || "", z: d[8] || 0, z0: d[8] || 0, dv: 0, ai: { bee: 0.7, bird: 0.8, dragon: 0.8 }[d[7]] || 1, x: xO != null ? xO : W + 12, hp: d[2] * hm, mx: d[2] * hm, dm: d[3] * dmm, sp: d[5] * 2 * SC.sp(r.t) * (1 + BF.spdM), gd: d[4] * SC.gd(r.t) * DF().gd, w: d[6], h: Math.round(d[6] * 0.7), cd: 0, fl: 0, ph: rnd() * 6, of: rnd() * 10, st: 0, si: 0, bp: 0, bn: 0, ba: 0, bt: 0, bf: 0, xc: 0, kv: 0, l0: r.lost };
   if (d[7] === "boss") {
     // Boss: kích thước theo ảnh (có thể chỉnh trong Mod), vùng trúng đòn theo hình ảnh
     const b = BOSS[ti - BOSS0], im = BI[b.i], sz = bossPx(b.i), asp = ld(im) ? im.naturalHeight / im.naturalWidth : 0.92;
@@ -101,6 +103,7 @@ function kill(m, s) {
   R.kills++;
   S.st.kills++;
   ev("kill", g, m);
+  rageGain(m.k === "boss" ? 6 : 0.8);
   dirty = 1;
   tx(m.x, GY - (m.z || 0) - m.h - 14, "+" + g, "#ffd23a");
   const n = S.set.rm ? 3 : 10;
@@ -143,7 +146,7 @@ function fire(s, tg) {
   const r = R, kd = dk(), iw = (IM[0].width || 80) * kd, ox = DX + iw * 0.35, oy = GY - (IM[0].height || 70) * kd * 0.75, ts = r.mon.filter((m) => !m.dead && m.x > front() + 8 && m.x < W - 4).sort((p, q) => p.x - q.x);
   for (let i = 0; i < s.n; i++) {
     const t = ts[i % ts.length] || tg, a = Math.atan2(GY - (t.z || 0) - t.h / 2 - oy, t.x - ox) + (i - (s.n - 1) / 2) * 0.06;
-    r.lv.push({ x: ox, y: oy, vx: Math.cos(a) * CFG.leafSpd, vy: Math.sin(a) * CFG.leafSpd, a, tg: t, p: S.sk.pierce ? SKV.pierce(S.sk.pierce).n : 1, hs: [], ag: 0, pc: S.sk.pierce ? 1 : 0, k: r.buf > 0 ? "a" : "" });
+    r.lv.push({ x: ox, y: oy, vx: Math.cos(a) * CFG.leafSpd, vy: Math.sin(a) * CFG.leafSpd, a, tg: t, p: (S.sk.pierce ? SKV.pierce(S.sk.pierce).n : 1) + bfPierce(), hs: [], ag: 0, pc: S.sk.pierce ? 1 : 0, k: r.buf > 0 ? "a" : "" });
   }
   for (let i = 0; i < 6; i++) r.fx.push({ x: ox + 2, y: oy + (rnd() - 0.5) * 6, vx: 60 + rnd() * 110, vy: (rnd() - 0.5) * 70, g: -20, l: 0.25 + rnd() * 0.15, c: i % 2 ? "#ffd23a" : "#ff8a2a", s: 2 });
   r.atk = 0.15;
@@ -235,6 +238,7 @@ function upd(dt) {
   if (wv > r.wave) {
     r.wave = wv;
     ev("wave", wv);
+    if (wv % 10 === 0) pickOpen(wv);   // chọn 1 trong 3 phần thưởng
     r.bn = 2;
     sfx("wave");
     chestRoll();
@@ -261,7 +265,7 @@ function upd(dt) {
     const kd = dk(), ox = DX + (IM[0].width || 80) * kd * 0.35, oy = GY - (IM[0].height || 70) * kd * 0.75;
     for (let i = 0; i < sg.n; i++) {
       const a = (i - (sg.n - 1) / 2) * (sg.n > 10 ? 0.05 : 0.06) + 0.1;
-      r.lv.push({ x: ox, y: oy, vx: Math.cos(a) * CFG.leafSpd, vy: Math.sin(a) * CFG.leafSpd, a, p: S.sk.pierce ? SKV.pierce(S.sk.pierce).n : 1, hs: [], ag: 0, pc: S.sk.pierce ? 1 : 0, k: "s" });
+      r.lv.push({ x: ox, y: oy, vx: Math.cos(a) * CFG.leafSpd, vy: Math.sin(a) * CFG.leafSpd, a, p: (S.sk.pierce ? SKV.pierce(S.sk.pierce).n : 1) + bfPierce(), hs: [], ag: 0, pc: S.sk.pierce ? 1 : 0, k: "s" });
     }
     r.ex.push({ x: ox + 4, y: oy, t: 0, sc: 0.9, col: "s", ring: "#ffe066", rr: 34 });
     tx(DX, GY - 60, "BÃO LỬA", "#ffb040");
@@ -284,6 +288,8 @@ function upd(dt) {
   }
   galeUpd(dt, s);
   bossFxUpd(dt, s);
+  rageUpd(dt, s);
+  if (BF.wall > 0 && (r.bw -= dt) <= 0) { r.bw = 25; r.sh = Math.max(r.sh, 2 + 0.5 * BF.wall); tx(DX, GY - 60, "TẤM KHIÊN", "#8effd0"); }
   if (r.gw && (r.gw.t += dt) >= r.gw.l) r.gw = null;
   r.sp -= dt;
   if (r.sp <= 0 && r.mon.length < CFG.maxMon) {
