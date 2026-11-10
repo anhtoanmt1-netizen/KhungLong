@@ -12,7 +12,7 @@ function show(id) {
 let newDf = 0;
 function dfLabel() {
   const e = $('dfl'), d = DF();
-  e.textContent = 'Chế độ: ' + d.n;
+  e.textContent = 'Chế độ: ' + d.n + (S.rb.n || S.rb.s ? ' · Kiếp ' + (S.rb.n + 1) + ' · Linh Hồn ' + S.rb.s : '');
   e.style.setProperty('--c', d.c);
 }
 function renderDf() {
@@ -21,7 +21,7 @@ function renderDf() {
 }
 
 function act(a, k, i) {
-  if (hubAct(a, k) || pickAct(a, k)) return;   // Hồ sơ (js/hub.js), chọn phần thưởng (js/picks.js)
+  if (hubAct(a, k) || pickAct(a, k) || evoAct(a, k)) return;   // Hồ sơ (js/hub.js), chọn phần thưởng (js/picks.js)
   switch (a) {
     case 'play': startRun(); break;
     case 'play1': S.rw = 1; save(); startRun(); break;

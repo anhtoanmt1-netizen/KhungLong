@@ -67,7 +67,7 @@ function startCast(m, bs) {
   const ready = m.b.sk.filter((k) => !(bs.cds[k] > 0));
   if (!ready.length) { bs.nt = 1; return; }
   const k = ready[Math.floor(rnd() * ready.length)], d = BSK[k];
-  bs.cds[k] = d.cd * DF().si;
+  bs.cds[k] = d.cd * DF().si * bioM(R.wave).bcd;
   bs.nt = 2.5 + rnd() * 1.5;
   bs.c = { k, t: 0, fired: 0, vf: null, stopped: 0 };
   tx(m.x, GY - (m.z || 0) - m.h - 22, d.n.toUpperCase() + "!", d.c);

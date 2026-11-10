@@ -1,4 +1,4 @@
-# Pixel Dino Survivor (v2.5 - Long Nộ bấm tay, chọn phần thưởng mỗi 10 đợt)
+# Pixel Dino Survivor (v2.6 - Tái Sinh, tiến hóa phân nhánh, vùng đất)
 Game 2D pixel art, tự động chiến đấu, PWA chạy offline. Không cần build: HTML/CSS/JS thuần, đã tách thành nhiều file.
 
 ## Chạy thử
@@ -6,7 +6,7 @@ Game 2D pixel art, tự động chiến đấu, PWA chạy offline. Không cần
 
 ## Đưa lên GitHub và triển khai
 ```
-git init && git add . && git commit -m "Pixel Dino Survivor v2.5" && git branch -M main
+git init && git add . && git commit -m "Pixel Dino Survivor v2.6" && git branch -M main
 git remote add origin https://github.com/<tên-bạn>/pixel-dino-survivor.git && git push -u origin main
 ```
 Vào Settings > Pages, chọn nhánh main, thư mục root. Mở link HTTPS trên Android Chrome > Menu > Cài đặt ứng dụng.
@@ -24,6 +24,7 @@ js/    (nạp theo đúng thứ tự trong index.html)
   audio.js · fire.js · icons.js · render.js (có bossDraw) · chest.js · music.js · custom.js · settings.js
   mod.js              Bảng Mod ẩn (mật khẩu, bật/tắt, nhập vàng, cỡ khủng long, cỡ Boss, Nhập đợt)
   keypad.js           (v2.1) bàn phím số riêng cho mọi ô nhập số / mật khẩu (css/keypad.css)
+  evo.js              (v2.6) hệ nguyên tố, vùng đất, Tái Sinh và thiên phú (css/evo.css)
   rage.js             (v2.5) Long Nộ: thanh nộ, 3 kiểu xả, hiệu ứng, nút bấm
   picks.js            (v2.5) chọn 1 trong 3 phần thưởng mỗi 10 đợt (css/picks.css)
   hub.js              (v2.4) Hồ sơ: thành tựu, nhiệm vụ hằng ngày, Sách Quái, thông báo nhanh (css/hub.css)
@@ -37,7 +38,7 @@ assets1/  (32 file) nhân vật, quái, môi trường, âm thanh
   dino/   run0-4.png, die.png      boss/  boss01-12.png (ảnh 12 Boss, nền trong suốt)
   world/  background.jpg, tree.png, grass2.jpg, leaf.png
   fx/     fire.png (atlas đạn), chest1-7.png      audio/  bgm.mp3, fire_breath.mp3
-assets2/  (46 file) giao diện
+assets2/  (giao diện; ico/ = 19 icon thiên phú / hệ nguyên tố / vùng đất từ skill_library)
   cards/  frame_*.png (8 khung), art_*.png (21 ảnh thẻ; 6 ảnh mới lấy từ skill_library)      ui/  btn_*.png, coin.png
 ```
 Mỗi thư mục assets có tối đa 100 file (gồm cả thư mục con). Hiện còn dư chỗ để thêm ảnh/âm thanh mới.
@@ -127,6 +128,30 @@ Tiếng bắn dùng `assets1/audio/fire_breath.mp3`, nhạc nền mặc định 
 - **Hiệu ứng điểm ảnh** (`js/vfx/`): chạy bằng ES module (`<script type="module">`) nên cần mở game qua http/https (GitHub Pages ổn); mở thẳng `file://` thì chiêu vẫn hoạt động nhưng không có hình. Mỗi hiệu ứng vẽ lại tối đa 30 lần/giây, tối đa 6 hiệu ứng cùng lúc, tự bỏ qua nếu chưa nạp xong. Lời Nguyền và Hút Máu tô màu lên đúng hình khủng long / Boss nhờ mặt nạ dựng từ sprite (`VFX.actorOf`).
 - Ghi công: `js/vfx/` dùng bộ hiệu ứng điểm ảnh có phần mượn từ Sprite Fusion (https://www.spritefusion.com/pixel-art-vfx), giấy phép MIT, Copyright (c) 2026 Hugo Duprez; các dòng ghi công được giữ nguyên trong từng file.
 
+## Giữ chân lâu dài: Tiến hóa phân nhánh · Vùng đất · Tái Sinh (v2.6)
+Logic và giao diện ở `js/evo.js`, dữ liệu ở `config.js` (`BIO`, `BRN`, `EVOB`, `TAL`), lưu trong `S.br` và `S.rb`.
+### Tiến hóa phân nhánh (hệ nguyên tố)
+- Khi mua bậc tiến hóa **Huyền Thoại** (bậc 4) game hiện màn **Chọn hệ nguyên tố**; mỗi kiếp một hệ (tiếp tục tiến hóa lên bậc 5–7 cần có hệ). Mỗi hệ có hào quang màu riêng quanh khủng long, màu quầng/chấm quay theo hệ, và tên bậc 5–7 riêng.
+  - **Hỏa Long**: +10% sát thương, thiêu đốt thêm 35%. Tên: Long Hỏa → Hỏa Vương → Viêm Đế.
+  - **Băng Long**: 30% cơ hội làm chậm quái 35% trong 2 giây (Boss 0,8 giây), +6% choáng. Tên: Băng Long → Băng Vương → Hàn Đế.
+  - **Lôi Long**: +6% chí mạng, 25% cơ hội đòn đánh phóng sét nảy sang 2 quái gần nhất (40% sát thương). Tên: Lôi Long → Lôi Vương → Thiên Lôi Đế.
+  - **Ám Long**: +6% hút máu, +5% sát thương, gây thêm 50% sát thương lên quái dưới 30% máu. Tên: Ám Long → Ám Vương → U Minh Đế.
+- Save cũ đã tiến hóa tới bậc 4+ sẽ được hỏi chọn hệ ở đầu lượt chơi kế tiếp.
+### Vùng đất (mỗi 50 đợt)
+| Vùng | Đợt | Thay đổi |
+|---|---|---|
+| Rừng Xanh | 1–50 | không đổi |
+| Băng Nguyên | 51–100 | nền xanh lạnh, tuyết phủ và tuyết rơi; quái trâu hơn 10%, chậm hơn 10%, vàng +10% |
+| Dung Nham | 101–150 | nền đỏ cam, mặt đất nham thạch, tàn lửa bay; quái nhanh hơn và đau hơn 10%, vàng +20% |
+| Hư Không | 151+ | nền tím tối, sao lấp lánh; quái trâu và đau hơn 10%, nhanh hơn 5%, Boss dùng chiêu dồn dập hơn 15%, vàng +30% |
+Chuyển vùng có banner và nền đổi dần trong 2,5 giây. Hồ sơ có tab **VÙNG ĐẤT** (vùng chưa tới hiện "???"). Tùy chọn "Giảm hiệu ứng" tắt hạt thời tiết.
+### Tái Sinh và thiên phú
+- Điều kiện: tiến hóa tới Huyền Thoại và đạt **đợt 50 trong kiếp này**. Nút **Tái Sinh** ở menu (có chấm xanh khi đủ điều kiện); bấm 2 lần để xác nhận.
+- **Đặt lại**: vàng, nâng cấp, kỹ năng, tiến hóa, hệ nguyên tố, phần thưởng chọn mỗi 10 đợt. **Giữ lại**: Linh Hồn, thiên phú, thành tựu, Sách Quái, nhiệm vụ, cài đặt, số quái hạ trọn đời (số quái cần cho tiến hóa chỉ tính trong kiếp hiện tại).
+- Linh Hồn nhận được = (đợt cao nhất kiếp^1,25 ÷ 4,5 + 5 × bậc tiến hóa) × (1 + 10% mỗi cấp "Linh Hồn"). Ví dụ đợt 120 ở bậc 6: khoảng 118 Linh Hồn; đợt 150 ở bậc 7: khoảng 170.
+- 11 **thiên phú** vĩnh viễn (giá = giá cấp 1 × (1 + 0,3 × cấp); Lựa Chọn tính tuyến tính): Móng Vuốt (+5% sát thương/cấp, tối đa 30) · Da Rồng (+5% HP) · Vàng Rồng (+10% vàng) · Mắt Ưng (+1% chí mạng) · Tiết Kiệm (-2% giá nâng cấp) · Tiến Hóa Sớm (-5% quái cần hạ) · Nộ Khí Rồng (Long Nộ nạp nhanh +5%) · Lựa Chọn (+1 lượt đổi phần thưởng) · Vận May (rương nhiều hơn 10%) · Linh Hồn (+10% Linh Hồn) · Di Sản (mỗi kiếp bắt đầu với Sức mạnh và Sinh lực cấp 2 × cấp thiên phú).
+- Thành tựu mới: Tái Sinh, Du Hành (đạt các vùng đất mới), Nhà Nguyên Tố (thử các hệ).
+
 ## Long Nộ và phần thưởng mỗi 10 đợt (v2.5)
 ### Long Nộ (`js/rage.js`, nhánh thẻ "LONG NỘ")
 - Thẻ **Long Nộ** (cấp 1–10, cần tiến hóa Chiến Binh) mở thanh nộ và nút **LONG NỘ** tròn ở góc phải màn hình (hoặc phím **R / Space**). Mỗi cấp tăng sức mạnh +25% (x1 → x3,25) và tốc độ nạp +6%.
@@ -170,6 +195,9 @@ Vào từ menu (3 nút mới), từ màn Tạm dừng và Game Over. Dữ liệu
 - Tự hiện khi chạm vào ô số (hoặc khi hộp thoại tự đặt con trỏ vào ô, như Nhập đợt / Mật khẩu), tự ẩn khi bấm OK, bấm ra ngoài hoặc đổi màn hình. Chạm số đầu tiên sẽ thay giá trị có sẵn. OK phát phím Enter nên các bộ xử lý cũ (`mod.js`, `custom.js`) không cần sửa; giá trị đổi được lưu qua sự kiện `change` như khi gõ thật.
 - Máy tính: gõ phím số, Backspace, Enter (OK), Esc (đóng) cũng hoạt động. Các ô được đặt `readonly` + `inputmode="none"` để trình duyệt di động không mở bàn phím hệ thống.
 - Thêm ô số mới: chỉ cần dùng `<input type="number">` (hoặc `password`) có `inputmode="none" readonly`, `aria-label` (hiện làm tên ô) và `min`/`max` (quyết định số chữ số tối đa).
+
+## Nhật ký v2.6
+- Tiến hóa phân nhánh (4 hệ nguyên tố), 4 vùng đất theo đợt (nền, hạt thời tiết, hệ số riêng), Tái Sinh với 11 thiên phú vĩnh viễn; icon từ skill_library. Cache `pds-v27`.
 
 ## Nhật ký v2.5
 - Long Nộ: thanh nộ + nút bấm + 3 kiểu xả (Hơi Thở Lửa, Sao Băng, Bão Sét) + nhánh thẻ mới; chọn 1 trong 3 phần thưởng mỗi 10 đợt (18 phần thưởng, đánh đổi, cộng dồn có giảm). Cache `pds-v26`.

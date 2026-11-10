@@ -89,7 +89,9 @@ function pkRender() {
   if (!PK) return;
   $("pkt").textContent = "CHỌN MỘT PHẦN THƯỞNG · ĐỢT " + PK.w;
   $("pkc").innerHTML = PK.opts.map(pkCard).join("");
-  $("pkrr").style.display = PK.rr ? "none" : "";
+  const left = 1 + TL("tpick") - PK.rr;
+  $("pkrr").style.display = left > 0 ? "" : "none";
+  $("pkrr").textContent = "↻ Đổi 3 lựa chọn (còn " + left + ")";
   const cnt = {};
   for (const b of S.bf) cnt[b.id] = (cnt[b.id] || 0) + 1;
   const ids = Object.keys(cnt);
@@ -108,10 +110,10 @@ function pickChoose(i) {
   show(null);
 }
 function pickReroll() {
-  if (!PK || PK.rr) return;
+  if (!PK || PK.rr >= 1 + TL("tpick")) return;
   const o = pkOffer(PK.opts);
   PK.opts = o.length === 3 ? o : pkOffer();
-  PK.rr = 1;
+  PK.rr++;
   pkRender();
   try { sfx("ui") } catch (e) { }
 }

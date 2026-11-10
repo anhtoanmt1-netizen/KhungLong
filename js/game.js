@@ -18,6 +18,7 @@ function startRun() {
   R.ac = 2;
   ev("run");
   dqEnsure();
+  R.needBr = S.evo >= 4 && !S.br ? 1 : 0;   // chọn hệ nguyên tố (mở ở khung hình đầu tiên)
   chestRoll();
   show(null);
 }
@@ -40,7 +41,7 @@ function spawn(king, tiO, xO) {
     if (u.length && rnd() < 0.5) ti = u[Math.floor(rnd() * u.length)][0];
   }
   if (tiO != null) ti = tiO;
-  const d = SL[ti], bo = d[7] === "boss" || ti === 7 || ti === 15, hm = SC.hp(r.t) * (bo ? SC.bh(r.t) : 1) * DF().hp * (1 + BF.hpMon), dmm = SC.dm(r.t) * (bo ? SC.bd(r.t) : 1) * DF().dm;
+  const d = SL[ti], bo = d[7] === "boss" || ti === 7 || ti === 15, bm = bioM(r.wave), hm = SC.hp(r.t) * (bo ? SC.bh(r.t) : 1) * DF().hp * (1 + BF.hpMon) * bm.hp, dmm = SC.dm(r.t) * (bo ? SC.bd(r.t) : 1) * DF().dm * bm.dm;
   if (king) {
     sfx("boss", ti);
     r.bb = { s: "⚠ BOSS · " + d[0].toUpperCase(), t: 3, c: d[1] };
@@ -50,7 +51,7 @@ function spawn(king, tiO, xO) {
   } else if (d[8]) sfx("flyer", ti);
   if (d[2] > SL[r.tier][2]) r.tier = ti;
   cxSeen(ti);   // Sách Quái: gặp lần đầu thì mở trang
-  const mo = { ti, k: d[7] || "", z: d[8] || 0, z0: d[8] || 0, dv: 0, ai: { bee: 0.7, bird: 0.8, dragon: 0.8 }[d[7]] || 1, x: xO != null ? xO : W + 12, hp: d[2] * hm, mx: d[2] * hm, dm: d[3] * dmm, sp: d[5] * 2 * SC.sp(r.t) * (1 + BF.spdM), gd: d[4] * SC.gd(r.t) * DF().gd, w: d[6], h: Math.round(d[6] * 0.7), cd: 0, fl: 0, ph: rnd() * 6, of: rnd() * 10, st: 0, si: 0, bp: 0, bn: 0, ba: 0, bt: 0, bf: 0, xc: 0, kv: 0, l0: r.lost };
+  const mo = { ti, k: d[7] || "", z: d[8] || 0, z0: d[8] || 0, dv: 0, ai: { bee: 0.7, bird: 0.8, dragon: 0.8 }[d[7]] || 1, x: xO != null ? xO : W + 12, hp: d[2] * hm, mx: d[2] * hm, dm: d[3] * dmm, sp: d[5] * 2 * SC.sp(r.t) * (1 + BF.spdM) * bm.sp, gd: d[4] * SC.gd(r.t) * DF().gd * bm.gd, w: d[6], h: Math.round(d[6] * 0.7), cd: 0, fl: 0, ph: rnd() * 6, of: rnd() * 10, st: 0, si: 0, bp: 0, bn: 0, ba: 0, bt: 0, bf: 0, xc: 0, kv: 0, l0: r.lost };
   if (d[7] === "boss") {
     // Boss: kích thước theo ảnh (có thể chỉnh trong Mod), vùng trúng đòn theo hình ảnh
     const b = BOSS[ti - BOSS0], im = BI[b.i], sz = bossPx(b.i), asp = ld(im) ? im.naturalHeight / im.naturalWidth : 0.92;
@@ -120,7 +121,7 @@ function kill(m, s) {
   } else sfx("kill", m);
 }
 function hit(m, s) {
-  const cr = rnd() < s.cr, d = Math.round(s.dmg * (cr ? s.cd : 1) * mdm(m)), a = Math.min(d, m.hp);
+  const cr = rnd() < s.cr, d = Math.round(s.dmg * (cr ? s.cd : 1) * mdm(m) * (S.br === "dark" && m.k !== "boss" && m.hp < m.mx * 0.3 ? 1.5 : 1)), a = Math.min(d, m.hp);
   m.hp -= d;
   m.fl = 0.08;
   R.dmgT += a;
@@ -131,6 +132,8 @@ function hit(m, s) {
   sfx(cr ? "crit" : "hit");
   if (m.hp <= 0) { kill(m, s); return; }
   if (s.burn > 0) addBurn(m, d, s);
+  if (S.br === "ice" && rnd() < 0.3) { m.sl = m.k === "boss" ? 0.8 : 2; if (R.fx.length < 380) R.fx.push({ x: m.x, y: GY - (m.z || 0) - m.h / 2, vx: (rnd() - 0.5) * 40, vy: -rnd() * 40, l: 0.4, c: "#bfe6ff", s: 2 }); }
+  if (S.br === "volt" && rnd() < 0.25) chainBolt(m, d * 0.4, s);
   if (s.stunP > 0 && m.si <= 0 && rnd() < s.stunP * (m.k === "boss" ? 0.5 : 1)) stunMon(m, s);
   if (S.sk.exec) execProc(m, s);
 }
@@ -238,6 +241,7 @@ function upd(dt) {
   if (wv > r.wave) {
     r.wave = wv;
     ev("wave", wv);
+    if (bioOf(wv) !== bioOf(wv - 1)) bioEnter(wv);
     if (wv % 10 === 0) pickOpen(wv);   // chọn 1 trong 3 phần thưởng
     r.bn = 2;
     sfx("wave");
@@ -286,6 +290,7 @@ function upd(dt) {
     tx(DX, GY - 60, "TƯỜNG LỬA", "#8effd0");
     sfx("wall");
   }
+  if (r.needBr) { r.needBr = 0; branchOpen("run"); }
   galeUpd(dt, s);
   bossFxUpd(dt, s);
   rageUpd(dt, s);
@@ -335,6 +340,7 @@ function upd(dt) {
     }
     let msp = m.sp;
     if (m.k === "boss") msp *= bossMove(m, dt);
+    if (m.sl > 0) { m.sl -= dt; msp *= 0.65; }
     if (sn) msp = 0;
     if (m.k === "boss") bossSkillUpd(m, dt, s, sn);
     const lim = fx + m.w / 2 + m.of;

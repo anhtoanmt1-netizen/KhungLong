@@ -18,7 +18,7 @@ const rgMult = () => 1 + 0.25 * (Math.max(1, S.sk.rage) - 1);
 function rageGain(a) {
   const r = R;
   if (!r || !S.sk.rage || r.rgA) return;
-  r.rgM = Math.min(100, r.rgM + a * (1 + 0.06 * (S.sk.rage - 1)) * (1 + BF.rageM));
+  r.rgM = Math.min(100, r.rgM + a * (1 + 0.06 * (S.sk.rage - 1)) * (1 + BF.rageM) * (1 + 0.05 * TL("trage")));
 }
 function castRage() {
   const r = R, k = rgKind();

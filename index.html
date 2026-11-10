@@ -16,6 +16,7 @@
 <link rel="stylesheet" href="css/keypad.css">
 <link rel="stylesheet" href="css/hub.css">
 <link rel="stylesheet" href="css/picks.css">
+<link rel="stylesheet" href="css/evo.css">
 </head>
 <body>
 <div id="w">
@@ -67,6 +68,7 @@
       <button class="b" data-a="hub" data-k="q">📜 Nhiệm vụ<i class="hd" data-hd="q"></i></button>
       <button class="b" data-a="hub" data-k="c">📖 Sách Quái</button>
     </div>
+    <button class="b" data-a="rb">🔥 Tái Sinh<i class="hd" data-hd="r"></i></button>
     <button class="b r" data-a="newg">NEW GAME – TRÒ CHƠI MỚI</button>
     <div class="row">
       <button class="b" data-a="set"><i data-ic="gear"></i> Cài đặt</button>
@@ -178,6 +180,29 @@
     <p class="pkb" id="pkb"></p>
   </div>
 
+  <!-- Chọn hệ nguyên tố khi tiến hóa tới Huyền Thoại (js/evo.js) -->
+  <div class="sc" id="branch">
+    <h2 class="pkt">CHỌN HỆ NGUYÊN TỐ</h2>
+    <p class="brs">Dòng máu rồng của bạn thức tỉnh. Chọn một hệ cho kiếp này; Tái Sinh để thử hệ khác.</p>
+    <div class="brc" id="brc"></div>
+  </div>
+
+  <!-- Tái Sinh: Linh Hồn Long và thiên phú vĩnh viễn (js/evo.js) -->
+  <div class="sc" id="rebirth">
+    <div class="panel rb-panel">
+      <header class="ph">
+        <h2 class="ptitle">TÁI SINH</h2>
+        <button class="ibtn" data-a="rbclose" aria-label="Đóng"><img src="assets2/ui/btn_close.png" alt=""></button>
+      </header>
+      <div class="rbsum" id="rbsum"></div>
+      <div class="tlg" id="tlg"></div>
+      <div class="rbfoot">
+        <button type="button" class="b r" id="rbgo" data-a="rbgo">TÁI SINH</button>
+        <p class="rbn" id="rbnote"></p>
+      </div>
+    </div>
+  </div>
+
   <!-- Hồ sơ: Thành tựu · Nhiệm vụ hằng ngày · Sách Quái -->
   <div class="sc" id="hub">
     <div class="panel hub-panel">
@@ -277,6 +302,7 @@
 <script src="js/hub.js"></script>
 <script src="js/picks.js"></script>
 <script src="js/rage.js"></script>
+<script src="js/evo.js"></script>
 <script src="js/cards.js"></script>
 <script src="js/game.js"></script>
 <script src="js/ui.js"></script>

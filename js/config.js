@@ -1,5 +1,5 @@
 /* ===== Cấu hình và số liệu cân bằng: phiên bản, hằng số khung chơi, bảng nâng cấp (UP), quái (SL), kỹ năng (SK), tiến hóa (EVO), rương (CHR). ===== */
-const VERSION = "2.5";
+const VERSION = "2.6";
 const $ = (i) => document.getElementById(i), rnd = Math.random;
 const W = 640, H = 360, GY = 280, DX = 96, K = "pds_save_v1";
 const CFG = { iframe: 0.5, maxMon: 34, crit: 0.05, leafSpd: 340, chestP: 0.3, chestW: 20, chestDec: 0.01, chestMin: 0.03, chestH: 20, chestSpd: 90,
@@ -76,13 +76,47 @@ const SKV = {
   exec: (l) => ({ p: XC[l] / 100, pn: 0.02 + 0.002 * Math.max(0, l - 5), pb: 0.005 + 0.0005 * Math.max(0, l - 5) })
 };
 /* Chế độ độ khó (chọn khi bắt đầu game mới, lưu trong S.df). hp/dm: nhân máu / sát thương quái và Boss; gd: nhân vàng rơi và rương
-   (chế độ khó thưởng nhiều vàng hơn để vẫn max hết nâng cấp trong khoảng 2 giờ); si: nhân thời gian giữa 2 lần sinh quái (nhỏ hơn = đông hơn). */
+   (chế độ khó thưởng nhiều vàng hơn để vẫn max hết nâng cấp trong khoảng 2 giờ); ek: nhân số quái cần hạ để tiến hóa; si: nhân thời gian giữa 2 lần sinh quái (nhỏ hơn = đông hơn). */
 const DIFF = [
-  { n: "Thường", c: "#7ee06a", d: "Cân bằng. Phù hợp để làm quen.", hp: 1, dm: 1, gd: 0.8, si: 1 },
-  { n: "Khó", c: "#ffb23a", d: "Quái trâu và đau hơn, đông hơn; vàng rơi nhiều hơn.", hp: 1.8, dm: 1.5, gd: 0.95, si: 0.85 },
-  { n: "Địa ngục", c: "#ff4a4a", d: "Quái cực mạnh, dồn dập. Thưởng vàng lớn.", hp: 3.2, dm: 2.4, gd: 1.2, si: 0.7 }
+  { n: "Thường", c: "#7ee06a", d: "Cân bằng. Phù hợp để làm quen.", hp: 1, dm: 1, gd: 0.8, si: 1, ek: 1 },
+  { n: "Khó", c: "#ffb23a", d: "Quái trâu và đau hơn, đông hơn; vàng rơi nhiều hơn.", hp: 1.8, dm: 1.5, gd: 0.85, si: 0.85, ek: 1.15 },
+  { n: "Địa ngục", c: "#ff4a4a", d: "Quái cực mạnh, dồn dập. Thưởng vàng lớn.", hp: 3.2, dm: 2.4, gd: 1.05, si: 0.7, ek: 1.1 }
 ];
 const DF = () => DIFF[(S && S.df) | 0] || DIFF[0];
+/* ===== Vùng đất, hệ nguyên tố, thiên phú Tái Sinh (v2.6) ===== */
+/* Vùng đất đổi theo đợt (mỗi 50 đợt): hp/dm/sp/gd = hệ số cho quái (máu, sát thương, tốc độ) và vàng; bcd = hệ số hồi chiêu của chiêu Boss */
+const BIO = [
+  { n: "Rừng Xanh", c: "#7ee06a", from: 1, ic: "bio_0", d: "Nơi mọi chuyến phiêu lưu bắt đầu." },
+  { n: "Băng Nguyên", c: "#8ad0ff", from: 51, hp: 1.1, sp: 0.9, gd: 1.1, ic: "bio_1", d: "Quái trâu hơn 10% nhưng chậm hơn 10%; vàng +10%." },
+  { n: "Dung Nham", c: "#ff7a3a", from: 101, dm: 1.1, sp: 1.1, gd: 1.2, ic: "bio_2", d: "Quái nhanh hơn và đau hơn 10%; vàng +20%." },
+  { n: "Hư Không", c: "#c77dff", from: 151, hp: 1.1, dm: 1.1, sp: 1.05, gd: 1.3, bcd: 0.85, ic: "bio_3", d: "Quái mạnh hơn; Boss dùng chiêu dồn dập hơn 15%; vàng +30%." }
+];
+const bioOf = (w) => { let i = 0; for (let k = 1; k < BIO.length; k++) if (w >= BIO[k].from) i = k; return i; };
+const bioM = (w) => { const b = BIO[bioOf(w)]; return { hp: b.hp || 1, dm: b.dm || 1, sp: b.sp || 1, gd: b.gd || 1, bcd: b.bcd || 1 }; };
+/* Hệ nguyên tố: chọn khi tiến hóa tới bậc Huyền Thoại (bậc 4), mỗi kiếp một hệ; bậc 5–7 mang tên theo hệ */
+const BRN = {
+  fire: { n: "Hỏa Long", c: "#ff7a3a", ic: "br_fire", d: "+10% sát thương; đòn đánh thiêu đốt thêm 35%." },
+  ice: { n: "Băng Long", c: "#8ad0ff", ic: "br_ice", d: "30% cơ hội làm chậm quái 35% trong 2 giây (Boss ngắn hơn); +6% choáng." },
+  volt: { n: "Lôi Long", c: "#ffe14a", ic: "br_volt", d: "+6% chí mạng; 25% cơ hội đòn đánh phóng sét lan sang 2 quái gần nhất." },
+  dark: { n: "Ám Long", c: "#b07cff", ic: "br_dark", d: "+6% hút máu, +5% sát thương; gây thêm 50% sát thương lên quái dưới 30% máu." }
+};
+const EVOB = { fire: ["Long Hỏa", "Hỏa Vương", "Viêm Đế"], ice: ["Băng Long", "Băng Vương", "Hàn Đế"], volt: ["Lôi Long", "Lôi Vương", "Thiên Lôi Đế"], dark: ["Ám Long", "Ám Vương", "U Minh Đế"] };
+const evoName = (i) => (i >= 5 && S.br ? EVOB[S.br][i - 5] : EVO[i][0]);
+const evoCol = (i) => (i >= 4 && S.br ? BRN[S.br].c : EVO[i][3]);
+/* Thiên phú Tái Sinh: m = cấp tối đa, c = giá cấp 1 (Linh Hồn), giá = c × (1 + 0,3 × cấp) (lin: c × (cấp + 1)) */
+const TAL = [
+  { id: "tdmg", n: "Móng Vuốt", m: 30, c: 3, f: (l) => "+" + 5 * l + "% sát thương" },
+  { id: "thp", n: "Da Rồng", m: 30, c: 3, f: (l) => "+" + 5 * l + "% HP tối đa" },
+  { id: "tgold", n: "Vàng Rồng", m: 20, c: 3, f: (l) => "+" + 10 * l + "% vàng" },
+  { id: "tcrit", n: "Mắt Ưng", m: 15, c: 4, f: (l) => "+" + l + "% chí mạng" },
+  { id: "tcost", n: "Tiết Kiệm", m: 15, c: 6, f: (l) => "-" + 2 * l + "% giá nâng cấp" },
+  { id: "tevo", n: "Tiến Hóa Sớm", m: 10, c: 5, f: (l) => "-" + 5 * l + "% quái cần hạ để tiến hóa" },
+  { id: "trage", n: "Nộ Khí Rồng", m: 10, c: 3, f: (l) => "Long Nộ nạp nhanh hơn " + 5 * l + "%" },
+  { id: "tpick", n: "Lựa Chọn", m: 3, c: 40, lin: 1, f: (l) => "+" + l + " lượt đổi khi chọn phần thưởng" },
+  { id: "tluck", n: "Vận May", m: 10, c: 3, f: (l) => "Rương xuất hiện nhiều hơn " + 10 * l + "%" },
+  { id: "tsoul", n: "Linh Hồn", m: 10, c: 8, f: (l) => "+" + 10 * l + "% Linh Hồn khi tái sinh" },
+  { id: "tstart", n: "Di Sản", m: 5, c: 12, f: (l) => "Mỗi kiếp bắt đầu với Sức mạnh và Sinh lực cấp " + 2 * l }
+];
 /* Tiến hóa: [tên, vàng, số quái đã hạ, màu]. Mỗi bậc: +12% sát thương, +30 HP, +1% chí mạng, +5% vàng (xem CFG.evo*). */
 const EVO = [["Cỏ Non", 0, 0, "#58c24a"], ["Thợ Săn", 800, 60, "#4ac2c9"], ["Chiến Binh", 4000, 200, "#ffd23a"], ["Cổ Đại", 18000, 700, "#ff7a3a"], ["Huyền Thoại", 80000, 2000, "#c06aff"], ["Tối Cao", 360000, 5000, "#ffffff"], ["Thần Thú", 1400000, 11e3, "#ff4a8a"], ["Long Vương", 5000000, 19e3, "#3affc8"]];
 /* ----- 12 Boss (v2.1: máu/sát thương/vàng gốc tăng ~2x, thêm SC.bh/SC.bd tăng theo thời gian) (ảnh assets1/boss/boss01..12.png), xếp từ yếu đến mạnh. Chỉ số trong SL = 16 + thứ tự.

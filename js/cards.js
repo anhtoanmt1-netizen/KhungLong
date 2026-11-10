@@ -23,7 +23,7 @@ const CARDS = {
   hp:      { tab: 'def', frame: 'blood',  n: 'Sinh lực',          d: 'Tăng sinh lực tối đa.' },
   regen:   { tab: 'def', frame: 'lotus',  n: 'Hồi phục',          d: 'Tự hồi máu theo thời gian.' },
   def:     { tab: 'def', frame: 'steel',  n: 'Phòng thủ',         d: 'Giảm sát thương nhận vào.' },
-  evo:     { tab: 'sup', frame: 'bronze', n: 'Tiến hóa',          d: 'Mỗi bậc +12% sát thương, +30 HP, +1% chí mạng.' },
+  evo:     { tab: 'sup', frame: 'bronze', n: 'Tiến hóa',          d: 'Mỗi bậc +12% sát thương, +30 HP, +1% chí mạng. Bậc 4: chọn hệ nguyên tố.' },
   gold:    { tab: 'sup', frame: 'jade',   n: 'Kinh tế',           d: 'Nhận thêm vàng khi hạ quái.' },
   steal:   { tab: 'sup', frame: 'blood',  n: 'Hút máu',           d: 'Hồi máu theo sát thương (có trần hồi mỗi giây).' },
   burn:    { tab: 'fx',  frame: 'blood',  n: 'Thiêu đốt',         d: 'Mỗi đòn đánh gây thêm lửa cháy theo thời gian.' },
@@ -52,11 +52,11 @@ function cardInfo(k) {
   if (k === 'evo') {
     const n = EVO[S.evo + 1];
     if (!n) return { lv: S.evo, st: 'max', pr: 'MAX', d2: 'Đã tiến hóa tối đa' };
-    const enoughK = S.st.kills >= n[2], enoughG = S.gold >= n[1];
+    const need = evoNeed(n), lk = lifeKills(), enoughK = lk >= need, enoughG = S.gold >= n[1], noBr = S.evo + 1 > 4 && !S.br;
     return {
-      lv: S.evo, st: enoughK && enoughG ? 'ok' : 'poor', price: n[1], warn: !enoughK,
-      d2: '→ ' + n[0] + ' · hạ ' + Math.min(S.st.kills, n[2]) + '/' + n[2] + ' quái',
-      need: enoughK ? 'Chưa đủ vàng' : 'Chưa đủ quái hạ (' + S.st.kills + '/' + n[2] + ')'
+      lv: S.evo, st: enoughK && enoughG && !noBr ? 'ok' : 'poor', price: n[1], warn: !enoughK || noBr,
+      d2: '→ ' + evoName(S.evo + 1) + ' · hạ ' + Math.min(lk, need) + '/' + need + ' quái',
+      need: noBr ? 'Hãy chọn hệ nguyên tố trước' : enoughK ? 'Chưa đủ vàng' : 'Chưa đủ quái hạ (' + lk + '/' + need + ')'
     };
   }
   if (SK[k]) {
@@ -126,6 +126,7 @@ function buyCard(k) {
     S.gold -= n[1]; S.evo++;
     if (R && R.al) R.hp += CFG.evoHp;
     sfx('evo');
+    if (S.evo === 4 && !S.br) { ev('buy'); save(); renderUp(k, 'ok'); branchOpen('up'); return; }   // chọn hệ nguyên tố
   } else if (SK[k]) {
     S.gold -= skCost(k, S.sk[k]); S.sk[k]++;
     sfx('skill');

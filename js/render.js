@@ -402,7 +402,7 @@ function dino() {
   x.restore();
   if (al && S.evo > 0 && !S.set.rm) for (let i = 0; i < S.evo; i++) {
     const a = CT * 2 + i * 6.28 / S.evo;
-    rc(EVO[S.evo][3], DX + Math.cos(a) * 26 * kd, GY - 32 * kd + Math.sin(a) * 14 * kd, 3, 3);
+    rc(evoCol(S.evo), DX + Math.cos(a) * 26 * kd, GY - 32 * kd + Math.sin(a) * 14 * kd, 3, 3);
   }
   if (r && r.sh > 0 && al) {
     const A = atl("g"), wx = DX + iw * 0.42, fa = Math.min(1, r.sh / 0.5);
@@ -432,6 +432,7 @@ function draw() {
   if (R && R.hitT > 0.18 && !S.set.rm) x.translate(Math.round((rnd() - 0.5) * 4), Math.round((rnd() - 0.5) * 4));
   if (R && R.shk > 0 && !S.set.rm) x.translate(Math.round((rnd() - 0.5) * Math.min(6, R.shk * 12)), Math.round((rnd() - 0.5) * Math.min(6, R.shk * 12)));
   bg();
+  drawBiome();
   chests();
   if (R) {
     for (const g of R.rg) {
@@ -450,6 +451,7 @@ function draw() {
   if (R) for (const m of R.mon) slime(m);
   drawStatus();
   dino();
+  drawBranch();
   drawGale();
   drawBossFx();
   drawRage();

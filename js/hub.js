@@ -36,6 +36,9 @@ const ACH = [
   { id: "cdm", n: "Đại Cao Thủ", ic: "▤", d: "Đưa {n} thẻ nâng cấp lên cấp tối đa", t: [3, 8, 12], v: () => cntMax(UP, (k) => S.lv[k]), tt: "Cao Thủ" },
   { id: "cxs", n: "Nhà Sưu Tầm", ic: "❏", d: "Gặp {n} trang trong Sách Quái", t: [7, 14, 28], v: () => cxFound(), tt: "Sưu Tầm" },
   { id: "cxm", n: "Học Giả", ic: "✎", d: "Thông thạo {n} trang Sách Quái", t: [3, 10, 28], v: () => cxMastered(), tt: "Học Giả" },
+  { id: "rb", n: "Tái Sinh", ic: "↻", d: "Tái Sinh {n} lần", t: [1, 5, 15], v: () => S.rb.n, tt: "Tái Sinh" },
+  { id: "biome", n: "Du Hành", ic: "☄", d: "Đặt chân tới đợt {n} (vùng đất mới)", t: [51, 101, 151], v: () => S.pr.bw, tt: "Du Hành" },
+  { id: "elem", n: "Nhà Nguyên Tố", ic: "❂", d: "Thử {n} hệ nguyên tố khác nhau", t: [2, 3, 4], v: () => [0, 1, 2, 3].filter((i) => (S.pr.brm | 0) & (1 << i)).length, tt: "Nguyên Tố" },
   { id: "hard", n: "Thử Lửa", ic: "♨", d: "Đạt đợt 50 ở chế độ Khó", t: [1], v: () => (S.pr.bwd[1] >= 50 ? 1 : 0), tt: "Thử Lửa" },
   { id: "hell", n: "Xuống Địa Ngục", ic: "☠", d: "Đạt đợt 50 ở chế độ Địa ngục", t: [1], v: () => (S.pr.bwd[2] >= 50 ? 1 : 0), tt: "Địa Ngục" },
   // Thành tựu ẩn: chỉ hiện "???" cho tới khi mở khóa
@@ -305,6 +308,7 @@ function ev(t, n, m) {
     case "buy": P.up++; qEv("buy", 1); break;
     case "wave":
       if (n > P.bw) P.bw = n;
+      if (n > S.rb.lb) S.rb.lb = n;   // đợt cao nhất của kiếp này (Tái Sinh)
       { const di = Math.max(0, DIFF.indexOf(DF())); if (n > P.bwd[di]) P.bwd[di] = n; }
       qEv("wave", n);
       break;
@@ -319,8 +323,8 @@ function ev(t, n, m) {
 
 /* ---------- Giao diện Hồ sơ ---------- */
 let hTab = "q", hFrom = "menu", hSel = 0, hubT = 0;
-const HTABS = [["a", "THÀNH TỰU"], ["q", "NHIỆM VỤ"], ["c", "SÁCH QUÁI"]];
-const hDot = (id) => (id === "q" ? qCan() : id === "a" ? achTotal() > S.ax : 0);
+const HTABS = [["a", "THÀNH TỰU"], ["q", "NHIỆM VỤ"], ["c", "SÁCH QUÁI"], ["v", "VÙNG ĐẤT"]];
+const hDot = (id) => (id === "q" ? qCan() : id === "a" ? achTotal() > S.ax : id === "r" ? (typeof rbOk === "function" && rbOk() ? 1 : 0) : 0);
 function openHub(tab, from) {
   hFrom = from || (scr === "hub" ? hFrom : scr) || "menu";
   if (hFrom === "hub") hFrom = "menu";
@@ -354,6 +358,7 @@ function renderHub() {
   const b = $("hbody");
   if (hTab === "a") b.innerHTML = htmlAch();
   else if (hTab === "q") b.innerHTML = htmlQuest();
+  else if (hTab === "v") b.innerHTML = htmlBiome();
   else { b.innerHTML = htmlCodex(); cxPaint(); }
   b.scrollTop = 0;
   hTick();
@@ -389,6 +394,15 @@ function htmlQuest() {
   h += `<div class="hrow q bonus${q.bn ? " done" : ""}"><span class="hico">★</span><div class="hmid"><b>Rương Ngày</b><small>Hoàn thành cả 3 nhiệm vụ để nhận ${fmtP(bg)} vàng và tăng chuỗi ngày</small></div><div class="hrt">${q.bn ? `<span class="hok">Đã nhận</span>` : all ? `<button type="button" class="b s" data-a="qbonus">Nhận</button>` : `<span class="hpv">${q.q.filter((e) => e.c).length} / 3</span>`}</div></div>`;
   h += `</div><p class="hnote">Mỗi ngày bạn được đổi 1 nhiệm vụ chưa làm (nút "Đổi"). Nhiệm vụ lấy theo tiến độ hiện tại của bạn và đổi mới lúc 0 giờ.</p>`;
   return h;
+}
+function htmlBiome() {
+  const cur = R && R.al ? bioOf(R.wave) : -1;
+  let h = `<div class="hsum"><span>Đợt cao nhất: <b>${S.pr.bw}</b> · Vùng đất đã khám phá: <b>${BIO.filter((b, i) => i === 0 || S.pr.bw >= b.from).length}</b>/${BIO.length}</span><span class="hnote">Mỗi 50 đợt bạn bước sang một vùng đất mới với nền và quái khác</span></div><div class="hlist">`;
+  BIO.forEach((b, i) => {
+    const got = i === 0 || S.pr.bw >= b.from, end = BIO[i + 1] ? BIO[i + 1].from - 1 : null;
+    h += `<div class="hrow bio${got ? " done" : " hid"}"><span class="hico bi"><img src="assets2/ico/${b.ic}.png" alt=""></span><div class="hmid"><b style="color:${got ? b.c : "#7480a8"}">${got ? b.n : "???"}${cur === i ? " · bạn đang ở đây" : ""}</b><small>${got ? b.d : "Đạt đợt " + b.from + " để khám phá vùng đất này."}</small></div><div class="hrt"><span class="hpv">Đợt ${b.from}${end ? "–" + end : "+"}</span></div></div>`;
+  });
+  return h + `</div>`;
 }
 function htmlCodex() {
   const f = cxFound(), m = cxMastered();
